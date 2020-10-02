@@ -1,28 +1,23 @@
-import { ApolloServer, gql } from 'apollo-server-micro'
+import knex from 'knex'
+import knexfile from 'db/knexfile'
+import schema from '../../graphql/schema.graphql'
+import { graphqlHTTP } = require('express-graphql')
 
-const typeDefs = gql`
-  type Query {
-    users: [User!]!
-  }
-  type User {
-    name: String
-  }
-`
+const app = express();
 
-const resolvers = {
-  Query: {
-    users(parent, args, context) {
-      return [{ name: 'Nextjs' }]
-    },
-  },
-}
+app.use(
+  '/graphql',
+  graphqlHTTP({
+    schema: MyGraphQLSchema,
+    graphiql: true,
+  }),
+);
 
-const apolloServer = new ApolloServer({ typeDefs, resolvers })
+app.listen(4000);
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
-
-export default apolloServer.createHandler({ path: '/api/graphql' })
+export default nextConnect()
+    .use('/api/graphql',
+          graphqlHTTP({
+              schema: MyGraphQLSchema,
+              graphiql: true
+    }))

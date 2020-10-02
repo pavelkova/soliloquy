@@ -1,0 +1,12 @@
+type User {
+  id: ID!
+  email: String!
+  entries: [Entry]
+}
+
+type Entry {
+  id: ID!
+  userId: ID!
+  entryDate: String!
+  content: String
+}
