@@ -1,7 +1,7 @@
 import knex from 'knex'
-const knexfile = require('db/knexfile').development
+import knexfile from './knexfile'
 
-export const db = knex(knexfile)
+export const db = knex(knexfile.development)
 
 export const selectData = (
     tableName,

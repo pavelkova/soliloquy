@@ -1,19 +1,17 @@
 import knex from 'knex'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { db } from 'db/helpers'
+import { db } from '../../db/helpers'
 
-cont JWT_SECRET = 'test'
+const JWT_SECRET = 'test'
 
 export default {
     Query: {
-        user: (_, { email }) => {},
-        current: async (_, args, { user }) {
+        current: async (_, { user }) => {
             if (user) {
-                return db
+                return await db('users')
                     .select('*')
-                    .from('users')
-                    .where({ where: { id: user.id }})
+                    .where({ id: user.id })
                     .first()
             }
             throw new Error(errors.login.notLoggedIn)
@@ -21,13 +19,14 @@ export default {
     },
     Mutation: {
         signup: async (_, { email, password }) => {
-            const user = await checkUser(email)
+            let user = await checkUser(email)
 
             if (user) {
                 throw new Error(errors.signup.userExists)
             }
 
-            user = await User.create({
+            user = db('users')
+            .insert({
                 email,
                 password: await bcrypt.hash(password, 10)
             })
@@ -38,6 +37,8 @@ export default {
             const user = await checkUser(email)
             const isValid = await bcrypt.compare(password, user.password)
 
+            console.log(user)
+            console.log(isValid)
             if (!user || !isValid) {
                 throw new Error(errors.login.incorrect)
             }
@@ -67,5 +68,8 @@ function generateToken(user) {
 }
 
 async function checkUser(email) {
-    return await User.findOne({ where: { email }})
+    return db('users')
+        .select('*')
+        .where({ email: email })
+        .first()
 }
