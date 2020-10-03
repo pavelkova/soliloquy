@@ -1,23 +1,26 @@
-import knex from 'knex'
-import knexfile from 'db/knexfile'
-import schema from '../../graphql/schema.graphql'
-import { graphqlHTTP } = require('express-graphql')
+import { makeExecutableSchema } from '@graphql-tools/schema'
+import { graphqlHTTP } from 'express-graphql'
+import nc from 'next-connect'
+import resolvers from 'graphql/resolvers'
+import typeDefs from 'graphql/type-defs'
 
-const app = express();
+const schema = makeExecutableSchema({
+    typeDefs,
+    resolvers
+})
 
-app.use(
-  '/graphql',
-  graphqlHTTP({
-    schema: MyGraphQLSchema,
-    graphiql: true,
-  }),
-);
-
-app.listen(4000);
-
-export default nextConnect()
+export default nc()
     .use('/api/graphql',
           graphqlHTTP({
-              schema: MyGraphQLSchema,
+              schema: schema,
               graphiql: true
     }))
+    .get((req, res) => {
+        res.send('hello')
+    })
+    .post((req, res) => {
+    })
+    .put(async (req, res) => {
+    })
+    .path(async (req, res) => {
+    })

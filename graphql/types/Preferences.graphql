@@ -1,0 +1,11 @@
+type Preferences {
+  id: ID!
+  userId: ID!
+  timezone: String
+  wordCountGoal: Int
+  fontName: String
+  fontSize: Int
+  backgroundColor: String
+  textColor: String
+  highlightColor: String
+}
