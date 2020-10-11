@@ -2,12 +2,14 @@ type User {
   id: ID!
   email: String!
   password: String!
-  # entries: [Entry]
-  # preferences: Preferences
+  entries: [Entry]
+  preferences: String
 }
 
 type Query {
-  current(id: ID!): User
+  currentUser(id: ID!): User
+  findUserById(id: ID!): User
+  findUserByEmail(email: String!): User
 }
 
 type Mutation {

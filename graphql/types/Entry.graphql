@@ -1,7 +1,20 @@
 type Entry {
   id: ID!
-  userId: ID!
-  entryDate: String!
+  user: User!
+  titleDate: String!
   content: String
-  timeLogs: [TimeLog]
+  createdAt: String
+  updatedAt: String
+  activityLogs: [ActivityLog]
+}
+
+type Query {
+  findEntryById(id: ID!): Entry
+  findEntryByDate(userId: ID!, titleDate: String!): Entry
+  findAllEntries(userId: ID!): [Entry]
+}
+
+type Mutation {
+  createEntry(userId: ID!, titleDate: String!, content: String): Entry
+  updateEntry(id: ID!, content: String): Entry
 }

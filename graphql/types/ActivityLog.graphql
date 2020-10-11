@@ -1,0 +1,25 @@
+type ActivityLog {
+  id: ID!
+  entry: Entry!
+  startTime: String!
+  endTime: String!
+  content: String
+}
+
+type Query {
+  findActivityLogById(id: ID!): ActivityLog
+  findAllActivityLogs(entryId: ID!): [ActivityLog]
+}
+
+type Mutation {
+  createActivityLog(
+    entryId: ID!,
+    content: String,
+    startTime: String,
+    endTime: String): ActivityLog
+  updateActivityLog(
+    id: ID!,
+    content: String,
+    startTime: String,
+    endTime: String): ActivityLog
+}

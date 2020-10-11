@@ -1,0 +1,8 @@
+query CURRENT_USER {
+}
+
+query USER_BY_ID {
+}
+
+query USER_BY_EMAIL {
+}

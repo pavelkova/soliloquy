@@ -1,0 +1,5 @@
+mutation CREATE_ACTIVITY_LOG {
+}
+
+mutation UPDATE_ACTIVITY_LOG {
+}

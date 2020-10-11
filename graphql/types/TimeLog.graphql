@@ -1,6 +1,0 @@
-type TimeLog {
-  id: ID!
-  entryId: ID!
-  startTime: String!
-  endTime: String!
-}

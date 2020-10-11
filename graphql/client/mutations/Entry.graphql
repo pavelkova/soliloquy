@@ -1,0 +1,5 @@
+mutation CREATE_ENTRY {
+}
+
+mutation UPDATE_ENTRY {
+}

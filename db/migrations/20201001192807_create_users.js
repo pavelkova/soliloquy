@@ -5,9 +5,10 @@ exports.up = function(knex) {
         table.increments('id').primary().notNullable()
         table.string('email').unique().notNullable()
         table.string('password').notNullable()
-        table.timestamps()
+      table.timestamps().defaultTo(knex.fn.now())
+      table.jsonb('preferences')
     })
-  
+
 };
 
 exports.down = function(knex) {
