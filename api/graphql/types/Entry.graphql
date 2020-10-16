@@ -1,0 +1,23 @@
+type Entry {
+  id: ID!
+  user: User!
+  content: String
+  wordCount: Int
+  yyyy: Int!
+  mm: Int!
+  dd: Int!
+  createdAt: String
+  updatedAt: String
+  activityLogs: [ActivityLog]
+}
+
+type Query {
+  findEntryById(id: ID!): Entry
+  findEntriesByDate(yyyy: Int!, mm: Int, dd: Int): Entry
+  findAllEntries: [Entry]
+}
+
+type Mutation {
+  createEntry: Entry
+  updateEntry(content: String, wordCount: Int, id: ID): Entry
+}

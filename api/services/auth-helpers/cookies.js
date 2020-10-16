@@ -1,7 +1,10 @@
-mport { serialize, parse } from 'cookie'
+// cookie helper used in next.js examples
+
+import { serialize, parse } from 'cookie'
 
 const TOKEN_NAME = 'token'
-const MAX_AGE = 60 * 60 * 8 // 8 hours
+
+export const MAX_AGE = 60 * 60 * 24 * 15
 
 export function setTokenCookie(res, token) {
   const cookie = serialize(TOKEN_NAME, token, {
@@ -25,7 +28,7 @@ export function removeTokenCookie(res) {
   res.setHeader('Set-Cookie', cookie)
 }
 
-export function parseCookies(req) {
+function parseCookies(req) {
   // For API Routes we don't need to parse the cookies.
   if (req.cookies) return req.cookies
 
@@ -35,6 +38,17 @@ export function parseCookies(req) {
 }
 
 export function getTokenCookie(req) {
-    const cookies = parseCookies(req)
-    return cookies[TOKEN_NAME]
+  const cookies = parseCookies(req)
+  return cookies[TOKEN_NAME]
 }
+
+/* export const tokenCookie = (tokenName, maxAge) => {
+ *   const set = (res, token) => {
+ *   }
+ *   const remove = (res, token) => {}
+ *   const parse = req => {}
+ *   const get = req => {
+ *     const cookies = parseCookies(req)
+ *     return cookies(tokenName)
+ *   }
+ * } */

@@ -3,6 +3,7 @@ import { graphqlHTTP } from 'express-graphql'
 import nc from 'next-connect'
 import resolvers from 'gql/resolvers'
 import typeDefs from 'gql/type-defs'
+import { getUserToken } from 'services/auth'
 
 const schema = makeExecutableSchema({
   typeDefs,
@@ -11,11 +12,15 @@ const schema = makeExecutableSchema({
 
 export default nc().use(
   '/api/graphql',
-  graphqlHTTP({
-    schema: schema,
-    graphiql: true,
-    context: {
-      /* currentUser: user, */
+  graphqlHTTP(async (req, res) => ({
+    schema,
+    graphiql: {
+      headerEditorEnabled: true,
     },
-  })
+    context: {
+      req,
+      res,
+      user: await getUserToken(req)
+    },
+  }))
 )
