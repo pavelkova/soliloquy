@@ -1,0 +1,25 @@
+#import "./Fragments.graphql"
+
+query ACTIVITY_LOG_BY_ID($id: ID!) {
+  findActivityLogById(id: $id) {
+    ...ActivityLogFragment
+  }
+}
+
+query ALL_ACTIVITY_LOGS {
+  findAllActivityLogs {
+    ...ActivityLogFragment
+  }
+}
+
+mutation CREATE_ACTIVITY_LOG($entryId: ID!,$content: String, $startTime: String, $endTime: String) {
+  createActivityLog(entryId: $entryId, content: $content, startTime: $startTime, endTime: $endTime) {
+    ...ActivityLogFragment
+  }
+}
+
+mutation UPDATE_ACTIVITY_LOG($id: ID!,$content: String, $startTime: String, $endTime: String) {
+  createActivityLog(id: $id, content: $content, startTime: $startTime, endTime: $endTime) {
+    ...ActivityLogFragment
+  }
+}

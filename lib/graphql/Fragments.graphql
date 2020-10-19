@@ -1,0 +1,28 @@
+fragment ActivityLogFragment on ActivityLog {
+  id
+  startTime
+  endTime
+  content
+}
+
+fragment EntryFragment on Entry {
+  id
+  content
+  wordCount
+  yyyy
+  mm
+  dd
+  createdAt
+  updatedAt
+}
+
+fragment SettingFragment on Setting {
+  id
+  key
+  value
+}
+
+fragment UserFragment on User {
+  id
+  email
+}

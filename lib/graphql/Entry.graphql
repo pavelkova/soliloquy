@@ -1,0 +1,47 @@
+#import "./Fragments.graphql"
+
+query TODAY {
+  findToday {
+    ...EntryFragment
+    activityLogs {
+      ...ActivityLogFragment
+    }
+  }
+}
+
+query ENTRY_BY_ID($id: ID!) {
+  findEntryById(id: $id) {
+    ...EntryFragment
+    activityLogs {
+      ...ActivityLogFragment
+    }
+  }
+}
+
+query ENTRIES_BY_DATE($yyyy: Int!, $mm: Int!, $dd: Int!) {
+  findEntriesByDate(yyyy: $yyyy, mm: $mm, dd: $dd) {
+    ...EntryFragment
+  }
+}
+
+query ALL_ENTRIES {
+  ...EntryFragment
+}
+
+mutation FIND_OR_CREATE_ENTRY {
+  createEntry {
+    ...EntryFragment
+    activityLogs {
+      ...ActivityLogFragment
+    }
+  }
+}
+
+mutation UPDATE_ENTRY($content: String, $wordCount: Int, $id: ID) {
+  updateEntry(content: $content, wordCount: $wordCount, id: $id) {
+    ...EntryFragment
+    activityLogs {
+      ...ActivityLogFragment
+    }
+  }
+}

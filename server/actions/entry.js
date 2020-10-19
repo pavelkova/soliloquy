@@ -45,6 +45,12 @@ const findAll = async (user) => {
   }
 }
 
+const findToday = async user => {
+  const today = todayFieldsWithUserLocale(user)
+  const todayEntry = await findByDate(user, today)
+  if (todayEntry) return todayEntry
+  return null
+}
 const create = async (user, content, wordCount) => {
   const today = todayFieldsWithUserLocale(user)
   let todayEntry = await findByDate(user, today)
@@ -76,5 +82,5 @@ const update = async (user, content, wordCount) => {
   // else add new activity log
 }
 
-export { findById, findByDate, findAll,
+export { findToday, findById, findByDate, findAll,
          create, update }

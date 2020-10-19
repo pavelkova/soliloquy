@@ -6,11 +6,11 @@ type Setting {
 }
 
 type Query {
-  findSettingByName(userId: ID!, key: String!): Setting
-  findAllSettings(userId: ID!): [Setting]
+  findSettingByName(key: String!): Setting
+  findAllSettings: [Setting]
 }
 
 type Mutation {
-  createSetting(userId: ID!, key: String!, value: String): Setting
+  createSetting(key: String!, value: String): Setting
   updateSetting(id: ID!, key: String!, value: String): Setting
 }

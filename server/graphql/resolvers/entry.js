@@ -1,11 +1,15 @@
 import { authenticate } from 'services/auth'
-import { findById, findByDate, findAll,
+import { findToday, findById, findByDate, findAll,
          create, update } from 'actions/entry'
 import { findAll as findEntryLogs } from 'actions/activity-log'
 import { findById as findEntryOwner } from 'actions/user'
 
 export default {
   Query: {
+    findToday: authenticate(
+      async (_, {}, ctx) => {
+        return await findToday(ctx.user)
+    }),
     findEntryById: authenticate(
       async (_, { id }, ctx) => {
         return await findById(ctx.user, id)
@@ -21,7 +25,7 @@ export default {
     }),
   },
   Mutation: {
-    createEntry: authenticate(
+    findOrCreateEntry: authenticate(
       async (_, {}, ctx) => {
         return await create(ctx.user)
     }),

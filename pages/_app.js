@@ -13,8 +13,8 @@ export default withUrqlClient((_ssr, ctx) => {
   return {
     url: '/api/graphql',
     fetchOptions: {
-      headers: {},
+      credentials: 'same-origin',
     },
-    fetch,
+    fetch
   }
 })(MyApp)

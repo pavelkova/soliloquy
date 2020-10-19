@@ -1,7 +1,5 @@
 export default function Index() {
 
-
-
   return (
       <div>
       <h1>date</h1>

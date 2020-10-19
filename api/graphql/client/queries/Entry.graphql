@@ -1,8 +1,0 @@
-query ENTRY_BY_DATE {
-}
-
-query ENTRY_BY_ID {
-}
-
-query ALL_ENTRIES {
-}

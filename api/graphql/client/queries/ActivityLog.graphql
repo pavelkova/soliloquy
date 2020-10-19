@@ -1,5 +1,0 @@
-query ACTIVITY_LOG_BY_ID {
-}
-
-query ALL_ACTIVITY_LOGS {
-}

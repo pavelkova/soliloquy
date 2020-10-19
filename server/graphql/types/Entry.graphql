@@ -12,12 +12,13 @@ type Entry {
 }
 
 type Query {
+  findToday: Entry
   findEntryById(id: ID!): Entry
   findEntriesByDate(yyyy: Int!, mm: Int, dd: Int): Entry
   findAllEntries: [Entry]
 }
 
 type Mutation {
-  createEntry: Entry
+  findOrCreateEntry: Entry
   updateEntry(content: String, wordCount: Int, id: ID): Entry
 }

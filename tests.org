@@ -1,0 +1,9 @@
+#+title: Tests
+* auth
+- bad email
+- bad password
+- no token cookie
+- token cookie but token expired
+* editor
+- activity logs
+- editing near midnight
