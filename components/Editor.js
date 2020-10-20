@@ -3,17 +3,17 @@ import { formatWithLocale } from 'utils/date'
 import { useQuery, useMutation } from 'urql'
 import { UPDATE_ENTRY } from '../lib/graphql/Entry.graphql'
 
-export const Editor = () => {
+export const Editor = ({ today }) => {
   // get or create entry from SSR
   // entry = { content: '', activityLogs: [{ createdAt: time, updatedAt: time, content: ''}, { createdAt: time, updatedAt: time, content: ''}]}
-  const user = { settings: {} }
+  const user = today.user
   const titleDate = formatWithLocale(user, { dateStyle: 'long' })
   // user preference or default: background, text color, highlight, font name, font size, timezone, word goal
   // five minutes to midnight at client time or user preference timezone, if exists
 
   const [isActive, setIsActive] = useState(false)
-  const [content, setContent] = useState('')
-  const [wordCount, setWordCount] = useState(0)
+  const [content, setContent] = useState(today.content || '')
+  const [wordCount, setWordCount] = useState(today.wordCount || 0)
   const [lastSaved, setLastSaved] = useState({
     content: '',
     time: new Date(),
@@ -33,14 +33,17 @@ export const Editor = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      update({ content, wordCount, updatedAt: new Date ()}).then(result => {
+      update({ content, wordCount }).then(result => {
         if (result.error) {
           // set isPaused, suggest try refreshing the page
           console.error(result.error)
         }
         const data = result.data.updateEntry
         console.log(data)
-        setLastSaved({ content: data.content, time: data.updatedAt })
+        if (data) {
+          setLastSaved({ content: data.content, time: data.updatedAt })
+        }
+        return data
       })
     }, 3000)
     return () => clearTimeout(timer)

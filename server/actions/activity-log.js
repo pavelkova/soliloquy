@@ -1,6 +1,8 @@
 import { db } from '../db'
+import { findById as findEntryById } from './entry'
 
 const t = db('activity_logs')
+
 const columns = [
   'id',
   'entry_id as entryId',
@@ -17,9 +19,14 @@ const findById = async (id) => {
 const findAll = async (entry) => {
   const entryLogs = await t.select(columns)
                            .where({ entry_id: entry.id })
-  if (entryLogs[-1] && !entryLogs[-1].end_time) {
 
+  if (entryLogs[-1] && !entryLogs[-1].end_time) {
+    const closedLog = await t.returning(columns)
+                             .where({ id: entryLogs[-1].id })
+                             .update({ end_time: entry.updatedAt })
   }
+
+  return entryLogs
 }
 
 const create = async (entry, startTime, endTime) => {

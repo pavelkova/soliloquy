@@ -29,8 +29,11 @@ query ALL_ENTRIES {
 }
 
 mutation FIND_OR_CREATE_ENTRY {
-  createEntry {
+  findOrCreateEntry {
     ...EntryFragment
+    user {
+      ...UserFragment
+    }
     activityLogs {
       ...ActivityLogFragment
     }
