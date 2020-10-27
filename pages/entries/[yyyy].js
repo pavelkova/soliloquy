@@ -1,8 +1,18 @@
 import { useRouter } from 'next/router'
-// check router if param is 4 digit number between 2000 and present year
+import { useQuery } from 'urql'
+import ENTRIES_BY_DATE from 'queries/EntriesByDate.graphql'
 
 export default function Year() {
   const router = useRouter()
+
+  const { yyyy } = router.query
+  let currentYear = new Date().getFullYear()
+  if (yyyy.match(/([0-9]{4})/)
+      && 1970 <= yyyy // user.createdAt.getFullYear()
+      && yyyy <= currentYear) {
+    const { data, fetching, error } = useQuery(ENTRIES_BY_DATE, { variables: yyyy })
+  }
+  console.log(router)
   /* console.log('YEAR ->')
    * console.log(router.query) */
   return (
@@ -11,7 +21,7 @@ export default function Year() {
     </>
   )
 }
-export const getServerSideProps = async (ssr, ctx) => {
+export const getServerSideProps = async ctx => {
   console.log('SSR ->')
   /* console.log('SSR ->')
    * console.log(ssr) */

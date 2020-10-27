@@ -1,0 +1,7 @@
+#import "../ActivityLogFragment.graphql"
+
+query {
+  findAllActivityLogs {
+    ...ActivityLogFragment
+  }
+}

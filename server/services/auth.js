@@ -11,28 +11,38 @@ export const authenticate = resolver => (root, args, ctx, info) => {
 }
 
 export const setUserToken = async (res, user) => {
-  const data = { user, createdAt: Date.now(), maxAge: MAX_AGE}
+  /* const data = { user, createdAt: Date.now(), maxAge: MAX_AGE} */
+  const userData = { id: user.id, email: user.email }
   try {
-    const token = await generateTokens(data, MAX_AGE)
+    const token = await generateTokens(userData, MAX_AGE)
     return setTokenCookie(res, token)
   } catch (e) {
-    console.error(e.message)
+    console.error(e)
+    throw new Error(e)
   }
 }
 
 export const getUserToken = async req => {
   const token = getTokenCookie(req)
-  if (!token) return
-  try {
-    const data = await validateToken(token)
-    return data?.user
-  } catch (e) {
-    console.error(e.message)
+  if (token) {
+    try {
+      const data = await validateToken(token)
+      console.log(data)
+      return data?.user
+    } catch (e) {
+      console.error(e.message)
+      throw new Error(e)
+    }
   }
+}
+
+export const revokeUserToken = async ctx => {
+  removeTokenCookie(ctx.res)
+  console.log(ctx.req.headers)
 }
 
 const currentUser = async ctx => {
   let user = await getUserToken(ctx.req)
   if (user) return await findById(user.id)
-  throw new Error('not logged in')
+  throw new Error('unauthenticated')
 }

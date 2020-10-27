@@ -1,0 +1,11 @@
+#import "../ActivityLogFragment.graphql"
+#import "../EntryFragment.graphql"
+
+mutation ($id: ID!, $content: String, $wordCount: Int) {
+  updateEntry(content: $content, wordCount: $wordCount, id: $id) {
+    ...EntryFragment
+    activityLogs {
+      ...ActivityLogFragment
+    }
+  }
+}

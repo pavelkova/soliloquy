@@ -1,10 +1,7 @@
 import { useQuery } from 'urql'
-
-const TodosQuery = `
-  query {
-    todos {
-      id
-      title
-    }
-  }
-`
+import { DateHeader } from './Entry/DateHeader'
+export const Entry = ({entry}) => {
+  return (
+    <DateHeader entry={entry} />
+  )
+}

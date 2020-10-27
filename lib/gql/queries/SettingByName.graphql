@@ -1,0 +1,7 @@
+#import "../SettingFragment.graphql"
+
+query ($key: String!) {
+  findSettingByName(key: $key) {
+    ...SettingFragment
+  }
+}

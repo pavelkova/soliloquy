@@ -1,5 +1,7 @@
 import App from 'next/app'
 import { withUrqlClient } from 'next-urql'
+import { defaultExchanges } from 'urql'
+import { devtoolsExchange } from '@urql/devtools'
 
 const MyApp = ({ Component, pageProps }) => {
   return <Component {...pageProps} />
@@ -15,6 +17,7 @@ export default withUrqlClient((_ssr, ctx) => {
     fetchOptions: {
       credentials: 'same-origin',
     },
+    exchanges: [devtoolsExchange, ...defaultExchanges],
     fetch
   }
 })(MyApp)

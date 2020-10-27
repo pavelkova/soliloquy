@@ -1,54 +1,40 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import { useMutation } from 'urql'
+import LOGIN from 'mutations/Login.graphql'
 
-const LOGIN_MUTATION = `
-  mutation ($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      id
-      email
-    }
-  }
-`
 
-export const AuthForm = (props) => {
-  let signup = (props.formName == 'signup')
+export const AuthForm = () => {
+  const router = useRouter()
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const [ result, login ] = useMutation(`
-  mutation ($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      id
-      email
-    }
-  }
-  `)
+  const [result, login] = useMutation(LOGIN)
 
-
-  const handleSubmit = async e => {
-
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-      const { data, fetching, error } = await login({email, password })
-
-      console.log(result)
-      /* console.log(loginResult) */
-      if (data?.login) {
-        console.log(data.login)
-      }
-      console.log(fetching)
-    }
+    const { data, fetching, error } = await login({ email,
+                                                    password })
+    if (error) console.error(error)
+    if (data?.login) router.push('/today')
+    // disable submit on invalid or loading
+  }
 
   return (
     <div>
-    <form onSubmit={ handleSubmit }>
-    <input value={email} onChange={e =>
-      setEmail(e.currentTarget.value)}/>
-    <input value={password} onChange={e =>
-      setPassword(e.currentTarget.value)}/>
-    /* {signup ? <input type="password"></input> : ''} */
-    <button type='submit'>Login</button>
-    </form>
+      <form onSubmit={handleSubmit}>
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.currentTarget.value)}
+        />
+        <input
+          value={password}
+          onChange={(e) => setPassword(e.currentTarget.value)}
+        />
+        <button type="submit">Login</button>
+      </form>
     </div>
   )
 }

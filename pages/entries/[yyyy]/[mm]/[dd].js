@@ -1,12 +1,12 @@
 import { useRouter } from 'next/router'
 import { useQuery } from 'urql'
 import { ssrQuery, ssrAuthCheck } from 'lib/urql-client'
-
-// check router if param is 4 digit number between 2000 and present year
-import { CURRENT_USER } from '../../../../lib/graphql/User.graphql'
+import CURRENT_USER from 'queries/CurrentUser.graphql'
 
 export default function Date({ ...props }) {
   const router = useRouter()
+  const { yyyy, mm, dd } = router.query
+  console.log(parseInt)
   if (typeof window != 'undefined' && !props.user.currentUser) {
     router.push('/login')
     console.log(router)

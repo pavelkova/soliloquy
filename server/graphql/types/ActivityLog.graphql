@@ -1,8 +1,8 @@
 type ActivityLog {
   id: ID!
   entry: Entry!
-  startTime: String!
-  endTime: String!
+  start: DateTime!
+  end: DateTime
   content: String
 }
 
@@ -15,11 +15,11 @@ type Mutation {
   createActivityLog(
     entryId: ID!,
     content: String,
-    startTime: String,
-    endTime: String): ActivityLog
+    start: DateTime,
+    end: DateTime): ActivityLog
   updateActivityLog(
     id: ID!,
     content: String,
-    startTime: String,
-    endTime: String): ActivityLog
+    start: DateTime,
+    end: DateTime): ActivityLog
 }

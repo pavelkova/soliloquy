@@ -1,0 +1,6 @@
+fragment ActivityLogFragment on ActivityLog {
+  id
+  start
+  end
+  content
+}

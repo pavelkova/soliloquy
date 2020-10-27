@@ -6,8 +6,8 @@ type Entry {
   yyyy: Int!
   mm: Int!
   dd: Int!
-  createdAt: String
-  updatedAt: String
+  createdAt: DateTime
+  updatedAt: DateTime
   activityLogs: [ActivityLog]
 }
 
@@ -20,5 +20,5 @@ type Query {
 
 type Mutation {
   findOrCreateEntry: Entry
-  updateEntry(content: String, wordCount: Int, id: ID): Entry
+  updateEntry(id: ID!, content: String, wordCount: Int): Entry
 }

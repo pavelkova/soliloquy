@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { formatWithLocale } from 'utils/date'
+import { DateHeader } from './Entry/DateHeader'
 import { useQuery, useMutation } from 'urql'
-import { UPDATE_ENTRY } from '../lib/graphql/Entry.graphql'
+import UPDATE_ENTRY  from 'lib/gql/mutations/UpdateEntry.graphql'
 
 export const Editor = ({ today }) => {
+
   // get or create entry from SSR
   // entry = { content: '', activityLogs: [{ createdAt: time, updatedAt: time, content: ''}, { createdAt: time, updatedAt: time, content: ''}]}
-  const user = today.user
-  const titleDate = formatWithLocale(user, { dateStyle: 'long' })
+
   // user preference or default: background, text color, highlight, font name, font size, timezone, word goal
   // five minutes to midnight at client time or user preference timezone, if exists
 
@@ -15,8 +15,8 @@ export const Editor = ({ today }) => {
   const [content, setContent] = useState(today.content || '')
   const [wordCount, setWordCount] = useState(today.wordCount || 0)
   const [lastSaved, setLastSaved] = useState({
-    content: '',
-    time: new Date(),
+    content: today.content || '',
+    time: today.updatedAt || null,
   })
 
   const [result, update] = useMutation(UPDATE_ENTRY)
@@ -33,15 +33,19 @@ export const Editor = ({ today }) => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      update({ content, wordCount }).then(result => {
+      console.log('EDITOR -> USE EFFECT ->')
+      update({ id: today.id, content, wordCount }).then(result => {
         if (result.error) {
           // set isPaused, suggest try refreshing the page
           console.error(result.error)
         }
-        const data = result.data.updateEntry
+        const data = result?.data?.updateEntry
+        console.log('EDITOR -> USE EFFECT -> UPDATE RESULT')
         console.log(data)
         if (data) {
-          setLastSaved({ content: data.content, time: data.updatedAt })
+          setLastSaved({ content: data.content,
+                         time: data.updatedAt })
+          console.log(data.updatedAt)
         }
         return data
       })
@@ -63,11 +67,12 @@ export const Editor = ({ today }) => {
 
   return (
     <>
-    <h1>{titleDate}</h1>
-
+      {/* <DateHeader entry={today} /> */}
       <div>
         {wordCount} {wordCount == 1 ? 'word' : 'words'}
       </div>
+      { }
+      <div></div>
     <textarea onChange={handleTextChange} value={content} />
     <button onClick={findOut}>save</button>
     </>
@@ -98,3 +103,35 @@ if less than 100 words: this entry was too short to analyze!
 
  */
 }
+
+/* const useUpdateMutation = async today => {
+ *   const [content, setContent] = useState(today.content || '')
+ *   const [wordCount, setWordCount] = useState(today.wordCount || 0)
+ *   const [lastSaved, setLastSaved] = useState({
+ *     content: '',
+ *     time: new Date(),
+ *   })
+ *
+ *   const [result, update] = useMutation(UPDATE_ENTRY)
+ *
+ *   const updateEntry = (content, wordCount) => {
+ *     update({ id: today.id, content, wordCount }).then(result => {
+ *         if (result.error) {
+ *           // set isPaused, suggest try refreshing the page
+ *           console.error(result.error)
+ *         }
+ *         today = result?.data?.updateEntry
+ *         console.log('EDITOR -> USE EFFECT -> UPDATE RESULT')
+ *         console.log(today)
+ *         if (today) {
+ *           setLastSaved({ content: today.content,
+ *                          time: today.updatedAt })
+ *         }
+ *       return today
+ *     })
+ *   }
+ * } */
+
+/* if ((new Date() - lastSaved.time) > 5000) {
+ *
+ * } */

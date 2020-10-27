@@ -1,0 +1,15 @@
+#import "../ActivityLogFragment.graphql"
+#import "../EntryFragment.graphql"
+#import "../UserFragment.graphql"
+
+mutation {
+  findOrCreateEntry {
+    ...EntryFragment
+    user {
+      ...UserFragment
+    }
+    activityLogs {
+      ...ActivityLogFragment
+    }
+  }
+}

@@ -1,6 +1,8 @@
 /* truly terrible function names */
 
 const formatWithLocale = (user, options = {}, date = '') => {
+  console.log('format with locale')
+  console.log(user)
   const d = date ? new Date(date) : new Date()
 
   if (user.settings?.timezone) {

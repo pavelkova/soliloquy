@@ -9,3 +9,16 @@ const preferences = {
   highlightColor: '',
   textAnalysis: false
 }
+
+export const PreferencesForm = (props) => {
+  return (
+    <>
+      <form>
+        <input />
+        <select>
+          <option>F</option>
+        </select>
+      </form>
+    </>
+  )
+}

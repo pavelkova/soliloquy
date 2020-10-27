@@ -15,78 +15,99 @@ const columns = [
 ]
 
 const findToday = async user => {
+  console.log('ACTIONS -> FIND TODAY ->')
+  let todayEntry
   const today = todayFieldsWithUserLocale(user)
-  const todayEntry = await findByDate(user, today)
-  if (todayEntry) return { todayEntry, today }
-  return null
+  try {
+    const entries = await findByDate(user, today)
+    todayEntry = entries[0]
+  } catch (e) {
+    console.error(e.message)
+    throw new Error(e)
+  }
+  return { today, todayEntry }
 }
 
 const findById = async (user, id) => {
-  return await t.select(columns)
-                .where({ user_id: user.id, id }).first()
+  let entry
+  try {
+    entry = await t.select(columns)
+                   .where({ user_id: user.id, id }).first()
+  } catch (e) {
+    console.error(e.message)
+    throw new Error(e)
+  }
+  return entry
 }
 // find all entries within
 const findByDate = async (user, date) => {
   if (!date.yyyy) throw new Error('no date provided')
+  // remove null mm & dd to return all entries for a year
   date.mm ? null : delete date.mm
+  // remove null dd to return all entries for a month
   date.dd ? null : delete date.dd
 
+  let entries
+
   try {
-    const entryArr = await t.select(columns)
-                            .where({ user_id: user.id,
-                                     ...date })
-    if (entryArr.length > 1) return entryArr
-    return entryArr[0]
+    entries = await t.select(columns)
+                     .where({ user_id: user.id,
+                              ...date })
 
   } catch (e) {
     console.error(e.message)
+    throw new Error(e)
   }
+  return entries
 }
 
 const findAll = async (user) => {
+  let entries
   try {
-    return await t.select(columns)
-                  .where({ user_id: user.id })
+    entries = await t.select(columns)
+                     .where({ user_id: user.id })
   } catch (e) {
     console.error(e.message)
   }
+  return entries
 }
 
 const create = async user => {
-  let { todayEntry, today } = await findToday(user)
+  console.log('ACTIONS -> CREATE ->')
 
+  let { today, todayEntry } = await findToday(user)
   if (!todayEntry) {
+    console.log('NOO TODAY')
     try {
       const entryArr = await t.returning(columns)
                               .insert({ user_id: user.id,
                                         ...today })
       todayEntry = entryArr[0]
     } catch (e) {
-      console.error(e)
-      throw new Error('could not create entry for today')
+      console.error(e.message)
+      throw new Error(e)
     }
   }
+  console.log('TODAY ENTRY')
+  console.log(todayEntry)
 
   return todayEntry
 }
 
-const update = async (user, content, wordCount) => {
-  let { todayEntry, today } = await findToday(user)
-
-  if (!todayEntry) { throw new Error('no entry for today') }
-
+const update = async (user, id, content, wordCount) => {
+  let entry
   try {
     const entryArr = await t.returning(columns)
-                            .where({ id: todayEntry.id })
+                            .where({ id })
                             .update({ content,
                                       word_count: wordCount,
                                       updated_at: new Date() })
-    todayEntry = entryArr[0]
+    entry = entryArr[0]
   } catch (e) {
-    console.error(e)
-    throw new Error('could not update today')
+    console.error(e.message)
+    throw new Error(e)
   }
-  return todayEntry
+  return entry
 }
 
 export { findToday, findById, findByDate, findAll,

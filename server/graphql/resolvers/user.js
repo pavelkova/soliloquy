@@ -2,7 +2,7 @@ import { findById, findByEmail,
          login, signup, updatePassword }  from 'actions/user'
 import { findAll as findUserEntries } from 'actions/entry'
 import { findAll as findUserSettings } from 'actions/setting'
-import { authenticate, setUserToken, getUserToken } from 'services/auth'
+import { authenticate, setUserToken, getUserToken, revokeUserToken } from 'services/auth'
 import { errors } from 'services/errors'
 
 export default {
@@ -20,27 +20,30 @@ export default {
   },
   Mutation: {
     signup: async (_, { email, password }, ctx) => {
-      return await signup(email, password)
+      let user = await signup(email, password)
+      if (user) setUserToken(ctx.res, user)
+      return user
     },
     login: async (_, { email, password }, ctx) => {
+      console.log('LOGIN MUTATION')
       let user = await login(email, password)
       if (user) setUserToken(ctx.res, user)
       return user
     },
+    logout: async (_, {}, ctx) => {
+      // remove cookie
+      await revokeUserToken()
+      return false
+    },
     updatePassword: authenticate(async(_, { oldPassword, newPassword }, ctx) => {
-      const updatedUser = await updatePassword(ctx.user, oldPassword, newPassword)
+      const updatedUser = await updatePassword(
+        ctx.user, oldPassword, newPassword)
       return updatedUser
     })
   },
   User: {
     entries: async (user, {}, ctx) => {
-      /* if (user.id === ctx.user.id) { */
-      try {
-        return await findUserEntries(user)
-      } catch (e) {
-        console.error(e.message)
-      }
-      /* } */
+      return await findUserEntries(user)
     },
     settings: async (user, {}, ctx) => {
       return await findUserSettings(user)

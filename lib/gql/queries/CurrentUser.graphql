@@ -1,0 +1,11 @@
+#import "../SettingFragment.graphql"
+#import "../UserFragment.graphql"
+
+query {
+  currentUser {
+    ...UserFragment
+    settings {
+      ...SettingFragment
+    }
+  }
+}

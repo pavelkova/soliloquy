@@ -1,0 +1,10 @@
+fragment EntryFragment on Entry {
+  id
+  content
+  wordCount
+  yyyy
+  mm
+  dd
+  createdAt
+  updatedAt
+}

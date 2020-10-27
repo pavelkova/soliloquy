@@ -12,46 +12,70 @@ const columns = [
 ]
 
 const findById = async (id) => {
-  return await t.select(columns)
-                .where({ id }).first()
+  console.log('ACTIONS -> USER -> FINDBYID ->')
+  let user
+  try {
+    user = await t.select(columns)
+                  .where({ id }).first()
+  } catch (e) {
+    console.error(e.message)
+    throw new Error(e)
+  }
+  return user
 }
 
 const findByEmail = async (email) => {
-  return await t.select(columns)
-                .where({ email }).first()
+  console.log('ACTIONS -> USER -> FINDBYEMAIL ->')
+  let user
+  try {
+    user = await t.select(columns)
+                  .where({ email }).first()
+  } catch (e) {
+    console.error(e.message)
+    throw new Error(e)
+  }
+  return user
 }
 
 const login = async (email, password) => {
+  console.log('ACTIONS -> USER -> LOGIN ->')
   const user = await findByEmail(email)
   if (user) {
+    console.log(user)
     const validPassword = await validatePassword(user, password)
+    console.log(validPassword)
     if (validPassword) return user
   }
-  throw new Error('email or password is wrong')
+  throw new Error('Invalid email or password.')
 }
-
 const signup = async (email, password) => {
+  console.log('ACTIONS -> USER -> SIGNUP ->')
   let user = await findByEmail({ email })
-
   if (!user) {
     const hash = await encryptPassword(password)
     user = await t.returning(columns)
                   .insert({ email, password: hash })
-    return user[0]
+    if (user) return user[0]
+    throw new Error('Could not complete signup.')
   }
-  throw new Error('email')
+  throw new Error('A user with that email already exists.')
 }
 
 const updatePassword = async (user, oldPassword, newPassword) => {
-  const match = await validatePassword(user, oldPassword)
-  if (match) {
-    const hash = await encryptPassword(newPassword)
-    const userArr = await t.returning(columns)
-                           .where({ id: user.id })
-                           .update({ password: hash })
-    return userArr[0]
+  console.log('ACTIONS -> USER -> UPDATEPASSWORD ->')
+  try {
+    const match = await validatePassword(user, oldPassword)
+    if (match) {
+      const hash = await encryptPassword(newPassword)
+      const userArr = await t.returning(columns)
+                             .where({ id: user.id })
+                             .update({ password: hash })
+      return userArr[0]
+    }
+  } catch (e) {
+    console.error(e.message)
+    throw new Error(e)
   }
-  throw new Error('old password doesnt match')
 }
 
 export { findById, findByEmail,

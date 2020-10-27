@@ -13,6 +13,8 @@ import { useRouter } from 'next/router'
 
 export default function Month() {
   const router = useRouter()
+  const { yyyy, mm } = router.query
+
   console.log('MONTH ->')
   console.log(router.query)
   return (
