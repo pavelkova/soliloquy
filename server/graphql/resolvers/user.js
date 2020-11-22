@@ -32,8 +32,16 @@ export default {
     },
     logout: async (_, {}, ctx) => {
       // remove cookie
-      await revokeUserToken()
-      return false
+      console.log(ctx.user)
+      const result = await revokeUserToken(ctx)
+      console.log('ACTIONS -> USER -> LOGOUT ->')
+      console.log(result)
+      console.log('LOGOUT -> CTX.RES ->')
+      console.log(ctx.res)
+      console.log('LOGOUT -> CTX.USER ->')
+      console.log(ctx.user)
+      /* console.log(ctx.req.headers) */
+      return
     },
     updatePassword: authenticate(async(_, { oldPassword, newPassword }, ctx) => {
       const updatedUser = await updatePassword(

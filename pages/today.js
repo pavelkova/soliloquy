@@ -1,26 +1,28 @@
 import { Editor } from 'components/Editor'
-import { useQuery, useMutation } from 'urql'
 import { ssrMutation, ssrAuthCheck } from 'lib/urql-client'
+import { useMutation } from 'urql'
 import FIND_OR_CREATE_ENTRY from 'mutations/FindOrCreateEntry.graphql'
 
-export default function Today({ today }) {
+export default function Today({ today, error }) {
+  if (error) return <p>Something went wrong</p>
   console.log('TODAY PAGE -> RENDER ->')
+/* if (window == 'undefined') return <p>what is happening</p> */
+  /* console.log(document) */
   console.log(today)
   if (!today) return <p>today does not exist</p>
   return (
     <div>
-    <Editor today={ today }/>
+      <Editor today={ today }/>
     </div>
   )
 }
 
 export const getServerSideProps = async ctx => {
   console.log('TODAY PAGE -> GET SSR PROPS ->')
-  console.log('FIND OR CREATE ENTRY')
-  console.log(FIND_OR_CREATE_ENTRY)
   const { data, error } = await ssrMutation(ctx, FIND_OR_CREATE_ENTRY)
   const todayEntry = data?.findOrCreateEntry || {}
-console.log(todayEntry)
+  console.log('TODAY ENTRY')
+  console.log(todayEntry)
   console.log('--------------------------------------------')
   console.log(error)
   console.log('--------------------------------------------')

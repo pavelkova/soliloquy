@@ -1,5 +1,6 @@
 import { db } from '../db'
 import { todayFieldsWithUserLocale } from 'utils/date'
+import { createOrUpdate as createOrUpdateActivityLog } from './activity-log'
 
 const t = db('entries')
 const columns = [
@@ -29,6 +30,7 @@ const findToday = async user => {
 }
 
 const findById = async (user, id) => {
+  console.log('ACTIONS -> FIND ENTRY BY ID ->')
   let entry
   try {
     entry = await t.select(columns)
@@ -41,6 +43,7 @@ const findById = async (user, id) => {
 }
 // find all entries within
 const findByDate = async (user, date) => {
+  console.log('ACTIONS -> FIND ENTRY BY DATE ->')
   if (!date.yyyy) throw new Error('no date provided')
   // remove null mm & dd to return all entries for a year
   date.mm ? null : delete date.mm
@@ -55,6 +58,7 @@ const findByDate = async (user, date) => {
                               ...date })
 
   } catch (e) {
+    console.log('ERROR IN findByDate')
     console.error(e.message)
     throw new Error(e)
   }
@@ -62,6 +66,7 @@ const findByDate = async (user, date) => {
 }
 
 const findAll = async (user) => {
+  console.log('ACTIONS -> FIND ALL ENTRIES ->')
   let entries
   try {
     entries = await t.select(columns)
@@ -73,11 +78,11 @@ const findAll = async (user) => {
 }
 
 const create = async user => {
-  console.log('ACTIONS -> CREATE ->')
+  console.log('ACTIONS -> CREATE ENTRY ->')
 
   let { today, todayEntry } = await findToday(user)
+
   if (!todayEntry) {
-    console.log('NOO TODAY')
     try {
       const entryArr = await t.returning(columns)
                               .insert({ user_id: user.id,
@@ -88,26 +93,30 @@ const create = async user => {
       throw new Error(e)
     }
   }
-  console.log('TODAY ENTRY')
-  console.log(todayEntry)
 
   return todayEntry
 }
 
-const update = async (user, id, content, wordCount) => {
-  let entry
+const update = async (_user, id, content, wordCount, startTime) => {
+  if (!content) return
+  console.log('ACTIONS -> UPDATE ENTRY->')
+
+  let updatedEntry
+
   try {
+    await createOrUpdateActivityLog(id, content, startTime)
+
     const entryArr = await t.returning(columns)
                             .where({ id })
                             .update({ content,
                                       word_count: wordCount,
                                       updated_at: new Date() })
-    entry = entryArr[0]
+    updatedEntry = entryArr[0]
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  return entry
+  return updatedEntry
 }
 
 export { findToday, findById, findByDate, findAll,

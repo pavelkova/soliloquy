@@ -1,4 +1,7 @@
-import { setTokenCookie, getTokenCookie, MAX_AGE } from './auth-helpers/cookies'
+import { getTokenCookie,
+         setTokenCookie,
+         removeTokenCookie,
+         MAX_AGE } from './auth-helpers/cookies'
 import { generateTokens, validateToken } from './auth-helpers/tokens'
 
 // REQUIRE AUTH
@@ -14,7 +17,7 @@ export const setUserToken = async (res, user) => {
   /* const data = { user, createdAt: Date.now(), maxAge: MAX_AGE} */
   const userData = { id: user.id, email: user.email }
   try {
-    const token = await generateTokens(userData, MAX_AGE)
+    const token = await generateTokens({ user: userData }, MAX_AGE)
     return setTokenCookie(res, token)
   } catch (e) {
     console.error(e)

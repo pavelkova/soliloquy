@@ -2,7 +2,7 @@
 #import "../EntryFragment.graphql"
 #import "../UserFragment.graphql"
 
-mutation {
+mutation FIND_OR_CREATE_ENTRY {
   findOrCreateEntry {
     ...EntryFragment
     user {

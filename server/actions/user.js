@@ -41,13 +41,12 @@ const login = async (email, password) => {
   console.log('ACTIONS -> USER -> LOGIN ->')
   const user = await findByEmail(email)
   if (user) {
-    console.log(user)
     const validPassword = await validatePassword(user, password)
-    console.log(validPassword)
     if (validPassword) return user
   }
   throw new Error('Invalid email or password.')
 }
+
 const signup = async (email, password) => {
   console.log('ACTIONS -> USER -> SIGNUP ->')
   let user = await findByEmail({ email })

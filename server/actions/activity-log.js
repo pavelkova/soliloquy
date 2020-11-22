@@ -43,7 +43,7 @@ const findAll = async (entryId) => {
   return logs
 }
 
-const create = async (entryId, start, end, content) => {
+const create = async (entryId, content, start) => {
   console.log('ACTIONS -> ACTIVITY LOG -> CREATE ->')
   let log
   /* const started = new Date(parseInt(start))
@@ -51,8 +51,9 @@ const create = async (entryId, start, end, content) => {
   try {
     log = await t.returning(columns)
                  .insert({ entry_id: entryId,
-                           start: started,
-                           end: ended })
+                           start,
+                           content,
+                           end: new Date() })
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
@@ -60,15 +61,14 @@ const create = async (entryId, start, end, content) => {
   return log[0]
 }
 
-const update = async (id, content, start, end) => {
+const update = async (id, content) => {
   console.log('ACTIONS -> ACTIVITY LOG -> UPDATE ->')
   let log
   try {
     log = await t.returning(columns)
                  .where({ id })
                  .update({ content,
-                           start,
-                           end })
+                           end: new Date() })
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
@@ -76,5 +76,21 @@ const update = async (id, content, start, end) => {
   return log
 }
 
+const createOrUpdate = async (entryId, newContent, startTime) => {
+  console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
+  const logs = findAll(entryId)
+  const currentLog = logs[-1]
+
+  // if no logs exist, create the first one
+  // or if logs exist but the last change was made more than five minutes ago, create a new log
+  if (!currentLog ||
+      (new Date(startTime) - new Date(currentLog.end) > 50000)) {
+    return create(entryId, newContent, startTime)
+  }
+  // otherwise just update the most recent log
+  return update(currentLog.id, newContent)
+}
+
 export { findById, findAll,
-         create, update }
+         create, update,
+         createOrUpdate }

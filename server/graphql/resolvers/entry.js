@@ -27,12 +27,11 @@ export default {
   Mutation: {
     findOrCreateEntry: authenticate(
       async (_, {}, ctx) => {
-        console.log('FIND OR CREATE ENTRY - NUTATION')
         return await create(ctx.user)
     }),
     updateEntry:  authenticate(
-      async (_, { id, content, wordCount }, ctx) => {
-        return await update(ctx.user, id, content, wordCount)
+      async (_, { id, content, wordCount, startTime }, ctx) => {
+        return await update(ctx.user, id, content, wordCount, startTime)
     }),
   },
   Entry: {

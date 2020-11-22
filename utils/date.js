@@ -1,5 +1,9 @@
 /* truly terrible function names */
 
+const getTimeSince = time => {
+  return new Date() - new Date(time)
+}
+
 const formatWithLocale = (user, options = {}, date = '') => {
   console.log('format with locale')
   console.log(user)
@@ -36,7 +40,8 @@ const todayFieldsWithUserLocale = user => {
   return splitDateFields(todayFields)
 }
 
-export { formatWithLocale,
+export { getTimeSince,
+         formatWithLocale,
          createDateWithLocale,
          splitDateFields,
          splitDateFieldsToStrings,

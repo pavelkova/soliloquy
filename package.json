@@ -2,13 +2,11 @@
   "name": "soliloquy",
   "version": "1.0.0",
   "scripts": {
-    "dev": "next",
+    "dev": "rm -rf ./.next/cache/next-babel-loader/ && next",
     "build": "next build",
-    "start": "next start"
+    "start": "rm -rf ./.next/cache/next-babel-loader/ && next start"
   },
   "dependencies": {
-    "@graphql-tools/webpack-loader": "^6.2.4",
-    "@urql/devtools": "^2.0.2",
     "bcrypt": "^5.0.0",
     "cookie": "^0.4.1",
     "express-graphql": "^0.11.0",
@@ -29,5 +27,9 @@
     "semi": false,
     "singleQuote": true
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@urql/devtools": "^2.0.2",
+    "webpack-graphql-loader": "^1.0.2"
+  }
 }

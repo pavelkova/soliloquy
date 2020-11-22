@@ -1,5 +1,5 @@
 import { findById, findAll,
-         create, update } from 'actions/activity-log'
+         /* create, update */ } from 'actions/activity-log'
 
 export default {
   Query: {
@@ -10,12 +10,12 @@ export default {
       return await findAll(entryId)
     }
   },
-  Mutation: {
-    createActivityLog: async (_, { entryId, start, end, content }, ctx) => {
-      return await create(entryId, start, end, content)
-    },
-    updateActivityLog: async (_, { id, content, start, end }, ctx) => {
-      return await update(id, start, end, content)
-    }
-  }
+  /* Mutation: {
+   *   createActivityLog: async (_, { entryId, start, end, content }, ctx) => {
+   *     return await create(entryId, start, end, content)
+   *   },
+   *   updateActivityLog: async (_, { id, content, start, end }, ctx) => {
+   *     return await update(id, start, end, content)
+   *   }
+   * } */
 }
