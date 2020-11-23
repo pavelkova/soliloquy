@@ -12,7 +12,7 @@ export const Editor = ({ today }) => {
   const [wordCount, setWordCount] = useState(today.wordCount || 0)
   const [lowestWC, setLowestWC] = useState(wordCount)
   /* const [activity, setActivity] = useState({ isActive: false, start: null, lowestWC: wordCount, activityLogID: today.activityLogs[-1]?.id || null }) */
-  const [activity, setActivity] = useState({ isActive: false, start: bu})
+  const [activity, setActivity] = useState({ isActive: false, start: null })
   const [isPaused, setIsPaused] = useState(false)
   const [pause, setPause] = useState({ isPaused: false, manualPause: false })
   const [lastSaved, setLastSaved] = useState({
@@ -178,3 +178,16 @@ if less than 100 words: this entry was too short to analyze!
 
 // user preference or default: background, text color, highlight, font name, font size, timezone, word goal
 // five minutes to midnight at client time or user preference timezone, if exists
+
+/*
+content, wordCount, activityStart, lowestActiveWordCount
+
+if content is updated and is different from lastsaved content ->
+if inactive, setIsActive to true (setLastSaved before setContent on requery)
+run updateEntry after three seconds
+
+if entry already had content, it should have at least one activity log
+
+
+if this is the first log: set lowestWordCount to zero
+ */

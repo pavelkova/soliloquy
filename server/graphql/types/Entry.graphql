@@ -11,6 +11,11 @@ type Entry {
   activityLogs: [ActivityLog]
 }
 
+type ActivityInput {
+  lowestWordCount: Int
+  start: DateTime
+}
+
 type Query {
   findToday: Entry
   findEntryById(id: ID!): Entry
@@ -20,5 +25,5 @@ type Query {
 
 type Mutation {
   findOrCreateEntry: Entry
-  updateEntry(id: ID!, content: String, wordCount: Int): Entry
+  updateEntry(id: ID!, content: String, wordCount: Int, activity: ActivityInput): Entry
 }

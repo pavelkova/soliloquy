@@ -12,12 +12,17 @@ export const AuthForm = () => {
 
   const [result, login] = useMutation(LOGIN)
 
+  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+  console.log(browserTimezone)
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     const { data, fetching, error } = await login({ email,
-                                                    password })
+                                                    password,
+                                                    browserTimezone })
     if (error) console.error(error)
+
     if (data?.login) router.push('/today')
     // disable submit on invalid or loading
   }

@@ -46,9 +46,9 @@ const findByDate = async (user, date) => {
   console.log('ACTIONS -> FIND ENTRY BY DATE ->')
   if (!date.yyyy) throw new Error('no date provided')
   // remove null mm & dd to return all entries for a year
-  date.mm ? null : delete date.mm
+  if (date.mm) delete date.mm
   // remove null dd to return all entries for a month
-  date.dd ? null : delete date.dd
+  if (date.dd) delete date.dd
 
   let entries
 
@@ -97,14 +97,14 @@ const create = async user => {
   return todayEntry
 }
 
-const update = async (_user, id, content, wordCount, startTime) => {
+const update = async (_user, id, content, { lowestWordCount, start }) => {
   if (!content) return
   console.log('ACTIONS -> UPDATE ENTRY->')
 
   let updatedEntry
 
   try {
-    await createOrUpdateActivityLog(id, content, startTime)
+    await createOrUpdateActivityLog(id, content, lowestWordCount, start)
 
     const entryArr = await t.returning(columns)
                             .where({ id })

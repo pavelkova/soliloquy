@@ -9,6 +9,8 @@ const columns = [
   'start',
   'end',
   'content',
+  'lowest_word_count as lowestWordCount',
+  'net_word_count as netWordCount'
 ]
 
 const findById = async (id) => {
@@ -76,7 +78,7 @@ const update = async (id, content) => {
   return log
 }
 
-const createOrUpdate = async (entryId, newContent, startTime) => {
+const createOrUpdate = async (entryId, newContent, startTime, lowestWordCount) => {
   console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
   const logs = findAll(entryId)
   const currentLog = logs[-1]

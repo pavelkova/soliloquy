@@ -30,8 +30,8 @@ export default {
         return await create(ctx.user)
     }),
     updateEntry:  authenticate(
-      async (_, { id, content, wordCount, startTime }, ctx) => {
-        return await update(ctx.user, id, content, wordCount, startTime)
+      async (_, { id, content, wordCount, activity }, ctx) => {
+        return await update(ctx.user, id, content, wordCount, activity )
     }),
   },
   Entry: {

@@ -1,7 +1,7 @@
 /* truly terrible function names */
 
 const getTimeSince = time => {
-  return new Date() - new Date(time)
+  return Date.now() - new Date(time)
 }
 
 const formatWithLocale = (user, options = {}, date = '') => {

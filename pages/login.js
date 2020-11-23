@@ -1,8 +1,7 @@
 import { AuthForm } from 'components/AuthForm'
-import { useMutation } from 'urql'
 
 export default function Login() {
-    return <AuthForm />
+  return <AuthForm />
 }
 
 /* export const getServerSideProps = async ctx => {

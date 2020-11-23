@@ -3,7 +3,9 @@ type ActivityLog {
   entry: Entry!
   start: DateTime!
   end: DateTime
-  content: String
+  content: String!
+  lowestWordCount: Int
+  netWordCount: Int
 }
 
 type Query {

@@ -24,10 +24,11 @@ export default {
       if (user) setUserToken(ctx.res, user)
       return user
     },
-    login: async (_, { email, password }, ctx) => {
+    login: async (_, { email, password, browserTimezone }, ctx) => {
       console.log('LOGIN MUTATION')
       let user = await login(email, password)
-      if (user) setUserToken(ctx.res, user)
+      // check for user.settings.timezone
+      if (user) setUserToken(ctx.res, user, browserTimezone)
       return user
     },
     logout: async (_, {}, ctx) => {
