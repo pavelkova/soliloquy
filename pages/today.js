@@ -6,8 +6,6 @@ import FIND_OR_CREATE_ENTRY from 'mutations/FindOrCreateEntry.graphql'
 export default function Today({ today, error }) {
   if (error) return <p>Something went wrong</p>
   console.log('TODAY PAGE -> RENDER ->')
-/* if (window == 'undefined') return <p>what is happening</p> */
-  /* console.log(document) */
   console.log(today)
   if (!today) return <p>today does not exist</p>
   return (

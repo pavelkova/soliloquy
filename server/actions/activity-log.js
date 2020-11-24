@@ -45,16 +45,20 @@ const findAll = async (entryId) => {
   return logs
 }
 
-const create = async (entryId, content, start) => {
+const create = async (entryId, content, lowestWordCount, netWordCount, start) => {
   console.log('ACTIONS -> ACTIVITY LOG -> CREATE ->')
   let log
   /* const started = new Date(parseInt(start))
    * const ended = new Date(parseInt(end)) */
+
   try {
     log = await t.returning(columns)
                  .insert({ entry_id: entryId,
-                           start,
                            content,
+                           lowest_word_count: lowestWordCount,
+                           net_word_count: netWordCount,
+                           start,
+                           // FIXME date function
                            end: new Date() })
   } catch (e) {
     console.error(e.message)
@@ -63,13 +67,16 @@ const create = async (entryId, content, start) => {
   return log[0]
 }
 
-const update = async (id, content) => {
+const update = async (id, content, lowestWordCount, netWordCount) => {
   console.log('ACTIONS -> ACTIVITY LOG -> UPDATE ->')
   let log
   try {
     log = await t.returning(columns)
                  .where({ id })
                  .update({ content,
+                           lowest_word_count: lowestWordCount,
+                           net_word_count: netWordCount,
+                           // FIXME date function
                            end: new Date() })
   } catch (e) {
     console.error(e.message)
@@ -78,19 +85,22 @@ const update = async (id, content) => {
   return log
 }
 
-const createOrUpdate = async (entryId, newContent, startTime, lowestWordCount) => {
+const createOrUpdate = async (entryId, content, wordCount, lowestWordCount, start) => {
   console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
   const logs = findAll(entryId)
   const currentLog = logs[-1]
 
+  const netWordCount = wordCount - lowestWordCount
+
   // if no logs exist, create the first one
   // or if logs exist but the last change was made more than five minutes ago, create a new log
   if (!currentLog ||
-      (new Date(startTime) - new Date(currentLog.end) > 50000)) {
-    return create(entryId, newContent, startTime)
+      // FIXME date function
+      (new Date(start) - new Date(currentLog.end) > 50000)) {
+    return create(entryId, content, lowestWordCount, netWordCount, start)
   }
   // otherwise just update the most recent log
-  return update(currentLog.id, newContent)
+  return update(currentLog.id, content, lowestWordCount, netWordCount)
 }
 
 export { findById, findAll,

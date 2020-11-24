@@ -11,7 +11,7 @@ type Entry {
   activityLogs: [ActivityLog]
 }
 
-type ActivityInput {
+input ActivityInput {
   lowestWordCount: Int
   start: DateTime
 }

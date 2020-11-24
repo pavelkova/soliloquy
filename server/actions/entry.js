@@ -18,6 +18,7 @@ const columns = [
 const findToday = async user => {
   console.log('ACTIONS -> FIND TODAY ->')
   let todayEntry
+  // FIXME date function
   const today = todayFieldsWithUserLocale(user)
   try {
     const entries = await findByDate(user, today)
@@ -97,19 +98,21 @@ const create = async user => {
   return todayEntry
 }
 
-const update = async (_user, id, content, { lowestWordCount, start }) => {
+const update = async (_user, id, content, wordCount, { lowestWordCount, start }) => {
   if (!content) return
   console.log('ACTIONS -> UPDATE ENTRY->')
 
   let updatedEntry
+  console.log(content, wordCount, lowestWordCount, start)
 
   try {
-    await createOrUpdateActivityLog(id, content, lowestWordCount, start)
+    await createOrUpdateActivityLog(id, content, wordCount, lowestWordCount, start)
 
     const entryArr = await t.returning(columns)
                             .where({ id })
                             .update({ content,
                                       word_count: wordCount,
+                                      // FIXME date function
                                       updated_at: new Date() })
     updatedEntry = entryArr[0]
   } catch (e) {
