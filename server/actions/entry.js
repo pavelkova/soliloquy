@@ -15,6 +15,13 @@ const columns = [
   'updated_at as updatedAt'
 ]
 
+/**
+ * Determine today's date for the logged-in user's preferred timezone
+ * and return an entry matching its yyyy-mm-dd, if one exists.
+ *
+ * @param user Object from GraphQL context with user id, email, and browser timezone
+ */
+// TODO add optional user timezone setting
 const findToday = async user => {
   console.log('ACTIONS -> FIND TODAY ->')
   let todayEntry
@@ -42,14 +49,23 @@ const findById = async (user, id) => {
   }
   return entry
 }
-// find all entries within
+
+/**
+ * Return an array of user's entries for a specified date or date range
+ *
+ * @param yyyy Integer, required.
+ * @param mm Integer in range 1-12 to match a calendar month. If not provided,
+ * all entries for the year will be returned.
+ * @param dd Integer in range 1-31 to match a date within the calendar month. If not provided,
+ * all entries for the month will be returned.
+ */
 const findByDate = async (user, date) => {
   console.log('ACTIONS -> FIND ENTRY BY DATE ->')
   if (!date.yyyy) throw new Error('no date provided')
   // remove null mm & dd to return all entries for a year
-  if (date.mm) delete date.mm
+  if (!date.mm) delete date.mm
   // remove null dd to return all entries for a month
-  if (date.dd) delete date.dd
+  if (!date.dd) delete date.dd
 
   let entries
 
@@ -66,7 +82,12 @@ const findByDate = async (user, date) => {
   return entries
 }
 
-const findAll = async (user) => {
+/**
+ * Find all entries for the authorized user.
+ *
+ * @param user User object passed from GraphQL context.
+ */
+const findAll = async user => {
   console.log('ACTIONS -> FIND ALL ENTRIES ->')
   let entries
   try {
@@ -78,11 +99,17 @@ const findAll = async (user) => {
   return entries
 }
 
+/**
+ * Initialize today's entry for the authorized user if it does not exist.
+ *
+ * @param user User object passed from GraphQL context.
+ */
 const create = async user => {
   console.log('ACTIONS -> CREATE ENTRY ->')
 
   let { today, todayEntry } = await findToday(user)
 
+  // [TODO] add locale-formatted datetimes
   if (!todayEntry) {
     try {
       const entryArr = await t.returning(columns)
@@ -98,7 +125,18 @@ const create = async user => {
   return todayEntry
 }
 
-const update = async (_user, id, content, wordCount, { lowestWordCount, start }) => {
+/*
+ * Update today's entry for authorized user and pass activity-related params
+ * to create or update the appropriate activity log.
+ *
+ * @param user
+ * @param id
+ * @param content
+ * @param wordCount
+ * @param lowestWordCount
+ * @param start
+ */
+const update = async (user, id, content, wordCount, { lowestWordCount, start }) => {
   if (!content) return
   console.log('ACTIONS -> UPDATE ENTRY->')
 

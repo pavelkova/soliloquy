@@ -7,7 +7,7 @@ const getTimeSince = time => {
 const formatWithLocale = (user, options = {}, date = '') => {
   console.log('format with locale')
   console.log(user)
-  const d = date ? new Date(date) : new Date()
+  const d = date ? new Date(date) : Date.now()
 
   if (user.settings?.timezone) {
     options.timeZone = user.settings.timezone

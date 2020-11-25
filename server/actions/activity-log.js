@@ -1,5 +1,4 @@
 import { db } from '../db'
-import { findById as findEntryById } from './entry'
 
 const t = db('activity_logs')
 
@@ -13,6 +12,11 @@ const columns = [
   'net_word_count as netWordCount'
 ]
 
+/**
+ * Find an activity log by ID
+ *
+ * @param id activity log ID
+ */
 const findById = async (id) => {
   console.log('ACTIONS -> ACTIVITY LOG -> FINDBYID ->')
   let log
@@ -25,6 +29,12 @@ const findById = async (id) => {
   }
   return log
 }
+
+/**
+ * Return an array of all activity logs for a given entry.
+ *
+ * @param entryId
+ */
 
 const findAll = async (entryId) => {
   console.log('ACTIONS -> ACTIVITY LOG -> FINDALL ->')
@@ -45,6 +55,15 @@ const findAll = async (entryId) => {
   return logs
 }
 
+/**
+ * Create a new activity log for user's today entry.
+ *
+ * @param entryId
+ * @param content
+ * @param lowestWordCount
+ * @param netWordCount
+ * @param start
+*/
 const create = async (entryId, content, lowestWordCount, netWordCount, start) => {
   console.log('ACTIONS -> ACTIVITY LOG -> CREATE ->')
   let log
@@ -67,6 +86,14 @@ const create = async (entryId, content, lowestWordCount, netWordCount, start) =>
   return log[0]
 }
 
+/**
+ * Update the most recent activity log for user's today entry.
+ *
+ * @param id
+ * @param content
+ * @param lowestWordCount
+ * @param netWordCount
+ */
 const update = async (id, content, lowestWordCount, netWordCount) => {
   console.log('ACTIONS -> ACTIVITY LOG -> UPDATE ->')
   let log
@@ -85,6 +112,16 @@ const update = async (id, content, lowestWordCount, netWordCount) => {
   return log
 }
 
+/**
+ * Get activity logs for user's today entry and determine whether to create a new one
+ * or update the most recent one.
+ *
+ * @param entryId
+ * @param content
+ * @param wordCount
+ * @param lowestWordCount
+ * @param start
+ */
 const createOrUpdate = async (entryId, content, wordCount, lowestWordCount, start) => {
   console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
   const logs = findAll(entryId)
