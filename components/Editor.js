@@ -15,8 +15,8 @@ export const Editor = ({ today }) => {
       </div>
       saved at { lastSavedAt.toLocaleString('en-us', { timeStyle: 'short' }) }
       <div></div>
-      <textarea onChange={handleTextChange} value={content} />
-      <button onClick={handleSave}>save</button>
+      <textarea onChange={handleTextChange} value={content} disabled={isPaused} />
+      <button onClick={handleSave} disabled={isPaused}>save</button>
     </>
   )
 }

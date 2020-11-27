@@ -27,6 +27,7 @@ const findToday = async user => {
   let todayEntry
   // FIXME date function
   const today = todayFieldsWithUserLocale(user)
+  console.log(today)
   try {
     const entries = await findByDate(user, today)
     todayEntry = entries[0]
@@ -34,6 +35,7 @@ const findToday = async user => {
     console.error(e.message)
     throw new Error(e)
   }
+  console.log(todayEntry)
   return { today, todayEntry }
 }
 
