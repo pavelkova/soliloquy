@@ -1,11 +1,10 @@
 type Entry {
   id: ID!
   user: User!
+  date: String!
+  timezone: String!
   content: String
   wordCount: Int
-  yyyy: Int!
-  mm: Int!
-  dd: Int!
   createdAt: DateTime
   updatedAt: DateTime
   activityLogs: [ActivityLog]
@@ -16,10 +15,16 @@ input ActivityInput {
   start: DateTime
 }
 
+input DateSpanInput {
+  fromDate: DateTime!
+  toDate: DateTime
+}
+
 type Query {
   findToday: Entry
   findEntryById(id: ID!): Entry
-  findEntriesByDate(yyyy: Int!, mm: Int, dd: Int): Entry
+  findEntryByDate(date: String!): Entry
+  findEntriesByDates(dateSpan: DateSpanInput!): [Entry]
   findAllEntries: [Entry]
 }
 

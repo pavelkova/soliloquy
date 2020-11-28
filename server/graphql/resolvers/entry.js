@@ -1,5 +1,5 @@
 import { authenticate } from 'services/auth'
-import { findToday, findById, findByDate, findAll,
+import { findToday, findById, findByDate, findByDateSpan, findAll,
          create, update } from 'actions/entry'
 import { findAll as findEntryLogs } from 'actions/activity-log'
 import { findById as findEntryOwner } from 'actions/user'
@@ -14,10 +14,13 @@ export default {
       async (_, { id }, ctx) => {
         return await findById(ctx.user, id)
     }),
-    findEntriesByDate: authenticate(
-      async (_, { yyyy, mm, dd }, ctx) => {
-        return await findByDate(ctx.user,
-                                { yyyy, mm, dd })
+    findEntryByDate: authenticate(
+      async (_, { date }, ctx) => {
+        return await findByDate(ctx.user, date)
+    }),
+    findEntriesByDates: authenticate(
+      async (_, { fromDate, toDate }, ctx) => {
+        return await findByDateSpan(ctx.user, fromDate, toDate)
     }),
     findAllEntries: authenticate(
       async (_, {}, ctx) => {
@@ -26,8 +29,8 @@ export default {
   },
   Mutation: {
     findOrCreateEntry: authenticate(
-      async (_, {}, ctx) => {
-        return await create(ctx.user)
+      async (_, { timezone }, ctx) => {
+        return await create(ctx.user, timezone)
     }),
     updateEntry:  authenticate(
       async (_, { id, content, wordCount, activity }, ctx) => {

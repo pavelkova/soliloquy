@@ -15,10 +15,10 @@ export default {
     })
   },
   Mutation: {
-    createSetting: authenticate(
-      async (_, { key, value }, ctx) => {
-        return await create(ctx.user, key, value)
-    }),
+    /* createSetting: authenticate(
+     *   async (_, { key, value }, ctx) => {
+     *     return await create(ctx.user, key, value)
+     * }), */
     updateSetting: authenticate(
       async (_, { id, key, value }, ctx) => {
         return await update(ctx.user, id, key, value)

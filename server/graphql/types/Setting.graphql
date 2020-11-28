@@ -11,6 +11,6 @@ type Query {
 }
 
 type Mutation {
-  createSetting(key: String!, value: String): Setting
+  # createSetting(key: String!, value: String): Setting
   updateSetting(id: ID!, key: String!, value: String): Setting
 }

@@ -1,24 +1,31 @@
 import { useRouter } from 'next/router'
 import { useQuery } from 'urql'
-import ENTRIES_BY_DATE from 'queries/EntriesByDate.graphql'
+import { isValid } from 'utils/date'
+import ENTRIES_BY_DATES from 'queries/EntriesByDates.graphql'
 
 export default function Year() {
   const router = useRouter()
-
   const { yyyy } = router.query
-  let currentYear = new Date().getFullYear()
-  if (yyyy.match(/([0-9]{4})/)
-      && 1970 <= yyyy // user.createdAt.getFullYear()
-      && yyyy <= currentYear) {
-    const { data, fetching, error } = useQuery(ENTRIES_BY_DATE, { variables: yyyy })
+
+  if (!isValid.year(yyyy)) {
+    throw new Error('Year parameter must be a valid year in 4-digit format.')
+    // redirect
   }
-  console.log(router)
-  /* console.log('YEAR ->')
-   * console.log(router.query) */
+
+  const fromDate = yyyy + '-01-01'
+  const toDate = yyyy + '-12-31'
+
+  const { data, fetching, error } = useQuery(ENTRIES_BY_DATES, { variables: { fromDate, toDate } })
+
+
+  if (fetching) return <p>Loading...</p>
+  if (error) return <p>{ error.message }</p>
+  if (data) console.log(data)
+
   return (
-    <>
+  <>
     'empty'
-    </>
+  </>
   )
 }
 export const getServerSideProps = async ctx => {

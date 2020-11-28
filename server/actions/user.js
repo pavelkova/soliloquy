@@ -1,6 +1,7 @@
 import { db } from '../db'
 import { encryptPassword,
          validatePassword } from 'services/auth-helpers/hashing'
+import { initialize as initializeDefaultSettings } from './settings'
 
 const t = db('users')
 const columns = [
@@ -51,11 +52,16 @@ const signup = async (email, password) => {
   console.log('ACTIONS -> USER -> SIGNUP ->')
   let user = await findByEmail({ email })
   if (!user) {
-    const hash = await encryptPassword(password)
-    user = await t.returning(columns)
-                  .insert({ email, password: hash })
-    if (user) return user[0]
-    throw new Error('Could not complete signup.')
+    try {
+      const hash = await encryptPassword(password)
+      const userArr = await t.returning(columns)
+                             .insert({ email, password: hash })
+      user = userArr[0]
+      await initializeDefaultSettings(user)
+    } catch(e) {
+      throw new Error('Could not complete signup.')
+    }
+    return user
   }
   throw new Error('A user with that email already exists.')
 }

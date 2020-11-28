@@ -1,15 +1,14 @@
 import { db } from '../db'
-import { todayFieldsWithUserLocale } from 'utils/date'
+import { now, formatEntryDate } from 'utils/date'
 import { createOrUpdate as createOrUpdateActivityLog } from './activity-log'
 
 const t = db('entries')
 const columns = [
   'id',
   'user_id as userId',
+  'date',
+  'timezone',
   'content',
-  'yyyy',
-  'mm',
-  'dd',
   'word_count as wordCount',
   'created_at as createdAt',
   'updated_at as updatedAt'
@@ -22,21 +21,19 @@ const columns = [
  * @param user Object from GraphQL context with user id, email, and browser timezone
  */
 // TODO add optional user timezone setting
-const findToday = async user => {
+const findToday = async (user, timezone) => {
   console.log('ACTIONS -> FIND TODAY ->')
+  const today = formatEntryDate(timezone)
+
   let todayEntry
-  // FIXME date function
-  const today = todayFieldsWithUserLocale(user)
-  console.log(today)
+
   try {
-    const entries = await findByDate(user, today)
-    todayEntry = entries[0]
+    todayEntry = await findByDate(user, today)
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  console.log(todayEntry)
-  return { today, todayEntry }
+  return todayEntry
 }
 
 const findById = async (user, id) => {
@@ -53,31 +50,45 @@ const findById = async (user, id) => {
 }
 
 /**
- * Return an array of user's entries for a specified date or date range
+ * Return a single entry for the authorized user that matches the given date
  *
- * @param yyyy Integer, required.
- * @param mm Integer in range 1-12 to match a calendar month. If not provided,
- * all entries for the year will be returned.
- * @param dd Integer in range 1-31 to match a date within the calendar month. If not provided,
- * all entries for the month will be returned.
+ * @param date String representing the date in format "yyyy-mm-dd"
  */
 const findByDate = async (user, date) => {
   console.log('ACTIONS -> FIND ENTRY BY DATE ->')
-  if (!date.yyyy) throw new Error('no date provided')
-  // remove null mm & dd to return all entries for a year
-  if (!date.mm) delete date.mm
-  // remove null dd to return all entries for a month
-  if (!date.dd) delete date.dd
+
+  let entry
+
+  try {
+    const entries = await t.select(columns)
+                           .where({ user_id: user.id, date })
+    entry = entries[0]
+
+  } catch (e) {
+    console.log('ERROR IN findByDate')
+    console.error(e.message)
+    throw new Error(e)
+  }
+  return entry
+}
+
+/**
+ * Return an array of user's entries between two given dates
+ *
+ * @param fromDate String representing the start date in format "yyyy-mm-dd"
+ * @param toDate String representing the end date in format "yyyy-mm-dd"
+ */
+const findByDateSpan = async(user, fromDate, toDate) => {
+  console.log('ACTIONS -> FIND ENTRIES BY DATES ->')
 
   let entries
 
   try {
     entries = await t.select(columns)
-                     .where({ user_id: user.id,
-                              ...date })
-
-  } catch (e) {
-    console.log('ERROR IN findByDate')
+                     .where({ user_id: user.id})
+                     .whereBetween('date', [fromDate, toDate])
+  } catch(e) {
+    console.log('ERROR IN findByDateSpan')
     console.error(e.message)
     throw new Error(e)
   }
@@ -106,17 +117,20 @@ const findAll = async user => {
  *
  * @param user User object passed from GraphQL context.
  */
-const create = async user => {
+const create = async (user, timezone) => {
   console.log('ACTIONS -> CREATE ENTRY ->')
 
-  let { today, todayEntry } = await findToday(user)
+  // [HACK] choose between
+  const today = formatEntryDate(timezone)
+  let todayEntry= await findToday(user, timezone)
 
-  // [TODO] add locale-formatted datetimes
   if (!todayEntry) {
     try {
       const entryArr = await t.returning(columns)
                               .insert({ user_id: user.id,
-                                        ...today })
+                                        date: today,
+                                        created_at: now(),
+                                        updated_at: now() })
       todayEntry = entryArr[0]
     } catch (e) {
       console.error(e.message)
@@ -139,7 +153,6 @@ const create = async user => {
  * @param start
  */
 const update = async (user, id, content, wordCount, { lowestWordCount, start }) => {
-  if (!content) return
   console.log('ACTIONS -> UPDATE ENTRY->')
 
   let updatedEntry
@@ -152,8 +165,7 @@ const update = async (user, id, content, wordCount, { lowestWordCount, start }) 
                             .where({ id })
                             .update({ content,
                                       word_count: wordCount,
-                                      // FIXME date function
-                                      updated_at: new Date() })
+                                      updated_at: now() })
     updatedEntry = entryArr[0]
   } catch (e) {
     console.error(e.message)
@@ -162,5 +174,5 @@ const update = async (user, id, content, wordCount, { lowestWordCount, start }) 
   return updatedEntry
 }
 
-export { findToday, findById, findByDate, findAll,
+export { findToday, findById, findByDate, findByDateSpan, findAll,
          create, update }

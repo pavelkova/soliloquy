@@ -1,8 +1,3 @@
-/* truly terrible function names */
-const getTimeSince = time => {
-  return Date.now() - new Date(time)
-}
-
 const now = () => {
   return new Date().toISOString()
 }
@@ -31,7 +26,7 @@ const formatEntryDate = (tz, date = '') => {
   return year + '-' + month + '-' + day
 }
 
-const formatDateWithLocale = (tz, options = {}, date = '') => {
+const formatLocalDateTime = (tz, options = {}, date = '', locale = 'en-US') => {
   /* options = {
    *   dateStyle: ['full', 'long', 'medium', 'short'],
    *   timeStyle: ['full', 'long', 'medium', 'short'],
@@ -45,13 +40,47 @@ const formatDateWithLocale = (tz, options = {}, date = '') => {
    *   timeZoneName: ['long', 'short']
    * }
    */
+  const d = date ? new Date(date) : new Date()
   options.timeZone = tz
+
+  return d.toLocaleString(locale, options)
+}
+
+const getTimeSince = time => {
+  return Date.now() - new Date(time)
+}
+
+const getTimeBetween = (start, end) => {
+  return new Date(end) - new Date(start)
+}
+
+
+// TODO move to validators when that file is ready
+const isValid = {
+  year: yyyy => {
+    return Boolean(yyyy.match(/[0-9]{4})/)
+                   && parseInt(yyyy) >= 1970
+                   && parseInt(yyyy) <= new Date().getUTCFullYear())
+  },
+  month: mm => {
+    return Boolean(mm.match(/[0-9]{1,2}/)
+                && parseInt(mm) >= 1
+                && parseInt(mm) <= 12)
+  },
+  day: dd => {
+    return Boolean(dd.match(/[0-9]{1,2}/)
+                   && parseInt(dd) >= 1
+                   && parseInt(mm) <= 31)
+  }
 }
 
 export { now,
          toUTC,
+         isValid,
          formatEntryDate,
-         formatDateWithLocale }
+         formatLocalDateTime,
+         getTimeSince,
+         getTimeBetween }
 
 /*
    postgres timestamp = YYYY-MM-DD HH:MM:SS.[......]-TZ

@@ -1,4 +1,5 @@
 import { db } from '../db'
+import { now, getTimeBetween } from 'utils/date'
 
 const t = db('activity_logs')
 
@@ -77,8 +78,7 @@ const create = async (entryId, content, lowestWordCount, netWordCount, start) =>
                            lowest_word_count: lowestWordCount,
                            net_word_count: netWordCount,
                            start,
-                           // FIXME date function
-                           end: new Date() })
+                           end: now() })
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
@@ -103,8 +103,7 @@ const update = async (id, content, lowestWordCount, netWordCount) => {
                  .update({ content,
                            lowest_word_count: lowestWordCount,
                            net_word_count: netWordCount,
-                           // FIXME date function
-                           end: new Date() })
+                           end: now() })
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
@@ -132,8 +131,7 @@ const createOrUpdate = async (entryId, content, wordCount, lowestWordCount, star
   // if no logs exist, create the first one
   // or if logs exist but the last change was made more than five minutes ago, create a new log
   if (!currentLog ||
-      // FIXME date function
-      (new Date(start) - new Date(currentLog.end) > 50000)) {
+      (getTimeBetween(start, currentLog.end) > 50000)) {
     return create(entryId, content, lowestWordCount, netWordCount, start)
   }
   // otherwise just update the most recent log

@@ -1,7 +1,0 @@
-#import "../EntryFragment.graphql"
-
-query ($yyyy: Int!, $mm: Int!, $dd: Int!) {
-  findEntriesByDate(yyyy: $yyyy, mm: $mm, dd: $dd) {
-    ...EntryFragment
-  }
-}
