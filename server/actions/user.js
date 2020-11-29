@@ -1,7 +1,7 @@
 import { db } from '../db'
 import { encryptPassword,
          validatePassword } from 'services/auth-helpers/hashing'
-import { initialize as initializeDefaultSettings } from './settings'
+import { initialize as initializeDefaultSettings } from './setting'
 
 const t = db('users')
 const columns = [

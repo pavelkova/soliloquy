@@ -129,6 +129,7 @@ const create = async (user, timezone) => {
       const entryArr = await t.returning(columns)
                               .insert({ user_id: user.id,
                                         date: today,
+                                        timezone: timezone,
                                         created_at: now(),
                                         updated_at: now() })
       todayEntry = entryArr[0]
@@ -137,7 +138,6 @@ const create = async (user, timezone) => {
       throw new Error(e)
     }
   }
-
   return todayEntry
 }
 
@@ -156,10 +156,9 @@ const update = async (user, id, content, wordCount, { lowestWordCount, start }) 
   console.log('ACTIONS -> UPDATE ENTRY->')
 
   let updatedEntry
-  console.log(content, wordCount, lowestWordCount, start)
 
   try {
-    await createOrUpdateActivityLog(id, content, wordCount, lowestWordCount, start)
+    if (start) await createOrUpdateActivityLog(id, content, wordCount, lowestWordCount, start)
 
     const entryArr = await t.returning(columns)
                             .where({ id })

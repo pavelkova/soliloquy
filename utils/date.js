@@ -58,7 +58,7 @@ const getTimeBetween = (start, end) => {
 // TODO move to validators when that file is ready
 const isValid = {
   year: yyyy => {
-    return Boolean(yyyy.match(/[0-9]{4})/)
+    return Boolean(yyyy.match(/[0-9]{4}/)
                    && parseInt(yyyy) >= 1970
                    && parseInt(yyyy) <= new Date().getUTCFullYear())
   },

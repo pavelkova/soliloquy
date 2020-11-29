@@ -30,6 +30,7 @@ export default {
   Mutation: {
     findOrCreateEntry: authenticate(
       async (_, { timezone }, ctx) => {
+        if (!timezone) timezone = ctx.user.tz
         return await create(ctx.user, timezone)
     }),
     updateEntry:  authenticate(

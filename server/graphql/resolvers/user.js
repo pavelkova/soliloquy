@@ -19,9 +19,9 @@ export default {
     },
   },
   Mutation: {
-    signup: async (_, { email, password }, ctx) => {
+    signup: async (_, { email, password, browserTimezone }, ctx) => {
       const user = await signup(email, password)
-      if (user) setUserToken(ctx.res, user)
+      if (user) setUserToken(ctx.res, user, browserTimezone)
       return user
     },
     login: async (_, { email, password, browserTimezone }, ctx) => {

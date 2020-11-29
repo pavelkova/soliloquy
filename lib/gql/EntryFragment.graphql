@@ -1,10 +1,9 @@
 fragment EntryFragment on Entry {
   id
+  date
+  timezone
   content
   wordCount
-  yyyy
-  mm
-  dd
   createdAt
   updatedAt
 }

@@ -5,6 +5,7 @@ exports.up = function (knex) {
     table.date('date').notNullable()
     table.text('content')
     table.text('timezone')
+    table.integer('word_count')
     table.timestamps()
   })
 }

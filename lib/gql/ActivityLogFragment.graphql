@@ -3,4 +3,6 @@ fragment ActivityLogFragment on ActivityLog {
   start
   end
   content
+  lowestWordCount
+  netWordCount
 }

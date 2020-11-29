@@ -1,7 +1,12 @@
+import { useMutation } from 'urql'
 import { AuthForm } from 'components/AuthForm'
+import LOGIN from 'mutations/Login.graphql'
 
 export default function Login() {
-  return <AuthForm />
+  const [result, login] = useMutation(LOGIN)
+  const formName = 'Login'
+
+  return <AuthForm formName={ formName } mutation={ login } />
 }
 
 /* export const getServerSideProps = async ctx => {
