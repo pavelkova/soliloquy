@@ -7,14 +7,17 @@ import entryResolvers from './resolvers/entry'
 import activityLogResolvers from './resolvers/activity-log'
 import settingResolvers from './resolvers/setting'
 
-const dateTimeResolver = { DateTime: new GraphQLScalarType(
-  { name: 'DateTime',
+
+const dateTimeResolver = {
+  DateTime: new GraphQLScalarType({
+    name: 'DateTime',
     description: 'A date and time, represented as an ISO-8601 string',
+    // serialize: prepares a queried value from the server to be sent to the client
     serialize: (value) => value.toISOString(),
-    // FIXME date function
-    parseValue: (value) => new Date(value),
-    parseLiteral: (ast) => new Date(ast.value)
-})
+    // parseValue:
+    parseValue: (value) => value,
+    parseLiteral: (ast) => ast.value
+  })
 }
 
 const resolversArray = [dateTimeResolver,

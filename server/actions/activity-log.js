@@ -36,19 +36,14 @@ const findById = async (id) => {
  *
  * @param entryId
  */
-
 const findAll = async (entryId) => {
   console.log('ACTIONS -> ACTIVITY LOG -> FINDALL ->')
   let logs
   try {
     logs = await t.select(columns)
                   .where({ entry_id: entryId })
-    /* if (logs[-1] && !logs[-1].end) {
-     *   const closedLog = await t.returning(columns)
-     *                            .where({ id: entryLogs[-1].id })
-     *                            .update({ end: entry.updatedAt })
-     * } */
     console.log(logs)
+    console.log(logs[-1])
   } catch (e) {
     console.error(e)
     throw new Error(e)
@@ -65,11 +60,9 @@ const findAll = async (entryId) => {
  * @param netWordCount
  * @param start
 */
-const create = async (entryId, content, lowestWordCount, netWordCount, start) => {
+const create = async (entryId, content, lowestWordCount, netWordCount, start, end) => {
   console.log('ACTIONS -> ACTIVITY LOG -> CREATE ->')
   let log
-  /* const started = new Date(parseInt(start))
-   * const ended = new Date(parseInt(end)) */
 
   try {
     log = await t.returning(columns)
@@ -78,7 +71,7 @@ const create = async (entryId, content, lowestWordCount, netWordCount, start) =>
                            lowest_word_count: lowestWordCount,
                            net_word_count: netWordCount,
                            start,
-                           end: now() })
+                           end })
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
@@ -94,7 +87,7 @@ const create = async (entryId, content, lowestWordCount, netWordCount, start) =>
  * @param lowestWordCount
  * @param netWordCount
  */
-const update = async (id, content, lowestWordCount, netWordCount) => {
+const update = async (id, content, lowestWordCount, netWordCount, end) => {
   console.log('ACTIONS -> ACTIVITY LOG -> UPDATE ->')
   let log
   try {
@@ -103,7 +96,7 @@ const update = async (id, content, lowestWordCount, netWordCount) => {
                  .update({ content,
                            lowest_word_count: lowestWordCount,
                            net_word_count: netWordCount,
-                           end: now() })
+                           end })
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
@@ -120,22 +113,27 @@ const update = async (id, content, lowestWordCount, netWordCount) => {
  * @param wordCount
  * @param lowestWordCount
  * @param start
+ * @param end
  */
-const createOrUpdate = async (entryId, content, wordCount, lowestWordCount, start) => {
+const createOrUpdate = async (entryId, content, wordCount, lowestWordCount, start, end) => {
   console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
-  const logs = findAll(entryId)
+  const logs = await findAll(entryId)
   const currentLog = logs[-1]
+  console.log('findAll -> logs ->')
+  console.log(logs)
+  console.log('currentLog ->')
+  console.log(currentLog)
 
   const netWordCount = wordCount - lowestWordCount
 
   // if no logs exist, create the first one
   // or if logs exist but the last change was made more than five minutes ago, create a new log
-  if (!currentLog ||
+  if (logs.length == 0 ||
       (getTimeBetween(start, currentLog.end) > 50000)) {
-    return create(entryId, content, lowestWordCount, netWordCount, start)
+    return create(entryId, content, lowestWordCount, netWordCount, start, end)
   }
   // otherwise just update the most recent log
-  return update(currentLog.id, content, lowestWordCount, netWordCount)
+  return update(currentLog.id, content, lowestWordCount, netWordCount, end)
 }
 
 export { findById, findAll,

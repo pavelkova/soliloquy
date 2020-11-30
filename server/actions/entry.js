@@ -124,14 +124,17 @@ const create = async (user, timezone) => {
   const today = formatEntryDate(timezone)
   let todayEntry= await findToday(user, timezone)
 
+  // use same timestamp for created_at and initial updated_at
+  const saveTime = new Date().toISOString()
+
   if (!todayEntry) {
     try {
       const entryArr = await t.returning(columns)
                               .insert({ user_id: user.id,
                                         date: today,
                                         timezone: timezone,
-                                        created_at: now(),
-                                        updated_at: now() })
+                                        created_at: saveTime,
+                                        updated_at: saveTime })
       todayEntry = entryArr[0]
     } catch (e) {
       console.error(e.message)
@@ -157,14 +160,17 @@ const update = async (user, id, content, wordCount, { lowestWordCount, start }) 
 
   let updatedEntry
 
+  // use the same timestamp for entry.updated_at and activity_log.end
+  const updateTime = new Date().toISOString()
+
   try {
-    if (start) await createOrUpdateActivityLog(id, content, wordCount, lowestWordCount, start)
+    if (start) await createOrUpdateActivityLog(id, content, wordCount, lowestWordCount, start, updateTime)
 
     const entryArr = await t.returning(columns)
                             .where({ id })
                             .update({ content,
                                       word_count: wordCount,
-                                      updated_at: now() })
+                                      updated_at: updateTime})
     updatedEntry = entryArr[0]
   } catch (e) {
     console.error(e.message)

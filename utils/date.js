@@ -51,6 +51,8 @@ const getTimeSince = time => {
 }
 
 const getTimeBetween = (start, end) => {
+  console.log('getTimeBetween')
+  console.log(new Date(end) - new Date(start))
   return new Date(end) - new Date(start)
 }
 
