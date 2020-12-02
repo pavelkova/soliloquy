@@ -6,8 +6,6 @@ export const Editor = ({ today }) => {
 
   const {content, wordCount, lastSavedAt, isPaused, handleSave, handleTextChange, handlePause } = useEditor({ today })
 
-  console.log(useEditor({ today }))
-
   return (
     <>
       {/* <DateHeader entry={today} /> */}
@@ -16,7 +14,7 @@ export const Editor = ({ today }) => {
         {wordCount} {wordCount == 1 ? 'word' : 'words'}
         {/* <button onClick={ setIsPaused(!isPaused)}>{ isPaused ? 'start' : 'pause' }</button> */}
       </div>
-      saved at { lastSavedAt.toLocaleString('en-us', { timeStyle: 'short' }) }
+      saved at { new Date(lastSavedAt).toLocaleString('en-us', { timeStyle: 'short' }) }
       <div></div>
       <textarea onChange={handleTextChange} value={content} disabled={isPaused} />
       <button onClick={handleSave} disabled={isPaused}>save</button>

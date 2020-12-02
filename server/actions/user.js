@@ -17,12 +17,12 @@ const findById = async (id) => {
   let user
   try {
     user = await t.select(columns)
-                  .where({ id }).first()
+                  .where({ id }) // .first() // error -- cannot chain .first() on an insert query
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  return user
+  return user[0]
 }
 
 const findByEmail = async (email) => {
@@ -30,12 +30,12 @@ const findByEmail = async (email) => {
   let user
   try {
     user = await t.select(columns)
-                  .where({ email }).first()
+                  .where({ email }) // .first() // error -- cannot chain .first() on an insert query
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  return user
+  return user[0]
 }
 
 const login = async (email, password) => {
