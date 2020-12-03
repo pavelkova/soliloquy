@@ -67,7 +67,7 @@ const signup = async (email, password) => {
 }
 
 const updatePassword = async (user, oldPassword, newPassword) => {
-  console.log('ACTIONS -> USER -> UPDATEPASSWORD ->')
+  console.log('ACTIONS -> USER -> UPDATE PASSWORD ->')
   try {
     const match = await validatePassword(user, oldPassword)
     if (match) {

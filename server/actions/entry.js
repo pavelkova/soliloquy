@@ -164,7 +164,9 @@ const update = async (user, id, content, wordCount, { lowestWordCount, start }) 
   const updateTime = new Date().toISOString()
 
   try {
-    if (start) await createOrUpdateActivityLog(id, content, wordCount, lowestWordCount, start, updateTime)
+    if (start) await createOrUpdateActivityLog(id, content,
+                                               wordCount, lowestWordCount,
+                                               start, updateTime)
 
     const entryArr = await t.returning(columns)
                             .where({ id })
@@ -176,6 +178,7 @@ const update = async (user, id, content, wordCount, { lowestWordCount, start }) 
     console.error(e.message)
     throw new Error(e)
   }
+  console.log(updatedEntry)
   return updatedEntry
 }
 

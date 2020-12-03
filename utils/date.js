@@ -2,10 +2,18 @@ const now = () => {
   return new Date().toISOString()
 }
 
-const toUTC = date => {
-  return new Date(date).toISOString()
+const toUTC = {
+  date: (date) => {
+    return new Date(date).toISOString()
+  },
+  now: () => {
+    return new Date().toISOString()
+  },
+  pgFormat: (date = '') => {
+    const d = date ? new Date(date) : new Date()
+    return d.toISOString.replace('T',' ').replace('Z', '')
+  }
 }
-
 /**
  * Return a date string in YYYY-MM-DD format to query or insert
  * to database column type "date".
@@ -13,7 +21,7 @@ const toUTC = date => {
  * @param tz String containing IANA timezone name, e.g. "America/New_York"
  * @param date String to be converted into Javascript Date object--
  *             if not provided, returns today
-*/
+ */
 const formatEntryDate = (tz, date = '') => {
   const d = date ? new Date(date) : new Date()
   const options = { timeZone: tz,
@@ -51,8 +59,6 @@ const getTimeSince = time => {
 }
 
 const getTimeBetween = (start, end) => {
-  console.log('getTimeBetween')
-  console.log(new Date(end) - new Date(start))
   return new Date(end) - new Date(start)
 }
 

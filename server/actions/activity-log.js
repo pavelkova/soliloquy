@@ -42,8 +42,6 @@ const findAll = async (entryId) => {
   try {
     logs = await t.select(columns)
                   .where({ entry_id: entryId })
-    console.log(logs)
-    console.log(logs[-1])
   } catch (e) {
     console.error(e)
     throw new Error(e)
@@ -62,6 +60,7 @@ const findAll = async (entryId) => {
 */
 const create = async (entryId, content, lowestWordCount, netWordCount, start, end) => {
   console.log('ACTIONS -> ACTIVITY LOG -> CREATE ->')
+
   let log
 
   try {
@@ -72,6 +71,7 @@ const create = async (entryId, content, lowestWordCount, netWordCount, start, en
                            net_word_count: netWordCount,
                            start,
                            end })
+    console.log(log)
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
@@ -89,7 +89,9 @@ const create = async (entryId, content, lowestWordCount, netWordCount, start, en
  */
 const update = async (id, content, lowestWordCount, netWordCount, end) => {
   console.log('ACTIONS -> ACTIVITY LOG -> UPDATE ->')
+
   let log
+
   try {
     log = await t.returning(columns)
                  .where({ id })
@@ -117,23 +119,26 @@ const update = async (id, content, lowestWordCount, netWordCount, end) => {
  */
 const createOrUpdate = async (entryId, content, wordCount, lowestWordCount, start, end) => {
   console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
+
   const logs = await findAll(entryId)
-  const currentLog = logs[-1]
-  console.log('findAll -> logs ->')
-  console.log(logs)
-  console.log('currentLog ->')
-  console.log(currentLog)
+  let currentLog = logs.slice(-1)[0]
 
-  const netWordCount = wordCount - lowestWordCount
-
-  // if no logs exist, create the first one
-  // or if logs exist but the last change was made more than five minutes ago, create a new log
-  if (logs.length == 0 ||
-      (getTimeBetween(start, currentLog.end) > 50000)) {
-    return create(entryId, content, lowestWordCount, netWordCount, start, end)
+  try {
+    const netWordCount = wordCount - lowestWordCount
+    // if no logs exist, create the first one
+    // or if logs exist but the last change was made more than five minutes ago, create a new log
+    if (!currentLog ||
+        (getTimeBetween(start, currentLog.end) > 50000)) {
+      currentLog = await create(entryId, content, lowestWordCount, netWordCount, start, end)
+    } else {
+      // otherwise just update the most recent log
+      currentLog = await update(currentLog.id, content, lowestWordCount, netWordCount, end)
+    }
+  } catch(e) {
+    console.error(e.message)
+    throw new Error(e)
   }
-  // otherwise just update the most recent log
-  return update(currentLog.id, content, lowestWordCount, netWordCount, end)
+  return currentLog
 }
 
 export { findById, findAll,
