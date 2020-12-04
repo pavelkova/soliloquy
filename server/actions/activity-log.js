@@ -122,13 +122,14 @@ const createOrUpdate = async (entryId, content, wordCount, lowestWordCount, star
 
   const logs = await findAll(entryId)
   let currentLog = logs.slice(-1)[0]
-
+  // HACK this should not be necessary?
+  if (content == currentLog.content && start == currentLog.start && end == currentLog.end) return
   try {
     const netWordCount = wordCount - lowestWordCount
     // if no logs exist, create the first one
     // or if logs exist but the last change was made more than five minutes ago, create a new log
     if (!currentLog ||
-        (getTimeBetween(start, currentLog.end) > 50000)) {
+        (getTimeBetween(currentLog.end, start) > 300000)) {
       currentLog = await create(entryId, content, lowestWordCount, netWordCount, start, end)
     } else {
       // otherwise just update the most recent log

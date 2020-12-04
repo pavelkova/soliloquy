@@ -1,5 +1,5 @@
 import { Editor } from 'components/Editor'
-import { ssrMutation } from 'lib/urql-client'
+import { ssrMutation, ssrQuery } from 'lib/urql-client'
 import TODAY from 'queries/Today.graphql'
 import FIND_OR_CREATE_ENTRY from 'mutations/FindOrCreateEntry.graphql'
 
@@ -20,14 +20,13 @@ export const getServerSideProps = async ctx => {
 /*
   [TODO] separate today query and create today mutation, then pass reexecuteQuery from [{ data, ...}, reexecuteQuery] = useQuery(TODAY) as a prop to call within useEditor -> unpause, which can't wrap useQuery(TODAY)
 */
-  const { data, error } = await ssrMutation(ctx, FIND_OR_CREATE_ENTRY)
+    const { data, error } = await ssrMutation(ctx, FIND_OR_CREATE_ENTRY)
   const todayEntry = data?.findOrCreateEntry || {}
   console.log('TODAY ENTRY')
   console.log(todayEntry)
   console.log('--------------------------------------------')
   console.log(error)
-  console.log('--------------------------------------------')
-    console.log(ctx)
-    console.log(ctx.req.client)
+    console.log('--------------------------------------------')
+
   return { props: { today: todayEntry, error } }
 }
