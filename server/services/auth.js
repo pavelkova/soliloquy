@@ -29,7 +29,6 @@ export const getUserToken = async req => {
   if (token) {
     try {
       const data = await validateToken(token)
-      console.log(data)
       return data?.user
     } catch (e) {
       console.error(e.message)
@@ -40,5 +39,4 @@ export const getUserToken = async req => {
 
 export const revokeUserToken = async ctx => {
   removeTokenCookie(ctx.res)
-  console.log(ctx.req.headers)
 }

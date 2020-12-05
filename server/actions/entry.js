@@ -122,7 +122,7 @@ const create = async (user, timezone) => {
 
   // [HACK] choose between
   const today = formatEntryDate(timezone)
-  let todayEntry= await findToday(user, timezone)
+  let todayEntry = await findToday(user, timezone)
 
   // use same timestamp for created_at and initial updated_at
   const saveTime = new Date().toISOString()

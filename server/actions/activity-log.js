@@ -64,19 +64,19 @@ const create = async (entryId, content, lowestWordCount, netWordCount, start, en
   let log
 
   try {
-    log = await t.returning(columns)
-                 .insert({ entry_id: entryId,
-                           content,
-                           lowest_word_count: lowestWordCount,
-                           net_word_count: netWordCount,
-                           start,
-                           end })
-    console.log(log)
+    const logArr = await t.returning(columns)
+                          .insert({ entry_id: entryId,
+                                    content,
+                                    lowest_word_count: lowestWordCount,
+                                    net_word_count: netWordCount,
+                                    start,
+                                    end })
+    log = logArr[0]
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  return log[0]
+  return log
 }
 
 /**
@@ -120,24 +120,29 @@ const update = async (id, content, lowestWordCount, netWordCount, end) => {
 const createOrUpdate = async (entryId, content, wordCount, lowestWordCount, start, end) => {
   console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
 
+  const netWordCount = wordCount - lowestWordCount
+
   const logs = await findAll(entryId)
   let currentLog = logs.slice(-1)[0]
-  // HACK this should not be necessary?
-  if (content == currentLog.content && start == currentLog.start && end == currentLog.end) return
-  try {
-    const netWordCount = wordCount - lowestWordCount
-    // if no logs exist, create the first one
-    // or if logs exist but the last change was made more than five minutes ago, create a new log
-    if (!currentLog ||
-        (getTimeBetween(currentLog.end, start) > 300000)) {
+
+  // if no logs exist, create the first one
+  // or if logs exist but the last change was made more than five minutes ago, create a new log
+  if (!currentLog ||
+      (getTimeBetween(currentLog.end, start) > 300000)) {
+    try {
       currentLog = await create(entryId, content, lowestWordCount, netWordCount, start, end)
-    } else {
-      // otherwise just update the most recent log
-      currentLog = await update(currentLog.id, content, lowestWordCount, netWordCount, end)
+    } catch(e) {
+      console.error(e.message)
+      throw new Error(e)
     }
-  } catch(e) {
-    console.error(e.message)
-    throw new Error(e)
+  } else {
+    // otherwise just update the most recent log
+    try {
+      currentLog = await update(currentLog.id, content, lowestWordCount, netWordCount, end)
+    } catch(e) {
+      console.error(e.message)
+      throw new Error(e)
+    }
   }
   return currentLog
 }
