@@ -14,28 +14,11 @@ const columns = [
   'updated_at as updatedAt'
 ]
 
-/**
- * Determine today's date for the logged-in user's preferred timezone
- * and return an entry matching its yyyy-mm-dd, if one exists.
+/** Return a single entry by its ID.
+ * @param {Integer} id
  *
- * @param user Object from GraphQL context with user id, email, and browser timezone
+ * @return {Object} entry
  */
-// TODO add optional user timezone setting
-const findToday = async (user, timezone) => {
-  console.log('ACTIONS -> FIND TODAY ->')
-  const today = formatEntryDate(timezone)
-
-  let todayEntry
-
-  try {
-    todayEntry = await findByDate(user, today)
-  } catch (e) {
-    console.error(e.message)
-    throw new Error(e)
-  }
-  return todayEntry
-}
-
 const findById = async (user, id) => {
   console.log('ACTIONS -> FIND ENTRY BY ID ->')
   let entry
@@ -75,8 +58,8 @@ const findByDate = async (user, date) => {
 /**
  * Return an array of user's entries between two given dates
  *
- * @param fromDate String representing the start date in format "yyyy-mm-dd"
- * @param toDate String representing the end date in format "yyyy-mm-dd"
+ * @param {String} fromDate Query start date in format "yyyy-mm-dd"
+ * @param {String} toDate   Query end date in format "yyyy-mm-dd"
  */
 const findByDateSpan = async(user, fromDate, toDate) => {
   console.log('ACTIONS -> FIND ENTRIES BY DATES ->')
@@ -113,33 +96,47 @@ const findAll = async user => {
 }
 
 /**
+ * Determine today's date for the logged-in user's preferred timezone
+ * and return an entry matching its yyyy-mm-dd, if one exists.
+ *
+ * @param {Object} user Object from GraphQL context with user id, email, and browser timezone
+ *
+ * @return {Object} String of today's date in user's locale and today's entry, if it does exist.
+ */
+
+const findToday = async (user) => {
+  console.log('ACTIONS -> FIND TODAY ->')
+
+  const today = formatEntryDate(user.tz)
+  const entry = await findByDate(user, today)
+
+  return { today, entry }
+}
+
+/**
  * Initialize today's entry for the authorized user if it does not exist.
  *
  * @param user User object passed from GraphQL context.
  */
-const create = async (user, timezone) => {
+const create = async (user, today) => {
   console.log('ACTIONS -> CREATE ENTRY ->')
 
-  // [HACK] choose between
-  const today = formatEntryDate(timezone)
-  let todayEntry = await findToday(user, timezone)
+  let todayEntry
 
   // use same timestamp for created_at and initial updated_at
   const saveTime = new Date().toISOString()
 
-  if (!todayEntry) {
-    try {
-      const entryArr = await t.returning(columns)
-                              .insert({ user_id: user.id,
-                                        date: today,
-                                        timezone: timezone,
-                                        created_at: saveTime,
-                                        updated_at: saveTime })
-      todayEntry = entryArr[0]
-    } catch (e) {
-      console.error(e.message)
-      throw new Error(e)
-    }
+  try {
+    const entryArr = await t.returning(columns)
+                            .insert({ user_id: user.id,
+                                      date: today,
+                                      timezone: user.tz,
+                                      created_at: saveTime,
+                                      updated_at: saveTime })
+    todayEntry = entryArr[0]
+  } catch (e) {
+    console.error(e.message)
+    throw new Error(e)
   }
   return todayEntry
 }
@@ -182,5 +179,17 @@ const update = async (user, id, content, wordCount, { lowestWordCount, start }) 
   return updatedEntry
 }
 
+const findOrCreateToday = async (user) => {
+  console.log('ACTIONS -> ENTRY -> FIND OR CREATE TODAY ->')
+
+  const { today, entry } = await findToday(user)
+
+  return entry ? entry : await create(user, today)
+}
+
 export { findToday, findById, findByDate, findByDateSpan, findAll,
+         findOrCreateToday,
          create, update }
+
+// [FIXME] consider moving "isPaused" from useEditor to its own component or hook, and run findOrCreateEntry mutation based on pause state from within Editor component to then feed useEditor with a new or refreshed today object, if required
+// OR is this where we use a subscription

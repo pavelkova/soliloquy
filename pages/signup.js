@@ -8,8 +8,9 @@ export default function Signup() {
 
   return <AuthForm formName={ formName } mutation={ signup } />
 }
-/* export const getServerSideProps = async ctx => {
- *   console.log('SIGNUP PAGE -> GET SSR PROPS ->')
- *   const { data, error } = await ssrQuery(ctx, CURRENT_USER)
- *   return { props: { today: todayEntry, error } }
- * } */
+
+export const getServerSideProps = async ctx => {
+  const { isAuthenticated } = await ssrAuthCheck(ctx, '/today', false)
+
+  return { props: { isAuthenticated } }
+}

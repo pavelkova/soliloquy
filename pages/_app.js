@@ -16,6 +16,9 @@ export default withUrqlClient((_ssr, ctx) => {
     url: '/api/graphql',
     fetchOptions: {
       credentials: 'same-origin',
+      headers: {
+        cookie: ctx?.req?.headers?.cookie ?? ''
+      }
     },
     exchanges: [devtoolsExchange, ...defaultExchanges],
     fetch

@@ -1,5 +1,6 @@
 import { authenticate } from 'services/auth'
 import { findToday, findById, findByDate, findByDateSpan, findAll,
+         findOrCreateToday,
          create, update } from 'actions/entry'
 import { findAll as findEntryLogs } from 'actions/activity-log'
 import { findById as findEntryOwner } from 'actions/user'
@@ -31,8 +32,8 @@ export default {
     findOrCreateEntry: authenticate(
       async (_, { timezone }, ctx) => {
         console.log('RESOLVERS -> ENTRY -> FIND OR CREATE ->')
-        if (!timezone) timezone = ctx.user.tz
-        return await create(ctx.user, timezone)
+        if (timezone) ctx.user.tz = timezone
+        return await findOrCreateToday(ctx.user)
     }),
     updateEntry:  authenticate(
       async (_, { id, content, wordCount, activity }, ctx) => {
