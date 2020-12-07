@@ -85,7 +85,7 @@ const isValid = {
   day: dd => {
     return Boolean(dd.match(/[0-9]{1,2}/)
                    && parseInt(dd) >= 1
-                   && parseInt(mm) <= 31)
+                   && parseInt(dd) <= 31)
   }
 }
 

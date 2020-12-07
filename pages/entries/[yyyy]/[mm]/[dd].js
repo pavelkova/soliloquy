@@ -1,34 +1,44 @@
 import { useRouter } from 'next/router'
 import { useQuery } from 'urql'
+import { isValid } from 'utils/date'
+import { ssrAuthCheck } from 'lib/urql-client'
+import ENTRY_BY_DATE from 'queries/EntryByDate.graphql'
 
 export default function Date({ ...props }) {
+
   const router = useRouter()
   const { yyyy, mm, dd } = router.query
 
-  if (!isValid.year(yyyy) || !isValid.month(mm) !isValid.day(dd)) {
+  if (!isValid.year(yyyy) || !isValid.month(mm) || !isValid.day(dd)) {
     throw new Error('bad date')
     // redirect
   }
 
-  const date = yyyy + '-' + mm + 'dd'
+  const date = yyyy + '-' + mm + '-' + dd
+  console.log(date)
 
-  const { data, fetching, error } = useQuery(ENTRY_BY_DATE, { variables: { date } })
+  const [{ data, fetching, error }] = useQuery({
+    query: ENTRY_BY_DATE,
+    variables: { date },
+  })
 
-  if (fetching) return <p>Loading...</p>
-  if (error) return <p>{ error.message }</p>
-  if (data) console.log(data)
+  let entry
 
+  if (fetching) return (<p>Loading...</p>)
+  if (error) return (<p>{ error.message }</p>)
+  if (data?.findEntryByDate) { entry = data.findEntryByDate }
+
+  console.log(entry)
   return (
-  <>
-    'empty'
+    <>
+      <h1>{ entry.date}</h1>
   </>
   )
 }
 
 export const getServerSideProps = async ctx => {
-  const token = await ssrAuthCheck(ctx)
-  const currentUser = await ssrQuery(ctx, CURRENT_USER)
-  let props = {}
-  props.user = currentUser
-  return { props }
+  console.log('SSR ->')
+  const { client, isAuthenticated } = await ssrAuthCheck(ctx, '/login')
+
+  return { props: { isAuthenticated } }
 }

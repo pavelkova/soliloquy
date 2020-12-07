@@ -1,7 +1,7 @@
 #import "../EntryFragment.graphql"
 
 query ($date: String!) {
-  findEntriesByDate(date: $date) {
+  findEntryByDate(date: $date) {
     ...EntryFragment
   }
 }

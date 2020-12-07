@@ -6,7 +6,7 @@ import ENTRIES_BY_DATES from 'queries/EntriesByDates.graphql'
 export default function Month() {
   const router = useRouter()
   const { yyyy, mm } = router.query
-
+console.log(router)
   if (!isValid.year(yyyy)) {
     throw new Error('Year parameter must be a valid year in 4-digit format.')
     // redirect
@@ -34,7 +34,10 @@ export default function Month() {
   const fromDate = yyyy + '-' + mm + '-01'
   const toDate = yyyy + '-' + mm + '-' + lastDayOfMonth
 
-  const { data, fetching, error } = useQuery(ENTRIES_BY_DATES, { variables: { fromDate, toDate } })
+  const [{ data, fetching, error }] = useQuery({
+    query: ENTRIES_BY_DATES,
+    variables: { fromDate, toDate },
+  })
 
   if (fetching) return <p>Loading...</p>
   if (error) return <p>{ error.message }</p>

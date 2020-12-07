@@ -9,11 +9,14 @@ const MyApp = ({ Component, pageProps }) => {
 
 App.getServerSideProps = async (ctx) => {
   const appProps = await App.getServerSideProps(ctx)
+
+  return { ...appProps }
 }
 
 export default withUrqlClient((_ssr, ctx) => {
+  console.log('-------------- withUrqlClient ->')
   return {
-    url: '/api/graphql',
+    url: 'http://localhost:3000/api/graphql',
     fetchOptions: {
       credentials: 'same-origin',
       headers: {

@@ -17,6 +17,7 @@ export default {
     }),
     findEntryByDate: authenticate(
       async (_, { date }, ctx) => {
+        console.log('RESOLVERS -> ENTRY -> FIND BY DATE ->')
         return await findByDate(ctx.user, date)
     }),
     findEntriesByDates: authenticate(
