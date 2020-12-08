@@ -21,8 +21,8 @@ export default {
         return await findByDate(ctx.user, date)
     }),
     findEntriesByDates: authenticate(
-      async (_, { fromDate, toDate }, ctx) => {
-        return await findByDateSpan(ctx.user, fromDate, toDate)
+      async (_, { dateSpan }, ctx) => {
+        return await findByDateSpan(ctx.user, dateSpan)
     }),
     findAllEntries: authenticate(
       async (_, {}, ctx) => {

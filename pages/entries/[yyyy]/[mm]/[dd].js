@@ -38,7 +38,7 @@ export default function Date({ ...props }) {
 
 export const getServerSideProps = async ctx => {
   console.log('SSR ->')
-  const { client, isAuthenticated } = await ssrAuthCheck(ctx, '/login')
+  const { isAuthenticated } = await ssrAuthCheck(ctx, '/login')
 
   return { props: { isAuthenticated } }
 }

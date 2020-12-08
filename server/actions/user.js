@@ -1,7 +1,9 @@
 import { db } from '../db'
 import { encryptPassword,
          validatePassword } from 'services/auth-helpers/hashing'
-import { initialize as initializeDefaultSettings } from './setting'
+import { initialize as initializeDefaultSettings,
+         findAll as findAllSettings } from './setting'
+
 
 const t = db('users')
 const columns = [
@@ -38,12 +40,24 @@ const findByEmail = async (email) => {
   return user[0]
 }
 
+/** Login user and create an object of their info to store in a JWT.
+ * @param {String} email
+ * @param {String} password
+ *
+ * @return {Object} User object with their settings attached
+ */
 const login = async (email, password) => {
   console.log('ACTIONS -> USER -> LOGIN ->')
+
   const user = await findByEmail(email)
+
   if (user) {
     const validPassword = await validatePassword(user, password)
-    if (validPassword) return user
+    if (validPassword) {
+      const settings = await findAllSettings(user)
+      user.settings = settings ?? {}
+    }
+    return user
   }
   throw new Error('Invalid email or password.')
 }

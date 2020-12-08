@@ -61,8 +61,10 @@ const findByDate = async (user, date) => {
  * @param {String} fromDate Query start date in format "yyyy-mm-dd"
  * @param {String} toDate   Query end date in format "yyyy-mm-dd"
  */
-const findByDateSpan = async(user, fromDate, toDate) => {
+const findByDateSpan = async(user, dateSpan) => {
   console.log('ACTIONS -> FIND ENTRIES BY DATES ->')
+
+  const { fromDate, toDate } = dateSpan
 
   let entries
 
