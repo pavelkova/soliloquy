@@ -3,15 +3,15 @@ import { useRouter } from 'next/router'
 
 const isValid = {
   email: {
-    check: (em) => {
-      return em.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)
+    check: em => {
+      return (em.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/))
     },
     description: 'Enter a valid email address.',
     errorMessage: 'Not a valid email address.'
   },
   password: {
     check: (pw) => {
-      return pw.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/)
+      return (pw.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/))
     },
     description: 'Password must be 8 or more characters in length, and must contain at least one uppercase letter, one lowercase letter, and one numerical digit.',
     errorMessage: 'Password fails to meet one or more of the criteria.'
@@ -62,7 +62,7 @@ export const AuthForm = ({formName, mutation}) => {
         </div>
         <div>
           <label>Password:
-            <input
+          <input
               id="password"
               name="password"
               value={password}

@@ -54,10 +54,10 @@ const login = async (email, password) => {
   if (user) {
     const validPassword = await validatePassword(user, password)
     if (validPassword) {
-      const settings = await findAllSettings(user)
-      user.settings = settings ?? {}
+      /* const settings = await findAllSettings(user)
+       * user.settings = settings ?? {} */
+      return user
     }
-    return user
   }
   throw new Error('Invalid email or password.')
 }

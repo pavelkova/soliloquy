@@ -49,17 +49,17 @@ const findAll = async (user) => {
 */
 const initialize = async user => {
   const defaultSettings = [
-    { key: 'timezone', value: 'auto'},
-    { key: 'wordCountGoal', value: '750' },
-    { key: 'timeFormat', value: '12h' }, // 12h vs 24h
-    { key: 'dayStartsAt', value: '00:00' },
-    { key: 'textAnalysis', value: 'disabled' },
-    { key: 'theme', value: 'default' },
-    { key: 'fontName', value: '' },
-    { key: 'fontSize', value: '' },
-    { key: 'backgroundColor', value: '' },
-    { key: 'textColor', value: '' },
-    { key: 'highlightColor', value: '' },
+    { key: 'timezone', value: 'auto'}, // String
+    { key: 'wordCountGoal', value: '750' }, // Integer
+    { key: 'timeFormat', value: '12h' }, // String
+    { key: 'dayStartsAt', value: '00:00' }, // String
+    { key: 'textAnalysis', value: 'disabled' }, // Boolean
+    { key: 'theme', value: 'default' }, // String
+    { key: 'fontName', value: '' }, // String
+    { key: 'fontSize', value: '' }, // Integer
+    { key: 'backgroundColor', value: '' }, // String
+    { key: 'textColor', value: '' }, // String
+    { key: 'highlightColor', value: '' }, // String
   ]
   defaultSettings.forEach(setting => { setting.user_id = user.id })
 

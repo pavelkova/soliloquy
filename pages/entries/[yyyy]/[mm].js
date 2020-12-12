@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { useQuery } from 'urql'
 import { isValid } from 'utils/date'
-import { ssrAuthCheck } from 'lib/urql-client'
+import { ssrAuthCheck } from 'lib/auth-check'
 import ENTRIES_BY_DATES from 'queries/EntriesByDates.graphql'
 
 export default function Month() {
@@ -53,7 +53,7 @@ console.log(router)
 
 export const getServerSideProps = async ctx => {
   console.log('SSR ->')
-  const { isAuthenticated } = await ssrAuthCheck(ctx, '/login')
+  const { user } = await ssrAuthCheck(ctx, '/login')
 
-  return { props: { isAuthenticated } }
+  return { props: { user } }
 }

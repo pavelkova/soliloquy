@@ -1,4 +1,5 @@
 import { useMutation } from 'urql'
+import { ssrAuthCheck } from 'lib/auth-check'
 import { AuthForm } from 'components/AuthForm'
 import SIGNUP from 'mutations/Signup.graphql'
 
@@ -10,7 +11,7 @@ export default function Signup() {
 }
 
 export const getServerSideProps = async ctx => {
-  const { isAuthenticated } = await ssrAuthCheck(ctx, '/today', false)
+  const { user } = await ssrAuthCheck(ctx, '/today', false)
 
-  return { props: { isAuthenticated } }
+  return { props: { user } }
 }
