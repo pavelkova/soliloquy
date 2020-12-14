@@ -5,6 +5,7 @@ exports.up = function (knex) {
     table.string('password').notNullable()
     table.string('name')
     table.timestamps()
+    table.jsonb('settings')
   })
 }
 

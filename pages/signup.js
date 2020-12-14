@@ -1,17 +1,19 @@
-import { useMutation } from 'urql'
 import { ssrAuthCheck } from 'lib/auth-check'
-import { AuthForm } from 'components/AuthForm'
-import SIGNUP from 'mutations/Signup.graphql'
+import { SignupForm } from 'components/SignupForm'
 
 export default function Signup() {
-  const [result, signup] = useMutation(SIGNUP)
-  const formName = 'Signup'
 
-  return <AuthForm formName={ formName } mutation={ signup } />
+  return (
+    <SignupForm />
+  )
 }
 
 export const getServerSideProps = async ctx => {
+  console.log('GET SSR -> SIGNUP')
+  const props = {}
   const { user } = await ssrAuthCheck(ctx, '/today', false)
 
-  return { props: { user } }
+  if (user) props.user = user
+
+  return { props }
 }

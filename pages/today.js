@@ -28,11 +28,12 @@ export const getServerSideProps = async ctx => {
     await client.mutation(FIND_OR_CREATE_ENTRY).toPromise().then(result => {
       if (result.error) {
         console.error(result.error)
-        props.error = result.error
+        props.error = result.error.message
       }
       props.today = result?.data?.findOrCreateEntry || {}
     })
   }
+  console.log(props)
 
   return { props }
 }

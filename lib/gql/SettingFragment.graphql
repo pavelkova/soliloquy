@@ -1,5 +1,0 @@
-fragment SettingFragment on Setting {
-  id
-  key
-  value
-}

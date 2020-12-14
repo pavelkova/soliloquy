@@ -11,7 +11,10 @@ export default function Login() {
 }
 
 export const getServerSideProps = async ctx => {
+  const props = {}
   const { user } = await ssrAuthCheck(ctx, '/today', false)
 
-  return { props: { user } }
+  if (user) props.user = user
+
+  return { props }
 }

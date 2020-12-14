@@ -5,7 +5,6 @@ import { mergeResolvers } from '@graphql-tools/merge'
 import userResolvers from './resolvers/user'
 import entryResolvers from './resolvers/entry'
 import activityLogResolvers from './resolvers/activity-log'
-import settingResolvers from './resolvers/setting'
 
 
 const dateTimeResolver = {
@@ -21,10 +20,21 @@ const dateTimeResolver = {
   })
 }
 
+const jsonResolver = {
+  JSONObject: new GraphQLScalarType({
+    name: 'JSONObject',
+    description: 'A javascript JSON string',
+    /* serialize: (value) => JSON.parse(value), */
+    serialize: (value) => value,
+    parseValue: (value) => JSON.stringify(value),
+    parseLiteral: (ast) => JSON.stringify(ast.value)
+  })
+}
+
 const resolversArray = [dateTimeResolver,
+                        jsonResolver,
                         userResolvers,
                         entryResolvers,
-                        activityLogResolvers,
-                        settingResolvers]
+                        activityLogResolvers]
 
 export default mergeResolvers(resolversArray)

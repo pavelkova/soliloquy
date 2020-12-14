@@ -1,7 +1,6 @@
 import { findById, findByEmail,
-         login, signup, updatePassword }  from 'actions/user'
+         login, signup, updatePassword, updateSettings }  from 'actions/user'
 import { findAll as findUserEntries } from 'actions/entry'
-import { findAll as findUserSettings } from 'actions/setting'
 import { authenticate, setUserToken, getUserToken, revokeUserToken } from 'services/auth'
 import { errors } from 'services/errors'
 
@@ -19,8 +18,8 @@ export default {
     },
   },
   Mutation: {
-    signup: async (_, { email, password, browserTimezone }, ctx) => {
-      const user = await signup(email, password)
+    signup: async (_, { email, name, password, browserTimezone }, ctx) => {
+      const user = await signup(email, name, password)
       if (user) setUserToken(ctx.res, user, browserTimezone)
       return user
     },
@@ -44,14 +43,15 @@ export default {
       const updatedUser = await updatePassword(
         ctx.user, oldPassword, newPassword)
       return updatedUser
+    }),
+    updateSettings: authenticate(async(_, { settings }, ctx) => {
+      const updatedUser = await updateSettings(ctx.user, settings)
+      return updatedUser
     })
   },
   User: {
     entries: async (user, {}, ctx) => {
       return await findUserEntries(user)
-    },
-    settings: async (user, {}, ctx) => {
-      return await findUserSettings(user)
     }
   }
 }

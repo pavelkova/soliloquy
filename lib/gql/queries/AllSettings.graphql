@@ -1,7 +1,0 @@
-#import "../SettingFragment.graphql"
-
-query {
-  findAllSettings {
-    ...SettingFragment
-  }
-}

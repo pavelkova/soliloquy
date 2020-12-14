@@ -1,17 +1,16 @@
 import { db } from '../db'
 import { encryptPassword,
          validatePassword } from 'services/auth-helpers/hashing'
-import { initialize as initializeDefaultSettings,
-         findAll as findAllSettings } from './setting'
-
 
 const t = db('users')
 const columns = [
   'id',
+  'name',
   'email',
   'password',
   'created_at as createdAt',
   'updated_at as updatedAt',
+  'settings'
 ]
 
 const findById = async (id) => {
@@ -62,17 +61,40 @@ const login = async (email, password) => {
   throw new Error('Invalid email or password.')
 }
 
-const signup = async (email, password) => {
+const signup = async (email, name, password) => {
   console.log('ACTIONS -> USER -> SIGNUP ->')
-  let user = await findByEmail({ email })
+  let user = await findByEmail(email)
+
+  console.log(user)
+
   if (!user) {
+    console.log('NO USER')
+
+    const defaultSettings = {
+      timezone: 'auto',
+      wordCountGoal: 750,
+      timeFormat: '12h',
+      dayStartsAt: '00:00',
+      textAnalysis: false,
+      theme: 'default',
+      fontName: '',
+      fontSize: 14,
+      backgroundColor: '',
+      textColor: '',
+      highlightColor: ''
+    }
+
     try {
       const hash = await encryptPassword(password)
       const userArr = await t.returning(columns)
-                             .insert({ email, password: hash })
+                             .insert({ email,
+                                       name,
+                                       password: hash,
+                                       settings: JSON.stringify(defaultSettings)})
+      console.log(userArr)
       user = userArr[0]
-      await initializeDefaultSettings(user)
     } catch(e) {
+      console.error(e)
       throw new Error('Could not complete signup.')
     }
     return user
@@ -97,5 +119,21 @@ const updatePassword = async (user, oldPassword, newPassword) => {
   }
 }
 
+const updateEmail = async (user, newEmail) => {
+  // send confirmation email?
+  return
+}
+
+const updateUserInfo = async (user, name) => {
+  // maybe include email here without verification
+  return
+}
+
+const updateSettings = async (user, settings) => {
+  console.log('ACTIONS -> USER -> UPDATE SETTINGS ->')
+  console.log(settings)
+  return
+}
+
 export { findById, findByEmail,
-         login, signup, updatePassword }
+         login, signup, updatePassword, updateSettings }

@@ -27,12 +27,16 @@ export const AuthForm = ({formName, mutation}) => {
 
   const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
+  useEffect(() => {console.log(email)}, [email])
+
   const handleSubmit = async (e) => {
+console.log('AUTH FORM -> SUBMIT ->')
+    console.log(e)
     e.preventDefault()
 
     const { data, fetching, error } = await mutation({ email,
-                                                    password,
-                                                    browserTimezone })
+                                                       password,
+                                                       browserTimezone })
     if (error) console.error(error)
 
     if (data && (data.login || data.signup)) router.push('/today')

@@ -1,7 +1,0 @@
-#import "../SettingFragment.graphql"
-
-mutation ($id: ID!, $key: String!, $value: String) {
-  createSetting(id: $id, key: $key, value: $value) {
-    ...SettingFragment
-  }
-}
