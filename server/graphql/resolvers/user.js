@@ -7,7 +7,8 @@ import { errors } from 'services/errors'
 export default {
   Query: {
     currentUser: async (_, {}, ctx) => {
-      if (ctx.user) return ctx.user
+      console.log('RESOLVERS -> CURRENT USER ->')
+      if (ctx.user) return await findById(ctx.user.id)
       throw new Error(errors.login.notLoggedIn)
     },
     findUserById: async (_, { id }, ctx) => {

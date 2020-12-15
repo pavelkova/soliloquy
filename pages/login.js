@@ -1,18 +1,22 @@
-import { useMutation } from 'urql'
-import { ssrAuthCheck } from 'lib/auth-check'
-import { AuthForm } from 'components/AuthForm'
-import LOGIN from 'mutations/Login.graphql'
+import { useRouter } from 'next/router'
+import { ssrRequireNoAuth } from 'lib/auth-check'
+import { LoginForm } from 'components/LoginForm'
 
 export default function Login() {
-  const [result, login] = useMutation(LOGIN)
-  const formName = 'Login'
+  const router = useRouter()
 
-  return <AuthForm formName={ formName } mutation={ login } />
+  function  redirectOnSuccess() {
+    router.push('/today')
+  }
+
+  return (
+    <LoginForm props={ redirectOnSuccess } />
+  )
 }
 
 export const getServerSideProps = async ctx => {
   const props = {}
-  const { user } = await ssrAuthCheck(ctx, '/today', false)
+  const { user } = await ssrRequireNoAuth(ctx)
 
   if (user) props.user = user
 

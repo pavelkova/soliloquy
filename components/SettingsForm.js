@@ -1,48 +1,62 @@
 import { useState } from 'react'
-
-const preferences = {
-  timezone: '',
-  theme: '',
-  fontName: '',
-  fontSize: 14,
-  wordCountGoal: 750,
-  backgroundColor: '#000000',
-  textColor: '#ffffff',
-  highlightColor: '',
-  textAnalysis: false
-}
-
-function Input({ name, initialValue, setFunction }) {
-  return (
-    <div>
-      <label>
-        <input
-          id={ name }
-          name={ name }
-          value={ initialValue }
-          onChange={(e) => setFunction(e.currentTarget.value) } />
-      </label>
-    </div>
-  )
-}
+import { useForm } from 'react-hook-form'
 
 export const SettingsForm = (props) => {
-  const [timezone, setTimezone] = useState(props.timezone)
-  const [wordCountGoal, setWordCountGoal] = useState(props.wordCountGoal)
-  const [textAnalysis] = useState(props.textAnalysis)
-  const [theme, setTheme] = useState(props.theme)
-  const [backgroundColor, setBackgroundColor] = useState(props.backgroundColor)
-  const [textColor, setTextColor] = useState(props.textColor)
-  const [highlightColor, setHighlightColor] = useState(props.highlightColor)
-  const [fontName, setFontName] = useState(props.fontName)
-  const [fontSize, setFontSize] = useState(props.fontSize)
+
+  const { register, handleSubmit, errors } = useForm()
 
   return (
-    <>
-      <form>
-        <Input name='word-count-goal' initialValue={ wordCountGoal } setFunction={ setWordCountGoal } />
-    <Input />
-      </form>
-    </>
+    <form>
+
+      <div>
+        <label>
+          <span>Word Count Goal</span>
+          <input type='number' name='wordCountGoal' ref={
+          register({ required: true })}/>
+        </label>
+      </div>
+
+      <div>
+        <label>
+          <span>Day starts at</span>
+          <input type='time' name='dayStartsAt' ref={
+          register({ required: true })}/>
+        </label>
+      </div>
+
+      <div>
+        <label>
+          <span>12-hour</span>
+          <input type='radio' name='timeFormat' ref={
+          register({ required: true })}/>
+        </label>
+        <label>
+          <span>24-hour</span>
+          <input type='radio' name='timeFormat' ref={
+          register({ required: true })
+          } />
+        </label>
+      </div>
+
+
+      <div>
+        <label>
+          <span>Timezone</span>
+          <select name='dayStartsAt' ref={
+          register({ required: true })}>
+            <option value='auto'>Autodetect</option>
+          </select>
+        </label>
+      </div>
+
+      <div>
+        <label>
+          <span>Font size</span>
+          <input type='number' name='fontSize' ref={
+          register({ required: true })}/>
+        </label>
+      </div>
+
+    </form>
   )
 }

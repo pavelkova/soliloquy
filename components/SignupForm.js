@@ -3,27 +3,36 @@ import { useMutation } from 'urql'
 import SIGNUP from 'mutations/Signup.graphql'
 
 export const SignupForm = () => {
-  const { register, handleSubmit, errors, setError } = useForm()
+  const { register, handleSubmit, errors, formState } = useForm({
+    mode: 'onBlur'
+  })
   /* const onSubmit = data => console.log(data) */
 
   const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   const [result, signup] = useMutation(SIGNUP)
 
   const onSubmit = async values => {
+    console.log(values)
     if (errors) console.error(errors)
 
     const { data, fetching, error } = await signup({ ...values, browserTimezone })
 
-    if (error) {}
+    if (error) { console.error(error) }
 
     if (data?.signup) router.push('/today')
     // setError
   }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div>
         <input type="text" placeholder="Name" name="name" ref={
-        register({required: true, maxLength: 80})} />
+        register({ required: 'This field is required.',
+                   maxLength: {
+                     value: 80,
+                     message: 'Name cannot be more than 80 characters long.'
+        }})} />
+        <span> ERROR: { errors.name?.message }</span>
       </div>
       <div>
         <input type="text" placeholder="Email" name="email" ref={
@@ -34,7 +43,7 @@ export const SignupForm = () => {
         register({required: true})} />
       </div>
 
-      <input type="submit" />
+      <input type="submit" disabled={ !formState.isValid } />
     </form>
   )
 }
