@@ -6,7 +6,6 @@ export const LoginForm = ({ redirectOnSuccess }) => {
   const { register, handleSubmit, errors, formState } = useForm({
     mode: 'onChange'
   })
-  /* const onSubmit = data => console.log(data) */
 
   const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   const [result, login] = useMutation(LOGIN)

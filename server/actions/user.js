@@ -131,6 +131,8 @@ const updateUserInfo = async (user, name) => {
 
 const updateSettings = async (user, settings) => {
   console.log('ACTIONS -> USER -> UPDATE SETTINGS ->')
+  const usery = await findById(user.id)
+  console.log(usery)
   console.log(settings)
   return
 }

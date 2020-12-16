@@ -46,8 +46,11 @@ export default {
       return updatedUser
     }),
     updateSettings: authenticate(async(_, { settings }, ctx) => {
-      const updatedUser = await updateSettings(ctx.user, settings)
-      return updatedUser
+      const newSettings = await updateSettings(ctx.user, settings)
+      console.log(newSettings)
+      return
+      /* const updatedUser = await updateSettings(ctx.user, settings)
+       * return updatedUser */
     })
   },
   User: {

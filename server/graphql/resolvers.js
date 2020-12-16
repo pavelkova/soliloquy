@@ -26,8 +26,10 @@ const jsonResolver = {
     description: 'A javascript JSON string',
     /* serialize: (value) => JSON.parse(value), */
     serialize: (value) => value,
-    parseValue: (value) => JSON.stringify(value),
-    parseLiteral: (ast) => JSON.stringify(ast.value)
+    /* parseValue: (value) => JSON.stringify(value), */
+    parseValue: (value) => value,
+    /* parseLiteral: (ast) => JSON.stringify(ast.value) */
+    parseLiteral: (ast) => ast.value
   })
 }
 
