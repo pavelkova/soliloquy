@@ -32,25 +32,14 @@ export default {
       return user
     },
     logout: async (_, {}, ctx) => {
-      // remove cookie
-      console.log(ctx.user)
-      const result = await revokeUserToken(ctx)
       console.log('ACTIONS -> USER -> LOGOUT ->')
-      console.log(result)
-      /* console.log(ctx.req.headers) */
-      return
+      return await revokeUserToken(ctx)
     },
     updatePassword: authenticate(async(_, { oldPassword, newPassword }, ctx) => {
-      const updatedUser = await updatePassword(
-        ctx.user, oldPassword, newPassword)
-      return updatedUser
+      return await updatePassword(ctx.user, oldPassword, newPassword)
     }),
     updateSettings: authenticate(async(_, { settings }, ctx) => {
-      const newSettings = await updateSettings(ctx.user, settings)
-      console.log(newSettings)
-      return
-      /* const updatedUser = await updateSettings(ctx.user, settings)
-       * return updatedUser */
+      return await updateSettings(ctx.user, settings)
     })
   },
   User: {

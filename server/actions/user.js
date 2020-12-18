@@ -15,35 +15,34 @@ const columns = [
 
 const findById = async (id) => {
   console.log('ACTIONS -> USER -> FINDBYID ->')
-  let user
   try {
-    user = await t.select(columns)
-                  .where({ id }) // .first() // error -- cannot chain .first() on an insert query
+    const userArr = await t.select(columns)
+                           .where({ id })
+    return userArr[0]
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  return user[0]
 }
 
 const findByEmail = async (email) => {
   console.log('ACTIONS -> USER -> FINDBYEMAIL ->')
-  let user
+
   try {
-    user = await t.select(columns)
-                  .where({ email }) // .first() // error -- cannot chain .first() on an insert query
+    const userArr = await t.select(columns)
+                           .where({ email })
+    return userArr[0]
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  return user[0]
 }
 
 /** Login user and create an object of their info to store in a JWT.
  * @param {String} email
  * @param {String} password
  *
- * @return {Object} User object with their settings attached
+ * @return {Object} User object
  */
 const login = async (email, password) => {
   console.log('ACTIONS -> USER -> LOGIN ->')
@@ -53,8 +52,6 @@ const login = async (email, password) => {
   if (user) {
     const validPassword = await validatePassword(user, password)
     if (validPassword) {
-      /* const settings = await findAllSettings(user)
-       * user.settings = settings ?? {} */
       return user
     }
   }
@@ -63,27 +60,12 @@ const login = async (email, password) => {
 
 const signup = async (email, name, password) => {
   console.log('ACTIONS -> USER -> SIGNUP ->')
-  let user = await findByEmail(email)
 
-  console.log(user)
+  const user = await findByEmail(email)
 
-  if (!user) {
-    console.log('NO USER')
-
-    const defaultSettings = {
-      timezone: 'auto',
-      wordCountGoal: 750,
-      timeFormat: '12h',
-      dayStartsAt: '00:00',
-      textAnalysis: false,
-      theme: 'default',
-      fontName: '',
-      fontSize: 14,
-      backgroundColor: '',
-      textColor: '',
-      highlightColor: ''
-    }
-
+  if (user) {
+    throw new Error('A user with that email already exists.')
+  } else {
     try {
       const hash = await encryptPassword(password)
       const userArr = await t.returning(columns)
@@ -91,19 +73,18 @@ const signup = async (email, name, password) => {
                                        name,
                                        password: hash,
                                        settings: JSON.stringify(defaultSettings)})
-      console.log(userArr)
-      user = userArr[0]
+      return userArr[0]
     } catch(e) {
       console.error(e)
       throw new Error('Could not complete signup.')
     }
-    return user
   }
-  throw new Error('A user with that email already exists.')
+
 }
 
 const updatePassword = async (user, oldPassword, newPassword) => {
   console.log('ACTIONS -> USER -> UPDATE PASSWORD ->')
+
   try {
     const match = await validatePassword(user, oldPassword)
     if (match) {
@@ -131,10 +112,16 @@ const updateUserInfo = async (user, name) => {
 
 const updateSettings = async (user, settings) => {
   console.log('ACTIONS -> USER -> UPDATE SETTINGS ->')
-  const usery = await findById(user.id)
-  console.log(usery)
-  console.log(settings)
-  return
+
+  try {
+    const userArr = await t.returning(columns)
+                           .where({ id: user.id })
+                           .update({ settings: JSON.stringify(settings) })
+    return userArr[0]
+  } catch (e) {
+    console.error(e.message)
+    throw new Error(e)
+  }
 }
 
 export { findById, findByEmail,

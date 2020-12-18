@@ -39,7 +39,7 @@ export default {
     updateEntry:  authenticate(
       async (_, { id, content, wordCount, activity }, ctx) => {
         console.log('RESOLVERS -> ENTRY -> UPDATE ->')
-        return await update(ctx.user, id, content, wordCount, activity )
+        return await update(ctx.user, id, content, wordCount, activity)
     }),
   },
   Entry: {

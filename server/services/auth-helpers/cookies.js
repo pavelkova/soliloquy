@@ -33,7 +33,6 @@ function parseCookies(req) {
   if (req.cookies) return req.cookies
 
   console.log('PARSE COOKIES -> req.cookies')
-  console.log(req.cookies)
   // For pages we do need to parse the cookies.
   const cookie = req.headers?.cookie
   return parse(cookie || '')

@@ -21,15 +21,15 @@ const columns = [
  */
 const findById = async (user, id) => {
   console.log('ACTIONS -> FIND ENTRY BY ID ->')
-  let entry
+
   try {
-    entry = await t.select(columns)
-                   .where({ user_id: user.id, id }).first()
+    const entryArr = await t.select(columns)
+                            .where({ user_id: user.id, id })
+    return entryArr[0]
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  return entry
 }
 
 /**
@@ -40,19 +40,14 @@ const findById = async (user, id) => {
 const findByDate = async (user, date) => {
   console.log('ACTIONS -> FIND ENTRY BY DATE ->')
 
-  let entry
-
   try {
-    const entries = await t.select(columns)
-                           .where({ user_id: user.id, date })
-    entry = entries[0]
-
+    const entryArr = await t.select(columns)
+                            .where({ user_id: user.id, date })
+    return entryArr[0]
   } catch (e) {
-    console.log('ERROR IN findByDate')
     console.error(e.message)
     throw new Error(e)
   }
-  return entry
 }
 
 /**
@@ -66,18 +61,15 @@ const findByDateSpan = async(user, dateSpan) => {
 
   const { fromDate, toDate } = dateSpan
 
-  let entries
-
   try {
-    entries = await t.select(columns)
-                     .where({ user_id: user.id})
-                     .whereBetween('date', [fromDate, toDate])
+    return await t.select(columns)
+                  .where({ user_id: user.id})
+                  .whereBetween('date', [fromDate, toDate])
+
   } catch(e) {
-    console.log('ERROR IN findByDateSpan')
     console.error(e.message)
     throw new Error(e)
   }
-  return entries
 }
 
 /**
@@ -87,14 +79,13 @@ const findByDateSpan = async(user, dateSpan) => {
  */
 const findAll = async user => {
   console.log('ACTIONS -> FIND ALL ENTRIES ->')
-  let entries
+
   try {
-    entries = await t.select(columns)
-                     .where({ user_id: user.id })
+    return await t.select(columns)
+                  .where({ user_id: user.id })
   } catch (e) {
     console.error(e.message)
   }
-  return entries
 }
 
 /**
@@ -123,8 +114,6 @@ const findToday = async (user) => {
 const create = async (user, today) => {
   console.log('ACTIONS -> CREATE ENTRY ->')
 
-  let todayEntry
-
   // use same timestamp for created_at and initial updated_at
   const saveTime = new Date().toISOString()
 
@@ -135,12 +124,11 @@ const create = async (user, today) => {
                                       timezone: user.tz,
                                       created_at: saveTime,
                                       updated_at: saveTime })
-    todayEntry = entryArr[0]
+    return entryArr[0]
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  return todayEntry
 }
 
 /*
@@ -157,8 +145,6 @@ const create = async (user, today) => {
 const update = async (user, id, content, wordCount, { lowestWordCount, start }) => {
   console.log('ACTIONS -> UPDATE ENTRY->')
 
-  let updatedEntry
-
   // use the same timestamp for entry.updated_at and activity_log.end
   const updateTime = new Date().toISOString()
 
@@ -172,13 +158,11 @@ const update = async (user, id, content, wordCount, { lowestWordCount, start }) 
                             .update({ content,
                                       word_count: wordCount,
                                       updated_at: updateTime})
-    updatedEntry = entryArr[0]
+    return entryArr[0]
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  console.log(updatedEntry)
-  return updatedEntry
 }
 
 const findOrCreateToday = async (user) => {
@@ -186,7 +170,7 @@ const findOrCreateToday = async (user) => {
 
   const { today, entry } = await findToday(user)
 
-  return entry ? entry : await create(user, today)
+  return entry ?? await create(user, today)
 }
 
 export { findToday, findById, findByDate, findByDateSpan, findAll,
