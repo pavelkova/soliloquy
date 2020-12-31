@@ -3,8 +3,10 @@ import { useMutation } from 'urql'
 import UPDATE_SETTINGS from 'mutations/UpdateSettings.graphql'
 
 export const SettingsForm = (props) => {
-
-  const { register, handleSubmit, errors } = useForm()
+console.log(props)
+  const { register, handleSubmit, errors } = useForm({
+    defaultValues: props
+  })
 
   const [result, updateSettings] = useMutation(UPDATE_SETTINGS)
 
@@ -47,12 +49,12 @@ export const SettingsForm = (props) => {
         <div>
           <h3>Clock display format</h3>
           <label>
-            <input type='radio' name='timeFormat' ref={
+            <input type='radio' name='timeFormat' value='12h' ref={
             register}/>
             <span>12-hour</span>
           </label>
           <label>
-            <input type='radio' name='timeFormat' ref={
+            <input type='radio' name='timeFormat' value='24h' ref={
             register}/>
             <span>24-hour</span>
           </label>
@@ -89,7 +91,8 @@ export const SettingsForm = (props) => {
             <h3>Theme</h3>
             <select name='theme' ref={
             register}>
-              <option value='auto'>Basic</option>
+              <option value='default'>Default</option>
+              <option value='custom'><i>(Custom)</i></option>
             </select>
           </label>
         </div>

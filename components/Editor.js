@@ -2,9 +2,10 @@ import React from 'react'
 /* import { DateHeader } from './Entry/DateHeader' */
 import { useEditor } from 'lib/use-editor'
 
-export const Editor = ({ today }) => {
+export const Editor = (props) => {
 
   const {content, wordCount, lastSavedAt, isPaused, handlePause, handleSave, handleTextChange } = useEditor({ today })
+  console.log(props)
 
   return (
     <>

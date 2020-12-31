@@ -2,8 +2,8 @@
 #import "../EntryFragment.graphql"
 #import "../UserFragment.graphql"
 
-mutation FIND_OR_CREATE_ENTRY {
-  findOrCreateEntry {
+mutation ($date: String!) {
+  findOrCreateEntry (date: $date) {
     ...EntryFragment
     user {
       ...UserFragment

@@ -1,39 +1,49 @@
+/* import { useEffect } from 'react'
+ * import { useMutation } from 'urql' */
+import { ssrRequireAuth } from 'lib/auth-check'
+import { formatEntryDate } from 'utils/date'
+/* import CREATE_ENTRY from 'mutations/CreateEntry.graphql' */
 import { Editor } from 'components/Editor'
-import { ssrAuthCheck } from 'lib/auth-check'
-import FIND_OR_CREATE_ENTRY from 'mutations/FindOrCreateEntry.graphql'
 
-export default function Today({ today, user, error }) {
+export default function Today({ user }) {
+  /* const [{ data, fetching, error }, createEntry] = useMutation(FIND_OR_CREATE_ENTRY)
 
-  if (error) return (<p>Something went wrong</p>)
-  console.log('TODAY PAGE -> RENDER ->')
+   * useEffect(() => {
+   *   const variables = { date: formatEntryDate(user.settings.timezone) }
+   *   createEntry(variables).then(
+   *       result => {
+   *         if (error) console.error(error)
+   *         if (fetching) console.log(result)
+   *         return () => {}
+   *     })
+   * }, [])
 
-  if (!today) return <p>today does not exist</p>
-
+   * return (
+   *   <>
+   *     { error && <p>Something went wrong.</p> }
+   *     { fetching && <p>Loading...</p> }
+   *     { data && <Editor entry={ data.findOrCreateEntry } /> }
+   *   </>
+   * ) */
+  console.log('TODAY PAGE')
+  const today = { date: formatEntryDate(user.settings.timezone) }
   return (
-  <div>
-      <Editor today={ today }/>
-    </div>
+    <>
+    <Editor props={ user, today } />
+    </>
   )
 }
 
 export const getServerSideProps = async ctx => {
   console.log('TODAY PAGE -> GET SSR PROPS ->')
-
   const props = {}
 
-  const { client, user } = await ssrAuthCheck(ctx, '/login')
+  const { user } = await ssrRequireAuth(ctx)
+  if (user) props.user = user
 
-  if (user) {
-    props.user = user
-    await client.mutation(FIND_OR_CREATE_ENTRY).toPromise().then(result => {
-      if (result.error) {
-        console.error(result.error)
-        props.error = result.error.message
-      }
-      props.today = result?.data?.findOrCreateEntry || {}
-    })
-  }
-  console.log(props)
-
+  ///
+  /* const tz = user.settings.timezone ?? lastEntry.timezone
+   * const entryExists = (formatEntryDate(tz) == lastEntry.date) */
+  ///
   return { props }
 }

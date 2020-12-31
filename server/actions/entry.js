@@ -56,6 +56,7 @@ const findByDate = async (user, date) => {
  * @param {String} fromDate Query start date in format "yyyy-mm-dd"
  * @param {String} toDate   Query end date in format "yyyy-mm-dd"
  */
+//
 const findByDateSpan = async(user, dateSpan) => {
   console.log('ACTIONS -> FIND ENTRIES BY DATES ->')
 
@@ -89,29 +90,11 @@ const findAll = async user => {
 }
 
 /**
- * Determine today's date for the logged-in user's preferred timezone
- * and return an entry matching its yyyy-mm-dd, if one exists.
- *
- * @param {Object} user Object from GraphQL context with user id, email, and browser timezone
- *
- * @return {Object} String of today's date in user's locale and today's entry, if it does exist.
- */
-
-const findToday = async (user) => {
-  console.log('ACTIONS -> FIND TODAY ->')
-
-  const today = formatEntryDate(user.tz)
-  const entry = await findByDate(user, today)
-
-  return { today, entry }
-}
-
-/**
  * Initialize today's entry for the authorized user if it does not exist.
  *
  * @param user User object passed from GraphQL context.
  */
-const create = async (user, today) => {
+const create = async (user, date) => {
   console.log('ACTIONS -> CREATE ENTRY ->')
 
   // use same timestamp for created_at and initial updated_at
@@ -120,7 +103,7 @@ const create = async (user, today) => {
   try {
     const entryArr = await t.returning(columns)
                             .insert({ user_id: user.id,
-                                      date: today,
+                                      date,
                                       timezone: user.tz,
                                       created_at: saveTime,
                                       updated_at: saveTime })
@@ -165,15 +148,15 @@ const update = async (user, id, content, wordCount, { lowestWordCount, start }) 
   }
 }
 
-const findOrCreateToday = async (user) => {
+const findOrCreateToday = async (user, date) => {
   console.log('ACTIONS -> ENTRY -> FIND OR CREATE TODAY ->')
 
-  const { today, entry } = await findToday(user)
+  const entry = await findByDate(user, date)
 
-  return entry ?? await create(user, today)
+  return entry ?? await create(user, date)
 }
 
-export { findToday, findById, findByDate, findByDateSpan, findAll,
+export { findById, findByDate, findByDateSpan, findAll,
          findOrCreateToday,
          create, update }
 

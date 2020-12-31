@@ -19,16 +19,15 @@ export default {
     },
   },
   Mutation: {
-    signup: async (_, { email, name, password, browserTimezone }, ctx) => {
+    signup: async (_, { email, name, password }, ctx) => {
       const user = await signup(email, name, password)
-      if (user) setUserToken(ctx.res, user, browserTimezone)
+      if (user) setUserToken(ctx.res, user)
       return user
     },
-    login: async (_, { email, password, browserTimezone }, ctx) => {
+    login: async (_, { email, password }, ctx) => {
       console.log('LOGIN MUTATION')
       const user = await login(email, password)
-      // check for user.settings.timezone
-      if (user) setUserToken(ctx.res, user, browserTimezone)
+      if (user) setUserToken(ctx.res, user)
       return user
     },
     logout: async (_, {}, ctx) => {

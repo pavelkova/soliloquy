@@ -5,12 +5,14 @@ import { LoginForm } from 'components/LoginForm'
 export default function Login() {
   const router = useRouter()
 
-  function  redirectOnSuccess() {
-    router.push('/today')
+  const props = {
+    redirectOnSuccess: (() => {
+      router.push('/today')
+    })
   }
 
   return (
-    <LoginForm props={ redirectOnSuccess } />
+    <LoginForm { ...props } />
   )
 }
 

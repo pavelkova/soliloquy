@@ -23,13 +23,15 @@ const toUTC = {
  *             if not provided, returns today
  */
 const formatEntryDate = (tz, date = '') => {
-  const d = date ? new Date(date) : new Date()
-  const options = { timeZone: tz,
-                    month: '2-digit',
+  /* const d = date ? new Date(date) : new Date() */
+  const options = { month: '2-digit',
                     day: '2-digit',
                     year: 'numeric'}
 
-  const [month, day, year] = d.toLocaleDateString('en-US', options).split('/')
+  // TODO slim down when i figure out how to store auto timezone
+  /* if (tz && tz !== 'auto') options.timeZone = tz */
+  const d = formatLocalDateTime(tz, options, date)
+  const [month, day, year] = d.split('/')
 
   return year + '-' + month + '-' + day
 }
@@ -49,7 +51,8 @@ const formatLocalDateTime = (tz, options = {}, date = '', locale = 'en-US') => {
    * }
    */
   const d = date ? new Date(date) : new Date()
-  options.timeZone = tz
+  // TODO slim down when i figure out how to store auto timezone
+  if (tz && tz !== 'auto') options.timeZone = tz
 
   return d.toLocaleString(locale, options)
 }
@@ -60,12 +63,6 @@ const getTimeSince = time => {
 
 const getTimeBetween = (start, end) => {
   console.log('getTimeBetween ->')
-  console.log('end')
-  console.log(end)
-  console.log(new Date(end))
-  console.log('start')
-  console.log(start)
-  console.log(new Date(start))
   return new Date(end) - new Date(start)
 }
 

@@ -21,7 +21,6 @@ input DateSpanInput {
 }
 
 type Query {
-  findToday: Entry
   findEntryById(id: ID!): Entry
   findEntryByDate(date: String!): Entry
   findEntriesByDates(dateSpan: DateSpanInput!): [Entry]
@@ -29,6 +28,6 @@ type Query {
 }
 
 type Mutation {
-  findOrCreateEntry: Entry
+  createEntry(date: String!): Entry
   updateEntry(id: ID!, content: String, wordCount: Int, activity: ActivityInput): Entry
 }

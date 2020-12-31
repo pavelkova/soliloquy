@@ -7,10 +7,6 @@ import { findById as findEntryOwner } from 'actions/user'
 
 export default {
   Query: {
-    findToday: authenticate(
-      async (_, {}, ctx) => {
-        return await findToday(ctx.user)
-    }),
     findEntryById: authenticate(
       async (_, { id }, ctx) => {
         return await findById(ctx.user, id)
@@ -30,11 +26,10 @@ export default {
     }),
   },
   Mutation: {
-    findOrCreateEntry: authenticate(
-      async (_, { timezone }, ctx) => {
-        console.log('RESOLVERS -> ENTRY -> FIND OR CREATE ->')
-        if (timezone) ctx.user.tz = timezone
-        return await findOrCreateToday(ctx.user)
+    createEntry: authenticate(
+      async (_, { date }, ctx) => {
+        console.log('RESOLVERS -> ENTRY -> CREATE ->')
+        return await findOrCreateToday(ctx.user, date)
     }),
     updateEntry:  authenticate(
       async (_, { id, content, wordCount, activity }, ctx) => {

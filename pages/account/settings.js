@@ -2,10 +2,11 @@ import { ssrRequireAuth } from 'lib/auth-check'
 import { SettingsForm } from 'components/SettingsForm'
 
 export default function Settings({ user }) {
-  console.log(user)
+
+  const props = user.settings
   return (
     <>
-      <SettingsForm props={ user.settings } />
+      <SettingsForm { ...props } />
     </>
   )
 }
