@@ -13,7 +13,11 @@ export const authenticate = resolver => (root, args, ctx, info) => {
   throw new Error('unauthenticated')
 }
 
-export const setUserToken = async (res, user, tz) => {
+// TODO make these functions synchronous
+export const setUserToken = async (res, user, browserTimezone) => {
+  const tz = user.settings.timezone == 'AUTO' ?
+             browserTimezone : user.settings.timezone
+
   const userData = { id: user.id, email: user.email, tz }
   try {
     const token = await generateTokens({ user: userData }, MAX_AGE)

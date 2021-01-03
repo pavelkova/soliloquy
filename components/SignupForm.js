@@ -8,14 +8,14 @@ export const SignupForm = () => {
   })
   /* const onSubmit = data => console.log(data) */
 
-  /* const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone */
+  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   const [result, signup] = useMutation(SIGNUP)
 
   const onSubmit = async values => {
     console.log(values)
     if (errors) console.error(errors)
 
-    const { data, fetching, error } = await signup({ ...values })
+    const { data, fetching, error } = await signup({ ...values, browserTimezone })
 
     if (error) { console.error(error) }
 
@@ -43,6 +43,15 @@ export const SignupForm = () => {
         register({required: true})} />
       </div>
 
+      <div>
+        <label>
+          <h3>Timezone</h3>
+          <select name='timezone' ref={
+          register}>
+            <option value='AUTO'>Autodetect</option>
+          </select>
+        </label>
+      </div>
       <input type="submit" disabled={ !formState.isValid } />
     </form>
   )

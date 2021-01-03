@@ -1,9 +1,6 @@
-import { formatWithLocale } from 'utils/date'
-
-export const DateHeader = ({ entry }) => {
-  // FIXME date function
-  const titleDate = formatWithLocale(entry.user, { dateStyle: 'long' })
-  console.log(entry)
+export const DateHeader = ({ date }) => {
+  const titleDate = new Date(date).toLocaleString('en-us', {
+    timeZone: 'GMT', dateStyle: 'full' })
   return (
     <div>
       <h1>{ titleDate }</h1>

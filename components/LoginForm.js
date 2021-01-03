@@ -7,17 +7,17 @@ export const LoginForm = ({ redirectOnSuccess }) => {
     mode: 'onChange'
   })
 
-  /* const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone */
+  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   const [result, login] = useMutation(LOGIN)
 
   const onSubmit = async values => {
     if (errors) console.error(errors)
 
-    const { data, fetching, error } = await login({ ...values })
+    const { data, fetching, error } = await login({ ...values, browserTimezone })
 
     if (error) { console.error(error) }
 
-    if (data?.login) console.log(typeof redirectOnSuccess)
+    if (data?.login) redirectOnSuccess()
     // setError
   }
   return (

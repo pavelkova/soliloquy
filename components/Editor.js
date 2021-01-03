@@ -1,16 +1,14 @@
 import React from 'react'
-/* import { DateHeader } from './Entry/DateHeader' */
+import { DateHeader } from './Entry/DateHeader'
 import { useEditor } from 'lib/use-editor'
 
-export const Editor = (props) => {
+export const Editor = ({ user, today }) => {
 
   const {content, wordCount, lastSavedAt, isPaused, handlePause, handleSave, handleTextChange } = useEditor({ today })
-  console.log(props)
 
   return (
     <>
-      {/* <DateHeader entry={today} /> */}
-      <h1>{ new Date(today.date).toLocaleString('en-us', { timeZone: 'GMT', dateStyle: 'full' })}</h1>
+      <DateHeader date={ today.date } />
       <div>
         {wordCount} {wordCount == 1 ? 'word' : 'words'}
         <button onClick={handlePause}>{ isPaused ? 'start' : 'pause' }</button>

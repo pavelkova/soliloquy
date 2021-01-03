@@ -4,41 +4,28 @@ import { isValid } from 'utils/date'
 import { ssrAuthCheck } from 'lib/auth-check'
 import ENTRY_BY_DATE from 'queries/EntryByDate.graphql'
 
-export default function Date({ ...props }) {
-
-  const router = useRouter()
-  const { yyyy, mm, dd } = router.query
-
-  if (!isValid.year(yyyy) || !isValid.month(mm) || !isValid.day(dd)) {
-    throw new Error('bad date')
-    // redirect
-  }
-
-  const date = yyyy + '-' + mm + '-' + dd
-  console.log(date)
-
-  const [{ data, fetching, error }] = useQuery({
-    query: ENTRY_BY_DATE,
-    variables: { date },
-  })
-
-  let entry
-
-  if (fetching) return (<p>Loading...</p>)
-  if (error) return (<p>{ error.message }</p>)
-  if (data?.findEntryByDate) { entry = data.findEntryByDate }
-
-  console.log(entry)
+export default function Date({ user, entry }) {
+  if (!entry) return <>No entry for this date.</>
   return (
     <>
-      <h1>{ entry.date}</h1>
+      <h1>{ entry.date }</h1>
+      <p>{ entry.content }</p>
   </>
   )
 }
 
 export const getServerSideProps = async ctx => {
   console.log('SSR ->')
-  const { user } = await ssrAuthCheck(ctx, '/login')
 
-  return { props: { user } }
+  const { client, user } = await ssrAuthCheck(ctx, '/login')
+
+  if (!user) return
+
+  const { yyyy, mm, dd } = ctx.params
+  if (!isValid.year(yyyy) || !isValid.month(mm) || !isValid.day(dd)) return
+
+  const date = yyyy + '-' + mm + '-' + dd
+  const result = await client.query(ENTRY_BY_DATE, { date }).toPromise()
+
+  return { props: { user, entry: result?.data?.findEntryByDate } }
 }

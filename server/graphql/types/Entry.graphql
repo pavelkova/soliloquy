@@ -28,6 +28,7 @@ type Query {
 }
 
 type Mutation {
-  createEntry(date: String!): Entry
+  findOrCreateToday: Entry
+  createEntry(date: String): Entry
   updateEntry(id: ID!, content: String, wordCount: Int, activity: ActivityInput): Entry
 }

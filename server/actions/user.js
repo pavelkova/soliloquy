@@ -66,6 +66,21 @@ const signup = async (email, name, password) => {
   if (user) {
     throw new Error('A user with that email already exists.')
   } else {
+
+    const defaultSettings = {
+      timezone: 'AUTO',
+      wordCountGoal: 750,
+      timeFormat: '12h',
+      dayStartsAt: '00:00',
+      textAnalysis: false,
+      theme: 'default',
+      fontName: '',
+      fontSize: 14,
+      backgroundColor: '',
+      textColor: '',
+      highlightColor: ''
+    }
+
     try {
       const hash = await encryptPassword(password)
       const userArr = await t.returning(columns)

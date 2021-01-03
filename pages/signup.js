@@ -1,12 +1,16 @@
+import { useRouter } from 'next/router'
 import { ssrRequireNoAuth } from 'lib/auth-check'
 import { SignupForm } from 'components/SignupForm'
-import { useRouter } from 'react'
 
 export default function Signup() {
   const router = useRouter()
-  // redirect to welcome page
+   const props = {
+    redirectOnSuccess: (() => {
+      router.push('/welcome')
+    })
+   }
   return (
-    <SignupForm />
+    <SignupForm {...props } />
   )
 }
 

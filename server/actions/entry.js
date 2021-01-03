@@ -148,7 +148,7 @@ const update = async (user, id, content, wordCount, { lowestWordCount, start }) 
   }
 }
 
-const findOrCreateToday = async (user, date) => {
+const findOrCreate = async (user, date) => {
   console.log('ACTIONS -> ENTRY -> FIND OR CREATE TODAY ->')
 
   const entry = await findByDate(user, date)
@@ -157,8 +157,7 @@ const findOrCreateToday = async (user, date) => {
 }
 
 export { findById, findByDate, findByDateSpan, findAll,
-         findOrCreateToday,
-         create, update }
+         findOrCreate, create, update }
 
 // [FIXME] consider moving "isPaused" from useEditor to its own component or hook, and run findOrCreateEntry mutation based on pause state from within Editor component to then feed useEditor with a new or refreshed today object, if required
 // OR is this where we use a subscription

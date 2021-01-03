@@ -53,7 +53,10 @@ console.log(router)
 
 export const getServerSideProps = async ctx => {
   console.log('SSR ->')
-  const { user } = await ssrAuthCheck(ctx, '/login')
+  const { client, user } = await ssrAuthCheck(ctx, '/login')
+  if (!user) return
+
+  const { yyyy, mm } = ctx.params
 
   return { props: { user } }
 }
