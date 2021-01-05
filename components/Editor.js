@@ -1,6 +1,6 @@
 import React from 'react'
 import { DateHeader } from './Entry/DateHeader'
-import { useEditor } from 'lib/use-editor'
+import { useEditor } from 'hooks/use-editor'
 
 export const Editor = ({ user, today }) => {
 

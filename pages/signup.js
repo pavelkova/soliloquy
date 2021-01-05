@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { ssrRequireNoAuth } from 'lib/auth-check'
+import { ssrRequireNoAuth } from 'lib/ssr-auth'
 import { SignupForm } from 'components/SignupForm'
 
 export default function Signup() {

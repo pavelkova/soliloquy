@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "api/*": ["api/**"],
+      "components/*": ["components/*"],
+      "db/*": ["db/*"],
+      "lib/*": ["lib/*"],
+      "hooks/*": ["lib/hooks/*"],
+      "mutations/*": ["lib/mutations/*"],
+      "queries/*": ["lib/queries/*"],
+      "pages/*": ["pages/*"],
+      "styles/*": ["styles/*"],
+      "utils/*": ["utils/*"],
+    }
+  },
+  "exclude": ["node_modules"]
+}

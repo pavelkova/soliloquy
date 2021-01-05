@@ -1,21 +1,31 @@
-import { useRouter } from 'next/router'
-import { useQuery } from 'urql'
+import { ssrRequireAuth } from 'lib/ssr-auth'
 import { isValid } from 'utils/date'
-import { ssrAuthCheck } from 'lib/auth-check'
 import ENTRIES_BY_DATES from 'queries/EntriesByDates.graphql'
+import { Entry } from 'components/Entry'
 
-export default function Month() {
-  const router = useRouter()
-  const { yyyy, mm } = router.query
-console.log(router)
-  if (!isValid.year(yyyy)) {
-    throw new Error('Year parameter must be a valid year in 4-digit format.')
-    // redirect
-  }
+export default function Month({ user, entries }) {
+  if (!entries || entries.length == 0) return (
+    <>No entries in this month.</>
+  )
 
-  if (!isValid.month(mm)) {
-    throw new Error('Month must be a number between 1 and 12, corresponding with a calendar month.')
-  }
+  return (
+    <>
+      { entries.map(entry =>
+        <div key={ entry.id }>
+          <Entry entry={ entry } />
+        </div>
+      ) }
+    </>
+  )
+}
+
+export const getServerSideProps = async ctx => {
+  console.log('SSR ->')
+  const { client, user } = await ssrRequireAuth(ctx)
+  if (!user) return
+
+  const { yyyy, mm } = ctx.params
+  if (!isValid.year(yyyy) || !isValid.month(mm)) return
 
   let lastDayOfMonth = '31'
 
@@ -35,28 +45,8 @@ console.log(router)
   const fromDate = yyyy + '-' + mm + '-01'
   const toDate = yyyy + '-' + mm + '-' + lastDayOfMonth
 
-  const [{ data, fetching, error }] = useQuery({
-    query: ENTRIES_BY_DATES,
-    variables: { dateSpan: { fromDate, toDate } },
-  })
+  const result = await client.query(ENTRIES_BY_DATES, {
+    dateSpan: { fromDate, toDate } }).toPromise()
 
-  if (fetching) return <p>Loading...</p>
-  if (error) return <p>{ error.message }</p>
-  if (data) console.log(data)
-
-  return (
-  <>
-    'empty'
-  </>
-  )
-}
-
-export const getServerSideProps = async ctx => {
-  console.log('SSR ->')
-  const { client, user } = await ssrAuthCheck(ctx, '/login')
-  if (!user) return
-
-  const { yyyy, mm } = ctx.params
-
-  return { props: { user } }
+  return { props: { user, entries: result?.data?.findEntriesByDates } }
 }

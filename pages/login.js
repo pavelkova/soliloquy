@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { ssrRequireNoAuth } from 'lib/auth-check'
+import { ssrRequireNoAuth } from 'lib/ssr-auth'
 import { LoginForm } from 'components/LoginForm'
 
 export default function Login() {

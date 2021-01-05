@@ -1,7 +1,0 @@
-#import "../UserFragment.graphql"
-
-query ($email: String!) {
-  findUserByEmail(email: $email) {
-    ...UserFragment
-  }
-}

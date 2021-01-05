@@ -1,9 +1,9 @@
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { graphqlHTTP } from 'express-graphql'
 import nc from 'next-connect'
-import resolvers from 'gql/resolvers'
-import typeDefs from 'gql/type-defs'
-import { getUserToken } from 'services/auth'
+import resolvers from 'api/resolvers'
+import typeDefs from 'api/type-defs'
+import { getUserToken } from 'api/actions/auth'
 
 const schema = makeExecutableSchema({
   typeDefs,

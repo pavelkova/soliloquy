@@ -1,42 +1,37 @@
-import { useRouter } from 'next/router'
-import { useQuery } from 'urql'
+import { ssrRequireAuth } from 'lib/ssr-auth'
 import { isValid } from 'utils/date'
-import { ssrAuthCheck } from 'lib/auth-check'
 import ENTRIES_BY_DATES from 'queries/EntriesByDates.graphql'
+import { Entry } from 'components/Entry'
 
-export default function Year() {
-  const router = useRouter()
-  const { yyyy } = router.query
-
-  if (!isValid.year(yyyy)) {
-    throw new Error('Year parameter must be a valid year in 4-digit format.')
-    // redirect
-  }
-
-  const fromDate = yyyy + '-01-01'
-  const toDate = yyyy + '-12-31'
-
-  const [{ data, fetching, error }] = useQuery({
-    query: ENTRIES_BY_DATES,
-    variables: { dateSpan: { fromDate, toDate } },
-  })
-
-
-
-  if (fetching) return <p>Loading...</p>
-  if (error) return <p>{ error.message }</p>
-  if (data) console.log(data)
+export default function Year({ user, entries }) {
+  if (!entries || entries.length == 0) return (
+    <>No entries in this year.</>
+  )
 
   return (
-  <>
-    'empty'
-  </>
+    <>
+      { entries.map(entry =>
+        <div key={ entry.id }>
+          <Entry entry={ entry } />
+        </div>
+      ) }
+    </>
   )
 }
 
 export const getServerSideProps = async ctx => {
   console.log('SSR ->')
-  const { user } = await ssrAuthCheck(ctx, '/login')
+  const { client, user } = await ssrRequireAuth(ctx)
+  if (!user) return
 
-  return { props: { user } }
+  const { yyyy } = ctx.params
+  if (!isValid.year(yyyy)) return
+
+  const fromDate = yyyy + '-01-01'
+  const toDate = yyyy + '-12-31'
+
+  const result = await client.query(ENTRIES_BY_DATES, {
+    dateSpan: { fromDate, toDate } }).toPromise()
+
+  return { props: { user, entries: result?.data?.findEntriesByDates } }
 }

@@ -1,0 +1,15 @@
+#import "../fragments/ActivityLogFragment.graphql"
+#import "../fragments/EntryFragment.graphql"
+#import "../fragments/UserFragment.graphql"
+
+mutation {
+  findOrCreateToday {
+    ...EntryFragment
+    user {
+      ...UserFragment
+    }
+    activityLogs {
+      ...ActivityLogFragment
+    }
+  }
+}

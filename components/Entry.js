@@ -1,7 +1,10 @@
-import { useQuery } from 'urql'
 import { DateHeader } from './Entry/DateHeader'
-export const Entry = ({entry}) => {
+
+export const Entry = ({ entry }) => {
   return (
-    <DateHeader entry={entry} />
+    <>
+      <DateHeader date={ entry.date } />
+      <div>{ entry.content }</div>
+    </>
   )
 }

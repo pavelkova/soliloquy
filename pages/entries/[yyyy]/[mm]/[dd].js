@@ -1,8 +1,7 @@
-import { useRouter } from 'next/router'
-import { useQuery } from 'urql'
 import { isValid } from 'utils/date'
-import { ssrAuthCheck } from 'lib/auth-check'
+import { ssrRequireAuth } from 'lib/ssr-auth'
 import ENTRY_BY_DATE from 'queries/EntryByDate.graphql'
+import { Entry } from 'components/Entry'
 
 export default function Date({ user, entry }) {
   if (!entry) return <>No entry for this date.</>
@@ -17,7 +16,7 @@ export default function Date({ user, entry }) {
 export const getServerSideProps = async ctx => {
   console.log('SSR ->')
 
-  const { client, user } = await ssrAuthCheck(ctx, '/login')
+  const { client, user } = await ssrRequireAuth(ctx)
 
   if (!user) return
 

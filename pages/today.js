@@ -1,5 +1,5 @@
 import { Editor } from 'components/Editor'
-import { ssrAuthCheck } from 'lib/auth-check'
+import { ssrRequireAuth } from 'lib/ssr-auth'
 import FIND_OR_CREATE_TODAY from 'mutations/FindOrCreateToday.graphql'
 
 export default function Today(props) {
@@ -20,7 +20,7 @@ export const getServerSideProps = async ctx => {
 
   const props = {}
 
-  const { client, user } = await ssrAuthCheck(ctx, '/login')
+  const { client, user } = await ssrRequireAuth(ctx)
 
   if (user) {
     props.user = user

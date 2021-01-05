@@ -1,0 +1,5 @@
+#import "../fragments/EntryFragment.graphql"
+
+query {
+  ...EntryFragment
+}
