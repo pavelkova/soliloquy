@@ -4,6 +4,12 @@ export const DateHeader = ({ date }) => {
   return (
     <div>
       <h1>{ titleDate }</h1>
+      <style jsx>{`
+h1 {
+font-family: Oswald;
+font-size: 2rem;
+}
+        `}</style>
     </div>
   )
 

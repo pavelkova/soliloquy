@@ -1,4 +1,4 @@
-import { ssrRequireAuth } from 'lib/auth-check'
+import { ssrRequireAuth } from 'lib/ssr-auth'
 import { SettingsForm } from 'components/SettingsForm'
 
 export default function Settings({ user }) {
