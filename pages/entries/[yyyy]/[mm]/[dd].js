@@ -17,7 +17,7 @@ export const getServerSideProps = async ctx => {
   console.log('SSR ->')
 
   const { client, user } = await ssrRequireAuth(ctx)
-
+  console.log(user)
   if (!user) return
 
   const { yyyy, mm, dd } = ctx.params

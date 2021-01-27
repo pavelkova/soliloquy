@@ -27,7 +27,7 @@ export const getServerSideProps = async ctx => {
     result => {
       if (result.error) {
         console.error(result.error)
-        props.error = result.error
+        props.error = result.error.message
       }
       props.today = result?.data?.findOrCreateToday || {}
   })

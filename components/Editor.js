@@ -10,15 +10,17 @@ export const Editor = ({ user, today }) => {
 
   return (
     <>
-    <Header />
+      <Header />
       <DateHeader date={ today.date } />
-      <div>
-        {wordCount} {wordCount == 1 ? 'word' : 'words'}
-        <button onClick={handlePause}>{ isPaused ? 'start' : 'pause' }</button>
+      <div className='stats-bar'>
+        <span>{wordCount} {wordCount == 1 ? 'word' : 'words'}</span>
+        <span>
+          saved at { new Date(lastSavedAt).toLocaleString('en-us', { timeStyle: 'short' }) }
+        </span>
+
       </div>
-      saved at { new Date(lastSavedAt).toLocaleString('en-us', { timeStyle: 'short' }) }
-      <div></div>
       <textarea onChange={handleTextChange} value={content} disabled={isPaused} />
+      <button onClick={handlePause}>{ isPaused ? 'start' : 'pause' }</button>
       <button onClick={handleSave} disabled={isPaused}>save</button>
 
       <style jsx>{ `
@@ -37,7 +39,11 @@ export const Editor = ({ user, today }) => {
             border: 2px solid ${ palettes.caramel.bright };
             color: ${ palettes.caramel.brighter };
         }
-      `}</style>
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+}
+        `}</style>
     </>
   )
 }
