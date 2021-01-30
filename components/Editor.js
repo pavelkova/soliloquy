@@ -12,25 +12,32 @@ export const Editor = ({ user, today }) => {
     <>
       <Header />
       <DateHeader date={ today.date } />
-      <div className='stats-bar'>
+      <div className='bar stats-bar'>
         <span>{wordCount} {wordCount == 1 ? 'word' : 'words'}</span>
         <span>
           saved at { new Date(lastSavedAt).toLocaleString('en-us', { timeStyle: 'short' }) }
         </span>
 
       </div>
-      <textarea onChange={handleTextChange} value={content} disabled={isPaused} />
-      <button onClick={handlePause}>{ isPaused ? 'start' : 'pause' }</button>
-      <button onClick={handleSave} disabled={isPaused}>save</button>
-
+      <div className='textarea-container'>
+        <textarea onChange={handleTextChange} value={content} disabled={isPaused} />
+      </div>
+      <div className='bar button-bar'>
+        <button onClick={handlePause}>{ isPaused ? 'start' : 'pause' }</button>
+        <button onClick={handleSave} disabled={isPaused}>save</button>
+      </div>
       <style jsx>{ `
         body {
             background: ${ palettes.caramel.light }
+min-height: 100vh;
         }
+.textarea-container {
+height: 100%;
+}
         textarea {
-            border: 1px solid black;
+            border: none;
             font-family: Raleway;
-            resize: none;
+padding: 10px;
             width: 100%;
             height: 100%;
         }
@@ -39,9 +46,14 @@ export const Editor = ({ user, today }) => {
             border: 2px solid ${ palettes.caramel.bright };
             color: ${ palettes.caramel.brighter };
         }
+.bar {
+display: flex;
+}
         .stats-bar {
-            display: flex;
             justify-content: space-between;
+}
+.button-bar {
+justify-content: flex-end;
 }
         `}</style>
     </>
