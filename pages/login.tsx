@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
-import { ssrRequireNoAuth } from 'lib/ssr-auth'
 import { LoginForm } from 'components/LoginForm'
+export { getServerSideProps } from 'lib/ssr/require-no-auth'
 
 export default function Login() {
   const router = useRouter()
@@ -14,13 +14,4 @@ export default function Login() {
   return (
     <LoginForm { ...props } />
   )
-}
-
-export const getServerSideProps = async ctx => {
-  const props = {}
-  const { user } = await ssrRequireNoAuth(ctx)
-
-  if (user) props.user = user
-
-  return { props }
 }

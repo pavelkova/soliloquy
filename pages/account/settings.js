@@ -1,5 +1,5 @@
-import { ssrRequireAuth } from 'lib/ssr-auth'
 import { SettingsForm } from 'components/SettingsForm'
+export { getServerSideProps } from 'lib/ssr/require-auth'
 
 export default function Settings({ user }) {
 
@@ -9,13 +9,4 @@ export default function Settings({ user }) {
       <SettingsForm { ...props } />
     </>
   )
-}
-
-export const getServerSideProps = async ctx => {
-  const props = {}
-
-  const { user } = await ssrRequireAuth(ctx)
-  if (user) props.user = user
-
-  return { props }
 }

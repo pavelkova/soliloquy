@@ -1,4 +1,4 @@
-import { ssrRequireAuth } from 'lib/ssr-auth'
+import { clientWithAuth } from 'lib/ssr/client-with-auth'
 import { isValid } from 'utils/date'
 import ENTRIES_BY_DATES from 'queries/EntriesByDates.graphql'
 import { Entry } from 'components/Entry'
@@ -21,8 +21,7 @@ export default function Year({ user, entries }) {
 
 export const getServerSideProps = async ctx => {
   console.log('SSR ->')
-  const { client, user } = await ssrRequireAuth(ctx)
-  if (!user) return
+  const { props, client } = await clientWithAuth(ctx)
 
   const { yyyy } = ctx.params
   if (!isValid.year(yyyy)) return
@@ -33,5 +32,7 @@ export const getServerSideProps = async ctx => {
   const result = await client.query(ENTRIES_BY_DATES, {
     dateSpan: { fromDate, toDate } }).toPromise()
 
-  return { props: { user, entries: result?.data?.findEntriesByDates } }
+  props.entries = result?.data?.findEntriesByDates
+
+  return { props }
 }
