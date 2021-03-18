@@ -3,12 +3,15 @@ import NextApp, { AppProps } from 'next/app'
 import { withUrqlClient, NextUrqlAppContext } from 'next-urql'
 import { defaultExchanges } from 'urql'
 import { devtoolsExchange } from '@urql/devtools'
-import { Flex } from 'rebass'
+import { Flex } from 'theme-ui'
 import { Navbar } from 'components/Navbar'
 
 const App = ({ Component, pageProps }: AppProps) => {
   return (
-    <Flex flexDirection='column' minHeight='100vh' p={2}>
+    <Flex sx={{ flexDirection: 'column',
+                minHeight: '100vh',
+                p: 2 }}>
+      {/* <Flex flexDirection='column' minHeight='100vh' p={2}> */}
       <Navbar />
       <Component {...pageProps} />
     </Flex>

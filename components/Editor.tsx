@@ -1,6 +1,5 @@
 import React from 'react'
-import { Flex, Box, Link } from 'rebass'
-import { Textarea } from '@rebass/forms'
+import { Flex, Box, Link, Textarea } from 'theme-ui'
 import { DateHeader } from './Entry/DateHeader'
 import { useEditor } from 'hooks/use-editor'
 import { palettes } from 'styles/themes'
@@ -12,28 +11,35 @@ export const Editor = ({ user, today }) => {
   const {content, wordCount, lastSavedAt, isPaused, handlePause, handleSave, handleTextChange } = useEditor({ today })
 
   return (
-    <Flex flex={1} flexDirection='column'>
+    <Flex sx={{ flex: '1', flexDirection: 'column' }}>
+      {/* <Flex flex={1} flexDirection='column'> */}
       <DateHeader date={ today.date } />
-      <Flex justifyContent='space-between' mb={1}>
+      <Flex sx={{ justifyContent: 'space-between', mb: 1 }}>
+        {/* <Flex justifyContent='space-between' mb={1}> */}
         <Box>
           { wordCount } { wordCount == 1 ? 'word' : 'words' }
         </Box>
-        <Box mx={1}>
+        <Box>
           saved at { new Date(lastSavedAt).toLocaleString('en-us', { timeStyle: 'short'}) }
         </Box>
       </Flex>
       <Textarea
         flex={1}
         sx={{
+          flex: '1',
           border: 'none',
+          outline: 'none',
           resize: 'none',
-          scrollbarWidth: 'thin'
+          scrollbarWidth: 'thin',
+          bg: isPaused ? 'grey' : 'white'
         }}
         onChange={handleTextChange}
         value={content}
         disabled={isPaused} />
-      <Flex justifyContent='flex-end' mt={1}>
-        <Link onClick={handlePause} mr={2}>
+      <Flex sx={{ justifyContent: 'flex-end', mt: 1 }}>
+        {/* <Flex justifyContent='flex-end' mt={1}> */}
+        <Link onClick={handlePause} sx={{ mr: 2 }}>
+          {/* <Link onClick={handlePause} mr={2}> */}
           { isPaused ? 'start' : 'pause' }
         </Link>
         <Link onClick={handleSave} disabled={isPaused}>

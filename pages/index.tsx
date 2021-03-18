@@ -1,4 +1,4 @@
-import { Flex, Text, Box, Link } from 'rebass'
+import { Flex, Text, Box, Link } from 'theme-ui'
 
 export default function Index() {
 

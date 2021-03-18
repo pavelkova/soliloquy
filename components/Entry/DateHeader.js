@@ -1,13 +1,14 @@
-import { Box, Text } from 'rebass'
+import { Box, Text } from 'theme-ui'
 
 export const DateHeader = ({ date }) => {
   const titleDate = new Date(date).toLocaleString('en-us', {
     timeZone: 'GMT', dateStyle: 'full' })
   return (
-    <Box mb={1}>
-      <Text fontSize={[2,3,4]}>
+    <Box sx={{ mb: 1 }}>
+      <Text sx={{ fontSize: [2,3,4] }}>
+        {/* <Text fontSize={[2,3,4]}> */}
         { titleDate }
-      </Text>
+        </Text>
     </Box>
   )
 
