@@ -1,13 +1,32 @@
 import { useForm } from 'react-hook-form'
 import { useMutation } from 'urql'
-import { Box, Button, Label, Input, Select } from 'theme-ui'
+import { Box, Button, Checkbox, Flex, Heading, Input, Label, Radio, Select } from 'theme-ui'
+import { useFormFields } from './FormFields/Common'
 import UPDATE_SETTINGS from 'mutations/UpdateSettings.graphql'
 
-export const SettingsForm = (props) => {
-  console.log(props)
-  const { register, handleSubmit, errors } = useForm({
+const SettingsGroup = props => {
+  return (
+    <Box sx={{ borderWidth: 1,
+               borderStyle: 'solid',
+               borderColor: 'muted',
+               mb: 2,
+               mt: 4,
+               p: 2 }}>
+      <Heading sx={{ border: 'inherit',
+                     background: 'background',
+                     width: 'max-content',
+                     mt: '-24px',
+                     p: 1 }}>{ props.title }</Heading>
+      { props.children }
+    </Box>
+  )
+}
+
+export const SettingsForm = props => {
+  const { register, handleSubmit, errors, formState } = useForm({
     defaultValues: props
   })
+  const [EmailAddress, Password, Name, Timezone] = useFormFields(register)
 
   const [result, updateSettings] = useMutation(UPDATE_SETTINGS)
 
@@ -26,140 +45,24 @@ export const SettingsForm = (props) => {
 
   return (
 
+    <Box as='form' onSubmit={ handleSubmit(onSubmit) }>
+      <SettingsGroup title='Fonts'>
+        <Label htmlFor='fontName' sx={{ mt: 2 }}>Font name</Label>
+        <Input name='fontName' ref={register} />
+        <Label htmlFor='fontSize' sx={{ mt: 2 }}>Font size</Label>
+        <Input type='number' name='fontSize' ref={register} />
+      </SettingsGroup>
+      <SettingsGroup title='Account'>
+        <EmailAddress />
+        <Name/>
+      </SettingsGroup>
+      <SettingsGroup title='Update password'>
+        <Password checkPattern={ false } name='oldPassword' title='Old password'  />
+        <Password name='newPassword' title='New password' />
+      </SettingsGroup>
+      <Button type='submit' disabled={ !formState.isValid }>
+        Submit
+      </Button>
+    </Box>
   )
 }
-    <form onSubmit={handleSubmit(onSubmit)}>
-
-/* <div>
- *   <h2>General</h2>
- *   <div>
- *     <label>
- *       <h3>Word Count Goal</h3>
- *       <input type='number' name='wordCountGoal' ref={
- *       register}/>
- *     </label>
- *   </div>
- * </div>
-
- * <div>
- *   <h2>Date & Time</h2>
- *   <div>
- *     <label>
- *       <h3>Day starts at</h3>
- *       <input type='time' name='dayStartsAt' ref={
- *       register}/>
- *     </label>
- *   </div>
- *   <div>
- *     <h3>Clock display format</h3>
- *     <label>
- *       <input type='radio' name='timeFormat' value='12h' ref={
- *       register}/>
- *       <span>12-hour</span>
- *     </label>
- *     <label>
- *       <input type='radio' name='timeFormat' value='24h' ref={
- *       register}/>
- *       <span>24-hour</span>
- *     </label>
- *   </div>
- *   <div>
- *     <label>
- *       <h3>Timezone</h3>
- *       <select name='timezone' ref={
- *       register}>
- *         <option value='auto'>Autodetect</option>
- *       </select>
- *     </label>
- *   </div>
- * </div>
-
- * <div>
- *   <h2>Appearance</h2>
- *   <div>
- *     <label>
- *       <h3>Font name</h3>
- *       <input type='number' name='fontName' ref={
- *       register}/>
- *     </label>
- *   </div>
- *   <div>
- *     <label>
- *       <h3>Font size</h3>
- *       <input type='number' name='fontSize' ref={
- *       register}/>
- *     </label>
- *   </div>
- *   <div>
- *     <label>
- *       <h3>Theme</h3>
- *       <select name='theme' ref={
- *       register}>
- *         <option value='default'>Default</option>
- *         <option value='custom'><i>(Custom)</i></option>
- *       </select>
- *     </label>
- *   </div>
- *   <div>
- *     <label>
- *       <h3>Text Color</h3>
- *       <input type='color' name='textColor' ref={
- *       register}/>
- *     </label>
- *   </div>
- *   <div>
- *     <label>
- *       <h3>Background Color</h3>
- *       <input type='color' name='backgroundColor' ref={
- *       register}/>
- *     </label>
- *   </div>
- *   <div>
- *     <label>
- *       <h3>Highlight Color</h3>
- *       <input type='color' name='highlightColor' ref={
- *       register}/>
- *     </label>
- *   </div>
- * </div>
-
- * <div>
- *   <h2>Account Settings</h2>
- *   <div>
- *     <label>
- *       <h3>Text Analysis</h3>
- *       <input type='checkbox' name='textAnalysis' ref={
- *       register}/>
- *     </label>
- *   </div>
-
- *   <div>
- *     <label>
- *       <h3>Email Address</h3>
- *       <input type='email' name='email' ref={
- *       register}/>
- *     </label>
- *   </div>
- *   <div>
- *     <label>
- *       <h3>Name</h3>
- *       <input type='text' name='name' ref={
- *       register}/>
- *     </label>
- *   </div>
- *   <div>
- *     <h3>Update Password</h3>
- *     <label>
- *       <span>Current password</span>
- *       <input type='password' name='currentPassword' ref={
- *       register}/>
- *     </label>
- *     <label>
- *       <span>New password</span>
- *       <input type='password' name='newPassword' ref={
- *         register}/>
-   </label>
-   </div>
-   </div>
-   <input type="submit"/>
-   </form> */

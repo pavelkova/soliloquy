@@ -6,6 +6,7 @@ const isRequired = { required: true }
 const ClockDisplayFormat = register => {
   return (
     <Flex>
+      <Text>Clock display format</Text>
       <Label>
         <Radio name='timeFormat' value='12hr' ref={register} />
         12-hour
@@ -77,7 +78,7 @@ const useFormFields = (register, watch, checkPattern = true) => {
                         : isRequired
     return (
       <>
-        <Label htmlFor='password'></Label>
+        <Label htmlFor='password'>Password</Label>
         <Flex>
           <Input type={ passwordVisible ? 'text' : 'password' }
                  name='password'

@@ -3,18 +3,20 @@ import NextApp, { AppProps } from 'next/app'
 import { withUrqlClient, NextUrqlAppContext } from 'next-urql'
 import { defaultExchanges } from 'urql'
 import { devtoolsExchange } from '@urql/devtools'
-import { Flex } from 'theme-ui'
+import { ThemeProvider, Flex } from 'theme-ui'
 import { Navbar } from 'components/Navbar'
+import theme from 'styles/theme'
 
 const App = ({ Component, pageProps }: AppProps) => {
   return (
-    <Flex sx={{ flexDirection: 'column',
-                minHeight: '100vh',
-                p: 2 }}>
-      {/* <Flex flexDirection='column' minHeight='100vh' p={2}> */}
-      <Navbar />
-      <Component {...pageProps} />
-    </Flex>
+    <ThemeProvider theme={theme}>
+      <Flex sx={{ flexDirection: 'column',
+                  minHeight: '100vh',
+                  p: 2 }}>
+        <Navbar />
+        <Component {...pageProps} />
+      </Flex>
+    </ThemeProvider>
   )
   /* return <Component {...pageProps} /> */
 }
