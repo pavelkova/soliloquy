@@ -6,6 +6,7 @@ import { devtoolsExchange } from '@urql/devtools'
 import { ThemeProvider, Flex } from 'theme-ui'
 import { Navbar } from 'components/Navbar'
 import theme from 'styles/theme'
+import { Footer } from 'components/Footer'
 
 const App = ({ Component, pageProps }: AppProps) => {
   return (
@@ -15,6 +16,7 @@ const App = ({ Component, pageProps }: AppProps) => {
                   p: 2 }}>
         <Navbar />
         <Component {...pageProps} />
+        <Footer />
       </Flex>
     </ThemeProvider>
   )

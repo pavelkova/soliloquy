@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { Alert, Box, Close, Divider, Flex, Heading, NavLink, Styled } from 'theme-ui'
-
+import { jsx, Alert, Box, Close, Divider, Flex, Heading, MenuButton, NavLink, Styled } from 'theme-ui'
+import { AiOutlineMenu, AiOutlineClose, AiOutlineUser } from 'react-icons/ai'
 
 const EntryMenu = () => {
   return (
@@ -40,23 +40,52 @@ const UserlessMenu = () => {
   )
 }
 
-const DropdownMenu = () => {
+/* props: open heading, closed heading, child menu  */
+
+const DropdownerMenu = () => {
   const [isOpen, setIsOpen] = useState(false)
   return (
-    <>
-      <Box onClick={ (e) => setIsOpen(!isOpen) }>
-        X
+      <Box sx={{ position: 'relative' }}>
+        <Box onClick={ (e) => setIsOpen(!isOpen) }>
+          { isOpen ? <AiOutlineClose/> : <AiOutlineMenu/> }
       </Box>
 
-        <Box sx={{ position: 'absolute',
-                   display: isOpen ?  'initial' : 'none',
-                   right: 2,
-                   bg: 'muted',
-                   mt: 3 }}>
+      <Box sx={{ display: isOpen ?  'initial' : 'none',
+                 position: 'absolute',
+                 top: '100%',
+                 right: 0,
+                 pl: 2,
+                 bg: 'muted' }}>
           <EntryMenu />
-          <UserMenu />
-        </Box>
-    </>
+        <UserMenu />
+      </Box>
+    </Box>
+  )
+}
+
+/* type DropdownProps = {
+  *   openHeader: React.ReactNode
+  *   closedHeader: React.ReactNode
+  *   children?: React.ReactNode
+  * } */
+
+const DropdownMenu = (props) => {
+  const [isOpen, setIsOpen] = useState(false)
+  return (
+    <Box sx={{ position: 'relative' }}>
+      <Box onClick={ (e) => setIsOpen(!isOpen) }>
+        { isOpen ? '- ' : '+ ' } { props.title }
+      </Box>
+
+      <Box sx={{ display: isOpen ?  'initial' : 'none',
+                 position: 'absolute',
+                 top: '100%',
+                 right: 0,
+                 pl: 2,
+                 bg: 'muted' }}>
+        { props.children }
+      </Box>
+    </Box>
   )
 }
 
@@ -65,7 +94,8 @@ const Sidebar = () => {
   return (
     <>
       <Box onClick={ (e) => setIsOpen(!isOpen) }>
-        sidebar
+        { isOpen ? <AiOutlineClose/> : <AiOutlineMenu/> }
+        <MenuButton />
       </Box>
       <Box sx={{ position: 'absolute',
                  display: isOpen ? 'initial' : 'none',
@@ -77,8 +107,12 @@ const Sidebar = () => {
                  bottom: 0,
                  minWidth: '30vw',
                  p: 3 }}>
-        <Close onClick={ (e) => setIsOpen(!isOpen) } />
+        
+        <Box onClick={ (e) => setIsOpen(!isOpen) }>
+          <MenuButton />
+        </Box>
         <EntryMenu/>
+        <DropdownMenu />
         <UserMenu/>
       </Box>
     </>
@@ -114,11 +148,13 @@ export const Navbar = () => {
               color: 'accent' }}>
         soliloquy
       </Heading>
-      <Flex>
+      <Flex sx={{ alignItems: 'baseline' }}>
+        <DropdownMenu title='entries'>
+          <UserMenu/>
+        </DropdownMenu>
         <StyledLink href='/today' title='Today' />
         <StyledLink href='/entries' title='Entries' />
         <StyledLink href='/account/settings' title='Profile' />
-        <DropdownMenu />
         <Sidebar />
       </Flex>
     </Flex>
