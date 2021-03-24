@@ -1,140 +1,54 @@
-import React, { useState } from 'react'
-import Link from 'next/link'
-import { jsx, Alert, Box, Close, Divider, Flex, Heading, MenuButton, NavLink, Styled } from 'theme-ui'
-import { AiOutlineMenu, AiOutlineClose, AiOutlineUser } from 'react-icons/ai'
+import React from 'react'
+import { Box, Flex, Heading } from 'theme-ui'
+import { DropdownMenu } from './Navbar/Dropdown'
+import { NavItem, RouterNavItem } from './Navbar/NavItem'
 
-const EntryMenu = () => {
-  return (
-    <>
-      <StyledLink href='/entries' title='Entries' />
-      <Box>
-        <NavLink>By year</NavLink>
-        <ul>
-          <li><NavLink>2021</NavLink></li>
-          <ul>
-            <li><NavLink>January</NavLink></li>
-          </ul>
-        </ul>
-      </Box>
-    </>
-  )
+const SiteMenu = {
+  home: { href: '/', title: 'Home' },
+  about: { href: '/about', title: 'About' }
 }
 
-const UserMenu = () => {
-  return (
-    <>
-      <NavLink>Profile</NavLink>
-      <NavLink>Settings</NavLink>
-      <Divider />
-      <NavLink>Logout</NavLink>
-    </>
-  )
+const AppMenu = {
+  today: { href: '/today', title: 'Today' },
+  entries: { href: '/entries', title: 'Entries' }
 }
 
-const UserlessMenu = () => {
-  return (
-    <>
-      <NavLink>Login</NavLink>
-      <NavLink>Signup</NavLink>
-    </>
-  )
+const FooterMenu = {
+  privacy: { href: '/privacy-policy', title: 'Privacy policy' },
+  github: { href: 'https://github.com/pavelkova/soliloquy', title: 'Github' },
+  developer: { href: 'https://egpavelka.com', title: 'Developer' }
 }
 
-/* props: open heading, closed heading, child menu  */
-
-const DropdownerMenu = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  return (
-      <Box sx={{ position: 'relative' }}>
-        <Box onClick={ (e) => setIsOpen(!isOpen) }>
-          { isOpen ? <AiOutlineClose/> : <AiOutlineMenu/> }
-      </Box>
-
-      <Box sx={{ display: isOpen ?  'initial' : 'none',
-                 position: 'absolute',
-                 top: '100%',
-                 right: 0,
-                 pl: 2,
-                 bg: 'muted' }}>
-          <EntryMenu />
-        <UserMenu />
-      </Box>
-    </Box>
-  )
+const userMenu = {
+  dashboard: { href: '/account/dashboard', title: 'Dashboard' },
+  settings: { href: '/account/settings', title: 'Settings' },
+  logout: { href: '/logout', title: 'Logout' },
 }
 
-/* type DropdownProps = {
-  *   openHeader: React.ReactNode
-  *   closedHeader: React.ReactNode
-  *   children?: React.ReactNode
-  * } */
-
-const DropdownMenu = (props) => {
-  const [isOpen, setIsOpen] = useState(false)
-  return (
-    <Box sx={{ position: 'relative' }}>
-      <Box onClick={ (e) => setIsOpen(!isOpen) }>
-        { isOpen ? '- ' : '+ ' } { props.title }
-      </Box>
-
-      <Box sx={{ display: isOpen ?  'initial' : 'none',
-                 position: 'absolute',
-                 top: '100%',
-                 right: 0,
-                 pl: 2,
-                 bg: 'muted' }}>
-        { props.children }
-      </Box>
-    </Box>
-  )
+const loginMenu = {
+  login: { href: '/login', title: 'Login' },
+  signup: { href: '/signup', title: 'Signup' }
 }
 
-const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  return (
-    <>
-      <Box onClick={ (e) => setIsOpen(!isOpen) }>
-        { isOpen ? <AiOutlineClose/> : <AiOutlineMenu/> }
-        <MenuButton />
-      </Box>
-      <Box sx={{ position: 'absolute',
-                 display: isOpen ? 'initial' : 'none',
-                 height: '100vh',
-                 bg: 'muted',
-                 zIndex: 1,
-                 right: 0,
-                 top: 0,
-                 bottom: 0,
-                 minWidth: '30vw',
-                 p: 3 }}>
-        
-        <Box onClick={ (e) => setIsOpen(!isOpen) }>
-          <MenuButton />
-        </Box>
-        <EntryMenu/>
-        <DropdownMenu />
-        <UserMenu/>
-      </Box>
-    </>
-  )
-}
+const createMenu = items => Object.values(items).map(item => {
+    return <RouterNavItem {...item} />
+})
 
-type LinkProps = {
-  title: string,
-  href: string
-}
-
-const StyledLink = (props: LinkProps) => {
+const createDropdown = (title, items) => {
   return (
-    <Link href={ props.href } passHref>
-      <NavLink sx={{ mr: 2, fontSize: 10, textTransform: 'uppercase' }}>
-        { props.title }
-      </NavLink>
-    </Link>
+    <DropdownMenu title={ title }>
+      { Object.values(items).map(item => {
+          return <RouterNavItem {...item} /> }) }
+    </DropdownMenu>
   )
 }
 
 export const Navbar = () => {
+  const UserMenu = createDropdown('User', userMenu)
+  const LoginMenu = createMenu(loginMenu)
+  console.log(UserMenu)
+  console.log(LoginMenu)
+
   return (
     <Flex
       sx={{ justifyContent: 'space-between',
@@ -149,13 +63,8 @@ export const Navbar = () => {
         soliloquy
       </Heading>
       <Flex sx={{ alignItems: 'baseline' }}>
-        <DropdownMenu title='entries'>
-          <UserMenu/>
-        </DropdownMenu>
-        <StyledLink href='/today' title='Today' />
-        <StyledLink href='/entries' title='Entries' />
-        <StyledLink href='/account/settings' title='Profile' />
-        <Sidebar />
+        { LoginMenu }
+          { UserMenu }
       </Flex>
     </Flex>
   )
