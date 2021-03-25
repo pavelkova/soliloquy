@@ -1,20 +1,29 @@
+import { useRouter } from 'next/router'
 import { clientWithAuth } from 'lib/ssr/client-with-auth'
 import { isValid } from 'utils/date'
 import ENTRIES_BY_DATES from 'queries/EntriesByDates.graphql'
 import { Entry } from 'components/Entry'
+import { Calendar } from 'components/Navbar/Calendar'
 
 export default function Month({ user, entries }) {
+  const router = useRouter()
+  const { yyyy, mm } = router.query
+  console.log(yyyy)
   if (!entries || entries.length == 0) return (
-    <>No entries in this month.</>
+    <>
+      <Calendar year={ yyyy } month={ mm } entries={ entries } />
+      <div>No entries in this month.</div>
+    </>
   )
 
   return (
     <>
-      { entries.map(entry =>
-        <div key={ entry.id }>
-          <Entry entry={ entry } />
-        </div>
-      ) }
+    <Calendar year={ yyyy } month={ mm } entries={ entries } />
+    { entries.map(entry =>
+      <div key={ entry.id }>
+        <Entry entry={ entry } />
+      </div>
+    ) }
     </>
   )
 }
@@ -26,28 +35,18 @@ export const getServerSideProps = async ctx => {
   const { yyyy, mm } = ctx.params
   if (!isValid.year(yyyy) || !isValid.month(mm)) return
 
-  let lastDayOfMonth = '31'
-
-  /* Thirty days hath September,
-     April, June and November.
-     All the rest have thirty-one,
-     Excepting February alone,
-     And that has twenty-eight days clear
-     And twenty-nine in each leap year. */
-
-  if (parseInt(mm) == 2) {
-    Number.isInteger(parseInt(yyyy)/4) ? lastDayOfMonth = '29' : lastDayOfMonth = '28'
-  } else if ([4, 6, 9, 11].includes(parseInt(mm))) {
-    lastDayOfMonth = '30'
+  const lastDayOfMonth = (y,m) => {
+    return new Date(yyyy, mm, 0).getDate()
   }
-
   const fromDate = yyyy + '-' + mm + '-01'
-  const toDate = yyyy + '-' + mm + '-' + lastDayOfMonth
+  const toDate = yyyy + '-' + mm + '-' + lastDayOfMonth(yyyy,mm)
 
   const result = await client.query(ENTRIES_BY_DATES, {
     dateSpan: { fromDate, toDate } }).toPromise()
 
-  props.entries = result?.data?.findEntriesByDates
+  const entries = result?.data?.findEntriesByDates
+  console.log(entries)
+  props.entries = entries
 
   return { props }
 }

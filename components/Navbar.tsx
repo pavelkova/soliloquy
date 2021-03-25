@@ -1,5 +1,6 @@
 import React from 'react'
 import { Box, Flex, Heading } from 'theme-ui'
+import { AiOutlineUser } from 'react-icons/ai'
 import { DropdownMenu } from './Navbar/Dropdown'
 import { NavItem, RouterNavItem } from './Navbar/NavItem'
 
@@ -20,7 +21,7 @@ const FooterMenu = {
 }
 
 const userMenu = {
-  dashboard: { href: '/account/dashboard', title: 'Dashboard' },
+  dashboard: { href: '/account/dashboard', title: 'Dashboard', icon: AiOutlineUser },
   settings: { href: '/account/settings', title: 'Settings' },
   logout: { href: '/logout', title: 'Logout' },
 }
@@ -46,8 +47,6 @@ const createDropdown = (title, items) => {
 export const Navbar = () => {
   const UserMenu = createDropdown('User', userMenu)
   const LoginMenu = createMenu(loginMenu)
-  console.log(UserMenu)
-  console.log(LoginMenu)
 
   return (
     <Flex
