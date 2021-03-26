@@ -39,7 +39,7 @@ const createDropdown = (title, items) => {
   return (
     <DropdownMenu title={ title }>
       { Object.values(items).map(item => {
-          return <RouterNavItem {...item} /> }) }
+          return <RouterNavItem key={ item.title } {...item} /> }) }
     </DropdownMenu>
   )
 }
@@ -63,7 +63,7 @@ export const Navbar = () => {
       </Heading>
       <Flex sx={{ alignItems: 'baseline' }}>
         { LoginMenu }
-          { UserMenu }
+        { UserMenu }
       </Flex>
     </Flex>
   )

@@ -16,7 +16,7 @@ export default function Today(props) {
 export const getServerSideProps = async ctx => {
   console.log('TODAY PAGE -> GET SSR PROPS ->')
 
-  const { props, client } = await clientWithAuth(ctx)
+  const { user, client } = await clientWithAuth(ctx)
 
   await client.mutation(FIND_OR_CREATE_TODAY).toPromise().then(
     result => {
@@ -27,5 +27,5 @@ export const getServerSideProps = async ctx => {
       props.today = result?.data?.findOrCreateToday || {}
   })
 
-  return { props }
+  return { props: { user } }
 }

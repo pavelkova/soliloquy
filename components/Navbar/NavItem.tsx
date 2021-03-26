@@ -9,7 +9,6 @@ type LinkProps = {
 }
 
 export const NavItem = (props: LinkProps) => {
-  console.log(props?.icon)
   return (
     <NavLink sx={{ mx: 1,
                    display: 'flex',

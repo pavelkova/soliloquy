@@ -21,7 +21,7 @@ export default function Year({ user, entries }) {
 
 export const getServerSideProps = async ctx => {
   console.log('SSR ->')
-  const { props, client } = await clientWithAuth(ctx)
+  const { user, client } = await clientWithAuth(ctx)
 
   const { yyyy } = ctx.params
   if (!isValid.year(yyyy)) return
@@ -32,7 +32,6 @@ export const getServerSideProps = async ctx => {
   const result = await client.query(ENTRIES_BY_DATES, {
     dateSpan: { fromDate, toDate } }).toPromise()
 
-  props.entries = result?.data?.findEntriesByDates
-
-  return { props }
+  return { props: { user, ...ctx.params,
+                    entries: result?.data?.findEntriesByDates } }
 }

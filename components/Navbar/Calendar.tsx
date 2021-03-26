@@ -54,7 +54,6 @@ export const Calendar = ({ year, month, entries }) => {
     }
     setColumns(dayColumns)
     setLoading(false)
-    console.log(columns)
   }, [])
 
   if (loading) return <Spinner/>
@@ -63,7 +62,7 @@ export const Calendar = ({ year, month, entries }) => {
       { weekdays.map(day => {
           return (
             <Box>
-              <Heading>{ day }</Heading>
+              <Heading>{ day.charAt(0) }</Heading>
               <Grid columns={1}>
                 { columns.previous[day].map(date => {
                   return <Box sx={{ color: 'lightgrey' }}>

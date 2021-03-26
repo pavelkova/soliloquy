@@ -36,7 +36,7 @@ export const createUrqlClient = token => {
   )
 }
 
-export const redirect = (condition, location) => {
+export const redirect = (condition: boolean, location: string) => {
   if (condition) {
     ctx.res.writeHead(302, { Location: location })
     ctx.res.end()
