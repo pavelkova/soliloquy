@@ -1,7 +1,7 @@
 #import "../fragments/UserFragment.graphql"
 
-mutation ($email: String!, $password: String!, $browserTimezone: String!) {
-  login(email: $email, password: $password, browserTimezone: $browserTimezone) {
+mutation ($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
     ...UserFragment
   }
 }

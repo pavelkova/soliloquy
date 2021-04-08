@@ -1,3 +1,5 @@
+import { userTimezone } from './locale'
+
 const now = () => {
   return new Date().toISOString()
 }
@@ -22,21 +24,19 @@ const toUTC = {
  * @param date String to be converted into Javascript Date object--
  *             if not provided, returns today
  */
-const formatEntryDate = (tz, date = '') => {
+const formatEntryDate = (user, date = '') => {
   /* const d = date ? new Date(date) : new Date() */
   const options = { month: '2-digit',
                     day: '2-digit',
                     year: 'numeric'}
 
-  // TODO slim down when i figure out how to store auto timezone
-  /* if (tz && tz !== 'auto') options.timeZone = tz */
-  const d = formatLocalDateTime(tz, options, date)
+  const d = formatLocalDateTime(user, options, date)
   const [month, day, year] = d.split('/')
 
   return year + '-' + month + '-' + day
 }
 
-const formatLocalDateTime = (tz, options = {}, date = '', locale = 'en-US') => {
+const formatLocalDateTime = (user, options = {}, date = '', locale = 'en-US') => {
   /* options = {
    *   dateStyle: ['full', 'long', 'medium', 'short'],
    *   timeStyle: ['full', 'long', 'medium', 'short'],
@@ -51,8 +51,7 @@ const formatLocalDateTime = (tz, options = {}, date = '', locale = 'en-US') => {
    * }
    */
   const d = date ? new Date(date) : new Date()
-  // TODO slim down when i figure out how to store auto timezone
-  if (tz && tz !== 'auto') options.timeZone = tz
+  if (user.settings.timezone) options.timeZone = userTimezone(user)
 
   return d.toLocaleString(locale, options)
 }

@@ -1,9 +1,10 @@
 import { findById, findByEmail,
          login, signup, updatePassword, updateSettings }  from '../actions/user'
+import { IResolvers } from 'graphql-tools'
 import { findAll as findUserEntries } from '../actions/entry'
 import { authenticate, setUserToken, getUserToken, revokeUserToken } from '../actions/auth'
 
-export default {
+const UserResolvers: IResolvers = {
   Query: {
     currentUser: async (_, {}, ctx) => {
       console.log('RESOLVERS -> CURRENT USER ->')
@@ -18,14 +19,14 @@ export default {
     },
   },
   Mutation: {
-    signup: async (_, { email, name, password, timezone, browserTimezone }, ctx) => {
+    signup: async (_, { email, name, password, timezone }, ctx) => {
       const user = await signup(email, name, password, timezone)
-      if (user) setUserToken(ctx.res, user, browserTimezone)
+      if (user) setUserToken(ctx.res, user)
       return user
     },
-    login: async (_, { email, password, browserTimezone }, ctx) => {
+    login: async (_, { email, password }, ctx) => {
       const user = await login(email, password)
-      if (user) setUserToken(ctx.res, user, browserTimezone)
+      if (user) setUserToken(ctx.res, user)
       return user
     },
     logout: async (_, {}, ctx) => {
@@ -44,3 +45,5 @@ export default {
     }
   }
 }
+
+export default UserResolvers

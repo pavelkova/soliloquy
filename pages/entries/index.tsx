@@ -1,3 +1,4 @@
+import { NextPage } from 'next'
 import { clientWithAuth } from 'lib/ssr/client-with-auth'
 import ALL_ENTRIES from 'queries/AllEntries.graphql'
 import { Entry } from 'components/Entry'

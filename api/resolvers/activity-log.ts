@@ -1,6 +1,9 @@
+import { IResolvers } from 'graphql-tools'
 import { findById, findAll } from '../actions/activity-log'
 
-export default {
+
+
+const ActivityLogResolvers: IResolvers = {
   Query: {
     findActivityLogById: async (_, { id }, ctx) => {
       return await findById(id)
@@ -10,3 +13,5 @@ export default {
     }
   }
 }
+
+export default ActivityLogResolvers

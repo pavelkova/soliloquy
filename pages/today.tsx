@@ -1,16 +1,36 @@
+import { useEffect } from 'react'
+import { useMutation } from 'urql'
+import { NextPage } from 'next'
+import { Flex, Message, Spinner } from 'theme-ui'
+import { DateHeader } from 'components/Entry/DateHeader'
 import { Editor } from 'components/Editor'
 import { clientWithAuth } from 'lib/ssr/client-with-auth'
-import FIND_OR_CREATE_TODAY from 'mutations/FindOrCreateToday.graphql'
+import { formatEntryDate } from 'utils/date'
+import { userTimezone } from 'utils/locale'
+import FIND_OR_CREATE_ENTRY from 'mutations/FindOrCreateEntry.graphql'
 
 export default function Today(props) {
-  console.log(props)
+  const [result, mutation] = useMutation(FIND_OR_CREATE_ENTRY)
+  const date = formatEntryDate(props.user)
 
-  if (props.error) return (<p>Something went wrong</p>)
-  console.log('TODAY PAGE -> RENDER ->')
+  useEffect(() => {
+    const findOrCreateToday = async () => {
+      return await mutation({ date, timezone: userTimezone(props.user) })
+    }
+    
+    findOrCreateToday()
+  }, [])
 
-  if (!props.today) return <p>today does not exist</p>
-
-  return <Editor { ...props } />
+  if (result.error) console.error(result.error)
+  return (
+    <Flex>
+    <DateHeader date={ date } />
+    { result.fetching && <Spinner /> }
+    { result.error && <Message>Something went wrong.</Message> }
+    { result.data?.findOrCreateEntry &&
+      <Editor user={ props.user } entry={ result.data.findOrCreateEntry } /> }
+    </Flex>
+  )
 }
 
 export const getServerSideProps = async ctx => {
@@ -18,14 +38,14 @@ export const getServerSideProps = async ctx => {
 
   const { user, client } = await clientWithAuth(ctx)
 
-  await client.mutation(FIND_OR_CREATE_TODAY).toPromise().then(
-    result => {
-      if (result.error) {
-        console.error(result.error)
-        props.error = result.error.message
-      }
-      props.today = result?.data?.findOrCreateToday || {}
-  })
+  /* await client.mutation(FIND_OR_CREATE_TODAY).toPromise().then(
+   *   result => {
+   *     if (result.error) {
+   *       console.error(result.error)
+   *       props.error = result.error.message
+   *     }
+   *     props.today = result?.data?.findOrCreateToday || {}
+   * }) */
 
   return { props: { user } }
 }

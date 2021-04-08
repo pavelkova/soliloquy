@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+import { GraphQLSchema } from 'graphql'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { graphqlHTTP } from 'express-graphql'
 import nc from 'next-connect'
@@ -6,7 +7,7 @@ import resolvers from 'api/resolvers'
 import typeDefs from 'api/type-defs'
 import { getUserToken } from 'api/actions/auth'
 
-const schema = makeExecutableSchema({
+const schema: GraphQLSchema = makeExecutableSchema({
   typeDefs,
   resolvers,
 })

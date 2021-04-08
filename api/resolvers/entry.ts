@@ -1,11 +1,11 @@
+import { IResolvers } from 'graphql-tools'
 import { authenticate } from '../actions/auth'
 import { findById, findByDate, findByDateSpan, findAll,
          create, update } from '../actions/entry'
 import { findAll as findEntryLogs } from '../actions/activity-log'
 import { findById as findEntryOwner } from '../actions/user'
-import { formatEntryDate } from 'utils/date'
 
-export default {
+const EntryResolvers: IResolvers = {
   Query: {
     findEntryById: authenticate(
       async (_, { id }, ctx) => {
@@ -26,20 +26,11 @@ export default {
     }),
   },
   Mutation: {
-    findOrCreateToday: authenticate(
-      async (_, { }, ctx) => {
+    findOrCreateEntry: authenticate(
+      async (_, { date, timezone }, ctx) => {
         console.log('RESOLVERS -> ENTRY -> FIND OR CREATE ->')
-        const today = formatEntryDate(ctx.user.tz)
-
-        const entry = await findByDate(ctx.user, today)
-        console.log(entry)
-
-        return entry ?? await create(ctx.user, today)
-    }),
-    createEntry: authenticate(
-      async (_, { date }, ctx) => {
-        console.log('RESOLVERS -> ENTRY -> CREATE ->')
-        return await create(ctx.user, date)
+        const entry = await findByDate(ctx.user, date)
+        return entry ?? await create(ctx.user, date, timezone)
     }),
     updateEntry:  authenticate(
       async (_, { id, content, wordCount, activity }, ctx) => {
@@ -57,10 +48,4 @@ export default {
   },
 }
 
-const findOrCreate = async (user, date) => {
-  console.log('ACTIONS -> ENTRY -> FIND OR CREATE TODAY ->')
-
-  const entry = await findByDate(user, date)
-
-  return entry ?? await create(user, date)
-}
+export default EntryResolvers

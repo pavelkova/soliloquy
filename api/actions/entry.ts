@@ -1,6 +1,6 @@
 import { db } from 'db'
 import { now, formatEntryDate } from 'utils/date'
-import { createOrUpdate as createOrUpdateActivityLog } from '../actions/activity-log'
+import { createOrUpdate as createOrUpdateActivityLog } from './activity-log'
 
 const t = db('entries')
 const columns = [
@@ -19,7 +19,19 @@ const columns = [
  *
  * @return {Object} entry
  */
-const findById = async (user, id) => {
+
+interface Entry {
+  id: number
+  user_id: number
+  date: string
+  timezone: string
+  content?: string
+  word_count: number
+  created_at: Date
+  updated_at: Date
+}
+
+const findById = async (user, id: number): Entry => {
   console.log('ACTIONS -> FIND ENTRY BY ID ->')
 
   try {
@@ -37,12 +49,13 @@ const findById = async (user, id) => {
  *
  * @param date String representing the date in format "yyyy-mm-dd"
  */
-const findByDate = async (user, date) => {
+const findByDate = async (user, date: string) => {
   console.log('ACTIONS -> FIND ENTRY BY DATE ->')
 
   try {
     const entryArr = await t.select(columns)
-                            .where({ user_id: user.id, date })
+    .where({ user_id: user.id, date })
+    console.log(entryArr)
     return entryArr[0]
   } catch (e) {
     console.error(e.message)
@@ -94,7 +107,7 @@ const findAll = async user => {
  *
  * @param user User object passed from GraphQL context.
  */
-const create = async (user, date) => {
+const create = async (user, date: string, tz: string) => {
   console.log('ACTIONS -> CREATE ENTRY ->')
 
   // use same timestamp for created_at and initial updated_at
@@ -104,7 +117,7 @@ const create = async (user, date) => {
     const entryArr = await t.returning(columns)
                             .insert({ user_id: user.id,
                                       date,
-                                      timezone: user.tz,
+                                      timezone: tz,
                                       created_at: saveTime,
                                       updated_at: saveTime })
     return entryArr[0]
@@ -119,13 +132,19 @@ const create = async (user, date) => {
  * to create or update the appropriate activity log.
  *
  * @param user
- * @param id
- * @param content
+ * @param id number
+ * @param content string
  * @param wordCount
  * @param lowestWordCount
  * @param start
  */
-const update = async (user, id, content, wordCount, { lowestWordCount, start }) => {
+// type EntryUpdateInput = {
+//   user: object
+//   id: number
+//   content: string
+//   wordCount: number
+// }
+const update = async (user, id: number, content: string, wordCount: number, { lowestWordCount: number, start }): Entry => {
   console.log('ACTIONS -> UPDATE ENTRY->')
 
   // use the same timestamp for entry.updated_at and activity_log.end
@@ -148,16 +167,8 @@ const update = async (user, id, content, wordCount, { lowestWordCount, start }) 
   }
 }
 
-const findOrCreate = async (user, date) => {
-  console.log('ACTIONS -> ENTRY -> FIND OR CREATE TODAY ->')
-
-  const entry = await findByDate(user, date)
-
-  return entry ?? await create(user, date)
-}
-
 export { findById, findByDate, findByDateSpan, findAll,
-         findOrCreate, create, update }
+         create, update }
 
 // [FIXME] consider moving "isPaused" from useEditor to its own component or hook, and run findOrCreateEntry mutation based on pause state from within Editor component to then feed useEditor with a new or refreshed today object, if required
 // OR is this where we use a subscription

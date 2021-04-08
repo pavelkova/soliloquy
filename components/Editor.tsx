@@ -4,14 +4,13 @@ import { DateHeader } from './Entry/DateHeader'
 import { useEditor } from 'hooks/use-editor'
 import { palettes } from 'styles/themes'
 
-export const Editor = ({ user, today }) => {
+export const Editor = ({ user, entry }) => {
 
-  const {content, wordCount, lastSavedAt, isPaused, handlePause, handleSave, handleTextChange } = useEditor({ today })
+  const {content, wordCount, lastSavedAt, isPaused, handlePause, handleSave, handleTextChange } = useEditor({ entry })
 
   return (
     <Flex sx={{ flex: '1', flexDirection: 'column' }}>
       {/* <Flex flex={1} flexDirection='column'> */}
-      <DateHeader date={ today.date } />
       <Flex sx={{ justifyContent: 'space-between',
                   borderBottomColor: 'muted',
                   borderBottomWidth: 1,

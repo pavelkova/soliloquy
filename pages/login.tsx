@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router'
+import { NextPage } from 'next'
 import { LoginForm } from 'components/LoginForm'
 export { getServerSideProps } from 'lib/ssr/require-no-auth'
 

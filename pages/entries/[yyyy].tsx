@@ -1,3 +1,4 @@
+import { NextPage } from 'next'
 import { clientWithAuth } from 'lib/ssr/client-with-auth'
 import { isValid } from 'utils/date'
 import ENTRIES_BY_DATES from 'queries/EntriesByDates.graphql'

@@ -14,13 +14,9 @@ export const authenticate = resolver => (root, args, ctx, info) => {
 }
 
 // TODO make these functions synchronous
-export const setUserToken = async (res, user, browserTimezone) => {
-  const tz = user.settings.timezone == 'AUTO' ?
-             browserTimezone : user.settings.timezone
-
-  const userData = { id: user.id, email: user.email, tz }
+export const setUserToken = async (res, user) => {
   try {
-    const token = await generateTokens({ user: userData }, MAX_AGE)
+    const token = await generateTokens({ user }, MAX_AGE)
     return setTokenCookie(res, token)
   } catch (e) {
     console.error(e)
@@ -28,8 +24,8 @@ export const setUserToken = async (res, user, browserTimezone) => {
   }
 }
 
-export const getUserToken = async req => {
-  const token = getTokenCookie(req)
+export const getUserToken = async ctx => {
+  const token: string = getTokenCookie(ctx.req)
   if (token) {
     try {
       const data = await validateToken(token)

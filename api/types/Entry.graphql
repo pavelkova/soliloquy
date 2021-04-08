@@ -23,12 +23,13 @@ input DateSpanInput {
 type Query {
   findEntryById(id: ID!): Entry
   findEntryByDate(date: String!): Entry
+  # findEntriesByMonth(year: Int!, month: Int!): [Entry]
+  # findEntriesByYear(year: Int!): [Entry]
   findEntriesByDates(dateSpan: DateSpanInput!): [Entry]
   findAllEntries: [Entry]
 }
 
 type Mutation {
-  findOrCreateToday: Entry
-  createEntry(date: String): Entry
+  findOrCreateEntry(date: String!, timezone: String!): Entry
   updateEntry(id: ID!, content: String, wordCount: Int, activity: ActivityInput): Entry
 }

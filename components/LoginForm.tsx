@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { useMutation } from 'urql'
-import { Box, Button, Input, Label, Switch } from 'theme-ui'
+import { Box, Button, Input, Label } from 'theme-ui'
 import LOGIN from 'mutations/Login.graphql'
 
 export const LoginForm = ({ redirectOnSuccess }) => {
@@ -13,23 +13,24 @@ export const LoginForm = ({ redirectOnSuccess }) => {
 
   const onSubmit = async values => {
     if (errors) console.error(errors)
+    console.log(values)
 
     const { data, fetching, error } = await login({ ...values, browserTimezone })
 
     if (error) { console.error(error) }
 
+    if (fetching) console.log(fetching)
+    if (data) console.log(data)
     if (data?.login) redirectOnSuccess()
     // setError
   }
   return (
     <Box as='form' onSubmit={ handleSubmit(onSubmit) }>
-      <Switch label="Remember my choice" defaultChecked={ true } />
-      <Switch label="Don't show this warning again" defaultChecked={ false } />
       <Label htmlFor='email'>Email</Label>
       <Input name='email' type='email' ref={register({required: true})} />
       <Label htmlFor='password'>Password</Label>
       <Input name='password' type='password' ref={register({required: true})} />
-      <Button type='submit' disabled={ !formState.isValid }>Submit</Button>
+      <Button type='submit'>Submit</Button>
     </Box>
   )
 }
