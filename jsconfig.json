@@ -10,8 +10,9 @@
       "mutations/*": ["lib/mutations/*"],
       "queries/*": ["lib/queries/*"],
       "pages/*": ["pages/*"],
+      "shared/*": ["shared/*"],
       "styles/*": ["styles/*"],
-      "utils/*": ["utils/*"],
+      "utils/*": ["utils/*"]
     }
   },
   "exclude": ["node_modules"]

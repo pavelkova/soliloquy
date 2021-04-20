@@ -1,0 +1,24 @@
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  password: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  entries: [Entry]
+  settings: JSONObject!
+}
+
+type Query {
+  currentUser: User
+  findUserById(id: ID!): User
+  findUserByEmail(email: String!): User
+}
+
+type Mutation {
+  login(email: String!, password: String!): User
+  signup(email: String!, name: String!, password: String!, timezone: String!): User
+  logout: Boolean
+  updatePassword(oldPassword: String!, newPassword: String!): User
+  updateSettings(settings: JSONObject!): User
+}

@@ -1,0 +1,9 @@
+#import "../fragments/ActivityLogFragment.graphql"
+
+mutation ($id: ID!, $content: String,
+  $start: DateTime, $end: DateTime) {
+  createActivityLog(id: $id, content: $content,
+    start: $start, end: $end) {
+    ...ActivityLogFragment
+  }
+}

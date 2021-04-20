@@ -44,14 +44,6 @@ const EntryResolvers: IResolvers = {
                                      args.date,
                                      args.timezone)
     }),
-    createEntry: authenticate(
-      async (_, args: Pick<Entry, 'date' | 'timezone'>, ctx: Ctx) => {
-        console.log('RESOLVERS -> ENTRY -> FIND OR CREATE ->')
-        const entry = await findByDate(ctx.user.id, args.date)
-        return entry ?? await create(ctx.user.id,
-                                     args.date,
-                                     args.timezone)
-    }),
     updateEntry:  authenticate(
       async (_, { id, content, wordCount, activity }, ctx: Ctx) => {
         console.log('RESOLVERS -> ENTRY -> UPDATE ->')

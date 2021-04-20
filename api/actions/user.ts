@@ -1,6 +1,6 @@
+import bcrypt from 'bcrypt'
 import { db } from 'db'
-import { encryptPassword,
-         validatePassword } from '../actions/auth/hashing'
+import { User, Settings } from 'shared/types'
 
 const t = db('users')
 const columns = [
@@ -13,7 +13,36 @@ const columns = [
   'settings'
 ]
 
-const findById = async (id) => {
+// TODO move to env variables
+const SALT_ROUNDS = 10
+
+// ENCRYPTION HELPERS
+async function validatePassword(user: User, enteredPassword: string) {
+  return await bcrypt.compare(enteredPassword, user.password)
+}
+
+async function encryptPassword(password: string) {
+  return await bcrypt.hash(password, SALT_ROUNDS)
+}
+
+function defaultSettings(timezone: string): Settings {
+  return {
+    timezone,
+    showTimezoneMismatch: true,
+    wordCountGoal: 750,
+    timeFormat: '12h',
+    dayStartsAt: '00:00',
+    textAnalysis: false,
+    theme: 'default',
+    fontName: '',
+    fontSize: 14,
+    backgroundColor: '',
+    textColor: '',
+    highlightColor: ''
+  }
+}
+
+const findById = async (id: number): Promise<User> => {
   console.log('ACTIONS -> USER -> FINDBYID ->')
   try {
     const userArr = await t.select(columns)
@@ -26,7 +55,7 @@ const findById = async (id) => {
 }
 
 // const findByEmail = async (email: string): User => {
-const findByEmail = async (email) => {
+const findByEmail = async (email: string): Promise<User> => {
   console.log('ACTIONS -> USER -> FINDBYEMAIL ->')
   try {
     const userArr = await t.select(columns)
@@ -44,7 +73,8 @@ const findByEmail = async (email) => {
  *
  * @return {Object} User object
  */
-const login = async (email: string, password: string) => {
+const login = async (email: string,
+                     password: string): Promise<User> => {
   // const login = async (email: string, password: string): User => {
   console.log('ACTIONS -> USER -> LOGIN ->')
 
@@ -52,14 +82,16 @@ const login = async (email: string, password: string) => {
 
   if (user) {
     const validPassword = await validatePassword(user, password)
-    if (validPassword) {
-      return user
-    }
+    if (validPassword) return user
   }
   throw new Error('Invalid email or password.')
 }
 
-const signup = async (email: string, name: string, password: string, timezone: string = '') => {
+const signup = async (email: string,
+                      name: string,
+                      password: string,
+                      timezone: string = ''): Promise<User> => {
+
   console.log('ACTIONS -> USER -> SIGNUP ->')
 
   const user = await findByEmail(email)
@@ -68,28 +100,13 @@ const signup = async (email: string, name: string, password: string, timezone: s
     throw new Error('A user with that email already exists.')
   } else {
 
-    const defaultSettings = {
-      timezone,
-      showTimezoneMismatch: true,
-      wordCountGoal: 750,
-      timeFormat: '12h',
-      dayStartsAt: '00:00',
-      textAnalysis: false,
-      theme: 'default',
-      fontName: '',
-      fontSize: 14,
-      backgroundColor: '',
-      textColor: '',
-      highlightColor: ''
-    }
-
     try {
       const hash = await encryptPassword(password)
       const userArr = await t.returning(columns)
                              .insert({ email,
                                        name,
                                        password: hash,
-                                       settings: JSON.stringify(defaultSettings)})
+                                       settings: JSON.stringify(defaultSettings(timezone))})
       return userArr[0]
     } catch(e) {
       console.error(e)
@@ -99,7 +116,9 @@ const signup = async (email: string, name: string, password: string, timezone: s
 
 }
 
-const updatePassword = async (user, oldPassword: string, newPassword: string) => {
+const updatePassword = async (user: User,
+                              oldPassword: string,
+                              newPassword: string): Promise<User> => {
   console.log('ACTIONS -> USER -> UPDATE PASSWORD ->')
 
   try {
@@ -117,22 +136,25 @@ const updatePassword = async (user, oldPassword: string, newPassword: string) =>
   }
 }
 
-const updateEmail = async (user, newEmail: string) => {
+const updateEmail = async (id: number,
+                           newEmail: string): Promise<User> => {
   // send confirmation email?
   return
 }
 
-const updateUserInfo = async (user, name) => {
+const updateUserInfo = async (id: number,
+                              name: string): Promise<User> => {
   // maybe include email here without verification
   return
 }
 
-const updateSettings = async (user, settings) => {
+const updateSettings = async (id: number,
+                              settings: Settings): Promise<User> => {
   console.log('ACTIONS -> USER -> UPDATE SETTINGS ->')
 
   try {
     const userArr = await t.returning(columns)
-                           .where({ id: user.id })
+                           .where({ id })
                            .update({ settings: JSON.stringify(settings) })
     return userArr[0]
   } catch (e) {

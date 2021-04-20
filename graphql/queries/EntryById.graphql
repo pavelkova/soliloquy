@@ -1,0 +1,11 @@
+#import "../fragments/ActivityLogFragment.graphql"
+#import "../fragments/EntryFragment.graphql"
+
+query ($id: ID!) {
+  findEntryById(id: $id) {
+    ...EntryFragment
+    activityLogs {
+      ...ActivityLogFragment
+    }
+  }
+}

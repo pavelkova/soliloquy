@@ -1,0 +1,7 @@
+#import "../fragments/ActivityLogFragment.graphql"
+
+query ($id: ID!) {
+  findActivityLogById(id: $id) {
+    ...ActivityLogFragment
+  }
+}

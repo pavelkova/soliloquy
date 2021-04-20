@@ -1,9 +1,10 @@
 import { initUrqlClient } from 'next-urql'
 import { ssrExchange, dedupExchange, cacheExchange, fetchExchange } from 'urql'
 import { devtoolsExchange } from '@urql/devtools'
+import { User } from 'shared/types'
 import CURRENT_USER from 'queries/CurrentUser.graphql'
 
-function createUrqlClient(token) {
+function createUrqlClient(token: string) {
   const ssrCache = ssrExchange({ isClient: false })
 
   return initUrqlClient(
@@ -32,19 +33,18 @@ export const checkClientAuth = async ctx => {
   const token = ctx?.req?.headers?.cookie ?? ''
   const client = createUrqlClient(token)
 
-  let user
+  console.log('CHECK CLIENT AUTH')
+  let user: User
   if (token) {
     const result = await client.query(CURRENT_USER).toPromise()
     user = result?.data?.currentUser
-    console.log(result)
+    // return { user: result?.data?.currentUser}
   }
-
-  console.log(token)
 
   return { user, client }
 }
 
-export const redirect = (ctx, condition, location) => {
+export const redirect = (ctx, condition, location: string) => {
   if (condition) {
     ctx.res.writeHead(302, { Location: location })
     ctx.res.end()

@@ -1,0 +1,27 @@
+type ActivityLog {
+  id: ID!
+  entry: Entry!
+  start: DateTime!
+  end: DateTime
+  content: String!
+  lowestWordCount: Int
+  netWordCount: Int
+}
+
+type Query {
+  findActivityLogById(id: ID!): ActivityLog
+  findAllActivityLogs(entryId: ID!): [ActivityLog]
+}
+
+# type Mutation {
+#   createActivityLog(
+#     entryId: ID!,
+#     content: String,
+#     start: DateTime,
+#     end: DateTime): ActivityLog
+#   updateActivityLog(
+#     id: ID!,
+#     content: String,
+#     start: DateTime,
+#     end: DateTime): ActivityLog
+# }

@@ -1,0 +1,15 @@
+#import "../fragments/ActivityLogFragment.graphql"
+#import "../fragments/EntryFragment.graphql"
+#import "../fragments/UserFragment.graphql"
+
+mutation ($date: String!, $timezone: String!) {
+  findOrCreateEntry(date: $date, timezone: $timezone) {
+    ...EntryFragment
+    user {
+      ...UserFragment
+    }
+    activityLogs {
+      ...ActivityLogFragment
+    }
+  }
+}

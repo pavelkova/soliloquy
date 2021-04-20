@@ -1,4 +1,5 @@
 import { db } from 'db'
+import { Entry, ActivityLog } from 'shared/types'
 import { now, getTimeBetween } from 'utils/date'
 
 const t = db('activity_logs')
@@ -18,7 +19,7 @@ const columns = [
  *
  * @param id activity log ID
  */
-const findById = async (id) => {
+const findById = async (id: number): Promise<ActivityLog> => {
   console.log('ACTIONS -> ACTIVITY LOG -> FINDBYID ->')
   let log
   try {
@@ -57,8 +58,14 @@ const findAll = async (entryId) => {
  * @param lowestWordCount
  * @param netWordCount
  * @param start
-*/
-const create = async (entryId, content, lowestWordCount, netWordCount, start, end) => {
+ */
+const create = async (entryId: number,
+                      content: string,
+                      lowestWordCount: number,
+                      netWordCount: number,
+                      start: Date,
+                      end: Date): Promise<ActivityLog> => {
+
   console.log('ACTIONS -> ACTIVITY LOG -> CREATE ->')
 
   let log
@@ -117,8 +124,13 @@ const update = async (id, content, lowestWordCount, netWordCount, end) => {
  * @param start
  * @param end
  */
-const createOrUpdate = async (entryId, content, wordCount, lowestWordCount, start, end) => {
-  console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
+const createOrUpdate = async (entryId,
+                              content,
+                              wordCount,
+                              lowestWordCount,
+                              start,
+                              end): Promise<ActivityLog> => {
+                                console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
 
   const netWordCount = wordCount - lowestWordCount
 

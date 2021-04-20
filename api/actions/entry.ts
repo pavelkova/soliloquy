@@ -1,4 +1,5 @@
 import { db } from 'db'
+import { Entry, ActivityLog, User } from 'shared/types'
 import { now, formatEntryDate } from 'utils/date'
 import { createOrUpdate as createOrUpdateActivityLog } from './activity-log'
 
@@ -20,23 +21,13 @@ const columns = [
  * @return {Object} entry
  */
 
-interface Entry {
-  id: number
-  user_id: number
-  date: string
-  timezone: string
-  content?: string
-  word_count: number
-  created_at: Date
-  updated_at: Date
-}
-
-const findById = async (user, id: number): Entry => {
+const findById = async (userId: number,
+                        id: number): Promise<Entry> => {
   console.log('ACTIONS -> FIND ENTRY BY ID ->')
 
   try {
     const entryArr = await t.select(columns)
-                            .where({ user_id: user.id, id })
+                            .where({ user_id: userId, id })
     return entryArr[0]
   } catch (e) {
     console.error(e.message)
@@ -49,12 +40,14 @@ const findById = async (user, id: number): Entry => {
  *
  * @param date String representing the date in format "yyyy-mm-dd"
  */
-const findByDate = async (user, date: string) => {
+const findByDate = async (userId: number,
+                          date: string): Promise<Entry> => {
+
   console.log('ACTIONS -> FIND ENTRY BY DATE ->')
 
   try {
     const entryArr = await t.select(columns)
-    .where({ user_id: user.id, date })
+    .where({ user_id: userId, date })
     console.log(entryArr)
     return entryArr[0]
   } catch (e) {
@@ -70,14 +63,16 @@ const findByDate = async (user, date: string) => {
  * @param {String} toDate   Query end date in format "yyyy-mm-dd"
  */
 //
-const findByDateSpan = async(user, dateSpan) => {
+const findByDateSpan = async(userId: number,
+                             dateSpan): Promise<Entry[]> => {
+
   console.log('ACTIONS -> FIND ENTRIES BY DATES ->')
 
   const { fromDate, toDate } = dateSpan
 
   try {
     return await t.select(columns)
-                  .where({ user_id: user.id})
+                  .where({ user_id: userId})
                   .whereBetween('date', [fromDate, toDate])
 
   } catch(e) {
@@ -91,12 +86,12 @@ const findByDateSpan = async(user, dateSpan) => {
  *
  * @param user User object passed from GraphQL context.
  */
-const findAll = async user => {
+const findAll = async (userId: number): Promise<Entry[]> => {
   console.log('ACTIONS -> FIND ALL ENTRIES ->')
 
   try {
     return await t.select(columns)
-                  .where({ user_id: user.id })
+                  .where({ user_id: userId })
   } catch (e) {
     console.error(e.message)
   }
@@ -107,7 +102,10 @@ const findAll = async user => {
  *
  * @param user User object passed from GraphQL context.
  */
-const create = async (user, date: string, tz: string) => {
+const create = async (userId: number,
+                      date: string,
+                      tz: string): Promise<Entry> => {
+
   console.log('ACTIONS -> CREATE ENTRY ->')
 
   // use same timestamp for created_at and initial updated_at
@@ -115,7 +113,7 @@ const create = async (user, date: string, tz: string) => {
 
   try {
     const entryArr = await t.returning(columns)
-                            .insert({ user_id: user.id,
+                            .insert({ user_id: userId,
                                       date,
                                       timezone: tz,
                                       created_at: saveTime,
@@ -144,7 +142,12 @@ const create = async (user, date: string, tz: string) => {
 //   content: string
 //   wordCount: number
 // }
-const update = async (user, id: number, content: string, wordCount: number, { lowestWordCount: number, start }): Entry => {
+const update = async (user: User,
+                      id: number,
+                      content: string,
+                      wordCount: number,
+                      { lowestWordCount: number, start }): Promise<Entry> => {
+
   console.log('ACTIONS -> UPDATE ENTRY->')
 
   // use the same timestamp for entry.updated_at and activity_log.end

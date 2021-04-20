@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { NavLink, IconButton } from 'theme-ui'
 
 type LinkProps = {
-  title: string,
-  href?: string,
+  title: string
+  href?: string
   icon?: React.ReactNode
 }
 

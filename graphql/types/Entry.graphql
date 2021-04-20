@@ -1,0 +1,35 @@
+type Entry {
+  id: ID!
+  user: User!
+  date: String!
+  timezone: String!
+  content: String
+  wordCount: Int
+  createdAt: DateTime
+  updatedAt: DateTime
+  activityLogs: [ActivityLog]
+}
+
+input ActivityInput {
+  lowestWordCount: Int
+  start: DateTime
+}
+
+input DateSpanInput {
+  fromDate: DateTime!
+  toDate: DateTime
+}
+
+type Query {
+  findEntryById(id: ID!): Entry
+  findEntryByDate(date: String!): Entry
+  # findEntriesByMonth(year: Int!, month: Int!): [Entry]
+  # findEntriesByYear(year: Int!): [Entry]
+  findEntriesByDates(dateSpan: DateSpanInput!): [Entry]
+  findAllEntries: [Entry]
+}
+
+type Mutation {
+  findOrCreateEntry(date: String!, timezone: String!): Entry
+  updateEntry(id: ID!, content: String, wordCount: Int, activity: ActivityInput): Entry
+}
