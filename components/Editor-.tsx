@@ -2,31 +2,53 @@ import React from 'react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useMutation, useQuery } from 'urql'
-import { now, getTimeSince } from 'utils/date'
+import { now, getTimeSince, formatEntryDate } from 'utils/date'
 import { usePageVisibility } from 'utils/visibility'
+import ENTRY_BY_DATE from 'queries/EntryByDate.graphql'
+import CREATE_ENTRY from 'mutations/CreateEntry.graphql'
 import UPDATE_ENTRY from 'mutations/UpdateEntry.graphql'
-import FIND_ENTRY_BY_DATE from 'mutations/EntryByDate.graphql'
 import { Flex, Box, Link, Textarea } from 'theme-ui'
 import { DateHeader } from './Entry/DateHeader'
 import { palettes } from 'styles/themes'
 
-export const Editor = ({ entry }) => {
+export const Editor = ({ user, entry }) => {
   const router = useRouter()
   const isVisible = usePageVisibility()
+  const date = formatEntryDate(user)
 
-  const [updateResult, executeUpdate] = useMutation(UPDATE_ENTRY)
-
-  const [content, setContent] = useState(entry.content || '')
-  const [wordCount, setWordCount] = useState(entry.wordCount || 0)
+  const [content, setContent] = useState('')
+  const [wordCount, setWordCount] = useState(0)
   const [lowestWordCount, setLowestWordCount] = useState(wordCount)
 
   const [lastSaved, setLastSaved] = useState({
-    content: entry.content || '', time: entry.updatedAt })
+    content: '', time: '' })
   const [activity, setActivity] = useState({ isActive: false, startTime: '' })
   const [pause, setPause] = useState({
     isPaused: false,
     requireManualUnpause: false
   })
+
+  function initEntry(entry) {
+    setContent(entry.content)
+    setWordCount(entry.wordCount)
+    setLastSaved({ content: entry.content, time: entry})
+
+  }
+
+  /* const [createResult, executeCreate] = useMutation(CREATE_ENTRY)
+   * const [updateResult, executeUpdate] = useMutation(UPDATE_ENTRY)
+
+   * const [content, setContent] = useState(entry.content || '')
+   * const [wordCount, setWordCount] = useState(entry.wordCount || 0)
+   * const [lowestWordCount, setLowestWordCount] = useState(wordCount)
+
+   * const [lastSaved, setLastSaved] = useState({
+   *   content: entry.content || '', time: entry.updatedAt })
+   * const [activity, setActivity] = useState({ isActive: false, startTime: '' })
+   * const [pause, setPause] = useState({
+   *   isPaused: false,
+   *   requireManualUnpause: false
+   * }) */
 
   function handleTextChange(e) {
     let text = e.target.value
@@ -35,7 +57,7 @@ export const Editor = ({ entry }) => {
                    return word.match(/[a-zA-Z]+/)})
 
     setContent(text)
-    
+
     if (wc.length != wordCount) {
       setWordCount(wc.length)
       if (wordCount < lowestWordCount) { setLowestWordCount(wordCount) }
@@ -142,7 +164,6 @@ export const Editor = ({ entry }) => {
    *          handleTextChange } */
   return (
     <Flex sx={{ flex: '1', flexDirection: 'column' }}>
-      {/* <Flex flex={1} flexDirection='column'> */}
       <Flex sx={{ justifyContent: 'space-between',
                   borderBottomColor: 'muted',
                   borderBottomWidth: 1,
@@ -150,7 +171,6 @@ export const Editor = ({ entry }) => {
                   fontSize: '10px',
                   p: 1,
                   mb: 1 }}>
-        {/* <Flex justifyContent='space-between' mb={1}> */}
         <Box>
           { wordCount } { wordCount == 1 ? 'word' : 'words' }
         </Box>
@@ -183,13 +203,15 @@ export const Editor = ({ entry }) => {
   )
 }
 
-const EditorTextArea = ({ isPaused, content, handleTextChange }) => {
+const EditorTextArea = ({ isPaused, content, user, handleTextChange }) => {
   // TODOon load: query by today's date
   // if no entry: create on focus
   // reload this component when unpaused
 
   // FROM ABOVE: (page visibility/pause button) --> isPaused
   // FROM HERE: set activity
+  const date = formatEntryDate(user)
+  const [entry, getEntry] = useQuery(ENTRY_BY_DATE, { date })
   return (
     <Textarea
       flex={1}
