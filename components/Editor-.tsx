@@ -10,6 +10,7 @@ import UPDATE_ENTRY from 'mutations/UpdateEntry.graphql'
 import { Flex, Box, Link, Textarea } from 'theme-ui'
 import { DateHeader } from './Entry/DateHeader'
 import { palettes } from 'styles/themes'
+import { Entry } from 'shared/types'
 
 export const Editor = ({ user, entry }) => {
   const router = useRouter()
@@ -28,11 +29,11 @@ export const Editor = ({ user, entry }) => {
     requireManualUnpause: false
   })
 
-  function initEntry(entry) {
+  function initEntry(entry: Entry) {
     setContent(entry.content)
     setWordCount(entry.wordCount)
-    setLastSaved({ content: entry.content, time: entry})
-
+    setLastSaved({ content: entry.content, time: entry.updatedAt })
+    // check activity state from shared/helpers
   }
 
   /* const [createResult, executeCreate] = useMutation(CREATE_ENTRY)
