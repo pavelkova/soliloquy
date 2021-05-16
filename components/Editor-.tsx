@@ -12,9 +12,53 @@ import { DateHeader } from './Entry/DateHeader'
 import { palettes } from 'styles/themes'
 import { Entry } from 'shared/types'
 
+export const EditorContainer = () => {
+  const isVisible = usePageVisibility()
+  const [pause, setPause] = useState({
+    isPaused: false,
+    requireManualUnpause: false
+  })
+
+  function pauseEditor(requireManualUnpause = true) {
+    console.log('EDITOR -> pauseEditor ->')
+    setActivity({ isActive: false, startTime: '' })
+    setPause({ isPaused: true, requireManualUnpause })
+  }
+
+  function unpauseEditor() {
+    console.log('EDITOR -> unpauseEditor ->')
+    setPause({ isPaused: false })
+  }
+
+  function togglePause() {
+    if (pause.isPaused)
+  }
+  // auto pause due to page losing focus
+  useEffect(() => {
+    console.log('EDITOR -> USE EFFECT -> isVisible ->')
+
+    if (isVisible) {
+      if (pause.isPaused && !pause.requireManualUnpause) {
+        unpauseEditor()
+      }
+      return
+    } else {
+      // wait 30 seconds before requiring reload
+      const timer = setTimeout(() => {
+        pauseEditor(false)
+      }, 30000)
+      return () => clearTimeout(timer)
+    }
+  }, [isVisible])
+
+  return (
+    <>Test</>
+  )
+}
+
 export const Editor = ({ user, entry }) => {
   const router = useRouter()
-  const isVisible = usePageVisibility()
+
   const date = formatEntryDate(user)
 
   const [content, setContent] = useState('')
@@ -24,10 +68,6 @@ export const Editor = ({ user, entry }) => {
   const [lastSaved, setLastSaved] = useState({
     content: '', time: '' })
   const [activity, setActivity] = useState({ isActive: false, startTime: '' })
-  const [pause, setPause] = useState({
-    isPaused: false,
-    requireManualUnpause: false
-  })
 
   function initEntry(entry: Entry) {
     setContent(entry.content)
@@ -36,28 +76,13 @@ export const Editor = ({ user, entry }) => {
     // check activity state from shared/helpers
   }
 
-  /* const [createResult, executeCreate] = useMutation(CREATE_ENTRY)
-   * const [updateResult, executeUpdate] = useMutation(UPDATE_ENTRY)
-
-   * const [content, setContent] = useState(entry.content || '')
-   * const [wordCount, setWordCount] = useState(entry.wordCount || 0)
-   * const [lowestWordCount, setLowestWordCount] = useState(wordCount)
-
-   * const [lastSaved, setLastSaved] = useState({
-   *   content: entry.content || '', time: entry.updatedAt })
-   * const [activity, setActivity] = useState({ isActive: false, startTime: '' })
-   * const [pause, setPause] = useState({
-   *   isPaused: false,
-   *   requireManualUnpause: false
-   * }) */
-
   function handleTextChange(e) {
     let text = e.target.value
     let wc = text.split(/([\s]|[-]{2,}|[.]{3,})+/)
                  .filter(word => {
                    return word.match(/[a-zA-Z]+/)})
 
-    setContent(text)
+    if (text != content) { setContent(text) }
 
     if (wc.length != wordCount) {
       setWordCount(wc.length)
@@ -120,49 +145,7 @@ export const Editor = ({ user, entry }) => {
     return
   }
 
-  function pauseEditor(requireManualUnpause = true) {
-    console.log('EDITOR -> pauseEditor ->')
-    setActivity({ isActive: false, startTime: '' })
-    setPause({ isPaused: true, requireManualUnpause })
-  }
 
-  function unpauseEditor() {
-    console.log('EDITOR -> unpauseEditor ->')
-    setPause({ isPaused: false })
-    // reload page & fetch entry from server in case entry has been changed elsewhere
-    // or day has changed since pause time
-    // TODO make this optional?
-    router.reload()
-  }
-
-  // auto pause due to page losing focus
-  useEffect(() => {
-    console.log('EDITOR -> USE EFFECT -> isVisible ->')
-
-    if (isVisible) {
-      if (pause.isPaused && !pause.requireManualUnpause) {
-        unpauseEditor()
-      }
-      return
-    } else {
-      // wait 30 seconds before requiring reload
-      const timer = setTimeout(() => {
-        pauseEditor(false)
-      }, 30000)
-      return () => clearTimeout(timer)
-    }
-  }, [isVisible])
-
-
-  // TODO contain vars within state object
-  /* return { content,
-   *          wordCount,
-   *          lastSavedAt: lastSaved.time,
-   *          isPaused: pause.isPaused,
-   *          handlePause: () => {
-   *            return pause.isPaused ? unpauseEditor() : pauseEditor() },
-   *          handleSave,
-   *          handleTextChange } */
   return (
     <Flex sx={{ flex: '1', flexDirection: 'column' }}>
       <Flex sx={{ justifyContent: 'space-between',
