@@ -12,61 +12,49 @@ import { DateHeader } from './Entry/DateHeader'
 import { palettes } from 'styles/themes'
 import { Entry } from 'shared/types'
 
-export const EditorContainer = () => {
+export const EditorContainer = ({ user }) => {
   const isVisible = usePageVisibility()
   const [pause, setPause] = useState({
     isPaused: false,
     requireManualUnpause: false
   })
 
-  function pauseEditor(requireManualUnpause = true) {
-    console.log('EDITOR -> pauseEditor ->')
-    setActivity({ isActive: false, startTime: '' })
-    setPause({ isPaused: true, requireManualUnpause })
+  function togglePause(requireManualUnpause = false) {
+    // just a precaution so that (!isPaused && requireManualUnpause) never happens
+    const isManual = pause.isPaused ? false : requireManualUnpause
+    setPause({ isPaused: !pause.isPaused, requireManualUnpause: isManual })
   }
 
-  function unpauseEditor() {
-    console.log('EDITOR -> unpauseEditor ->')
-    setPause({ isPaused: false })
-  }
-
-  function togglePause() {
-    if (pause.isPaused)
-  }
   // auto pause due to page losing focus
   useEffect(() => {
     console.log('EDITOR -> USE EFFECT -> isVisible ->')
 
     if (isVisible) {
-      if (pause.isPaused && !pause.requireManualUnpause) {
-        unpauseEditor()
-      }
+      if (!pause.requireManualUnpause && pause.isPaused) { togglePause(false) }
       return
     } else {
       // wait 30 seconds before requiring reload
       const timer = setTimeout(() => {
-        pauseEditor(false)
+        togglePause(false)
       }, 30000)
       return () => clearTimeout(timer)
     }
   }, [isVisible])
 
   return (
-    <>Test</>
+    <>
+      <Editor entry={ entry }
+              isPaused={ pause.isPaused }
+              togglePause={ togglePause } />
+    </>
   )
 }
 
-export const Editor = ({ user, entry }) => {
-  const router = useRouter()
-
-  const date = formatEntryDate(user)
-
+export const Editor = ({ entry, isPaused, togglePause }) => {
   const [content, setContent] = useState('')
   const [wordCount, setWordCount] = useState(0)
   const [lowestWordCount, setLowestWordCount] = useState(wordCount)
-
-  const [lastSaved, setLastSaved] = useState({
-    content: '', time: '' })
+  const [lastSaved, setLastSaved] = useState({ content: '', time: '' })
   const [activity, setActivity] = useState({ isActive: false, startTime: '' })
 
   function initEntry(entry: Entry) {
@@ -103,7 +91,7 @@ export const Editor = ({ user, entry }) => {
                     }
     }).then(result => {
       if (result.error) {
-        pauseEditor()
+        togglePause(true)
         console.error(result.error)
         return result.error
       }
@@ -184,31 +172,5 @@ export const Editor = ({ user, entry }) => {
           </Link>
         </Flex>
       </Flex>
-  )
-}
-
-const EditorTextArea = ({ isPaused, content, user, handleTextChange }) => {
-  // TODOon load: query by today's date
-  // if no entry: create on focus
-  // reload this component when unpaused
-
-  // FROM ABOVE: (page visibility/pause button) --> isPaused
-  // FROM HERE: set activity
-  const date = formatEntryDate(user)
-  const [entry, getEntry] = useQuery(ENTRY_BY_DATE, { date })
-  return (
-    <Textarea
-      flex={1}
-      sx={{
-        flex: '1',
-        border: 'none',
-        outline: 'none',
-        resize: 'none',
-        scrollbarWidth: 'thin',
-        bg: isPaused ? 'muted' : 'background'
-      }}
-      onChange={handleTextChange}
-      value={content}
-      disabled={isPaused} />
   )
 }
