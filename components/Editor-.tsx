@@ -14,6 +14,7 @@ import { Entry } from 'shared/types'
 
 export const EditorContainer = ({ user }) => {
   const isVisible = usePageVisibility()
+  const [savedEntry, setSavedEntry] = useState() // TODO pass these instead of entry prop
   const [pause, setPause] = useState({
     isPaused: false,
     requireManualUnpause: false
@@ -24,6 +25,8 @@ export const EditorContainer = ({ user }) => {
     const isManual = pause.isPaused ? false : requireManualUnpause
     setPause({ isPaused: !pause.isPaused, requireManualUnpause: isManual })
   }
+
+  // TODO LOOKUP ENTRY function on page load, on unpause
 
   // auto pause due to page losing focus
   useEffect(() => {
@@ -54,6 +57,7 @@ export const Editor = ({ entry, isPaused, togglePause }) => {
   const [content, setContent] = useState('')
   const [wordCount, setWordCount] = useState(0)
   const [lowestWordCount, setLowestWordCount] = useState(wordCount)
+  // TODO replace lastSaved with savedEntry prop
   const [lastSaved, setLastSaved] = useState({ content: '', time: '' })
   const [activity, setActivity] = useState({ isActive: false, startTime: '' })
 
@@ -63,6 +67,8 @@ export const Editor = ({ entry, isPaused, togglePause }) => {
     setLastSaved({ content: entry.content, time: entry.updatedAt })
     // check activity state from shared/helpers
   }
+
+  // TODO if entry was passe
 
   function handleTextChange(e) {
     let text = e.target.value
@@ -78,10 +84,27 @@ export const Editor = ({ entry, isPaused, togglePause }) => {
     }
   }
 
+  async function updateEntry() {
+    const result = await executeUpdate({ id: savedEntry.id,
+                                         content,
+                                         wordCount,
+                                         activity: { start: activity.startTime,
+                                                     lowestWordCount }})
+    if (result.error) return result.error
+    const data = result?.data?.updateEntry
+
+  }
+  async function createOrUpdate() {
+    const data = { error: {} }
+    if (savedEntry.id && (content !== savedEntry.content)) return { await executeUpdate() }
+    else if (!savedEntry.id && (content !== '')) return { await executeCreate() }
+    else return
+  }
+
   function handleSave() {
     console.log('EDITOR -> handleSave ->')
-
     if (content == lastSaved.content) return
+    // TODO if (savedEntry.id) executeUpdate, else if (content != '') executeCreate
     executeUpdate({ id: entry.id,
                     content,
                     wordCount,
