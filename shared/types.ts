@@ -39,12 +39,12 @@ export interface Entry {
   wordCount: number
   createdAt: Date
   updatedAt: Date
+  activityLogs: ActivityLog[]
 }
-
 
 export interface ActivityState {
   isActive: boolean
-  startTime: Date
+  startTime?: Date
 }
 
 export interface SaveState {

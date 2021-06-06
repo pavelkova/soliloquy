@@ -10,9 +10,70 @@ import UPDATE_ENTRY from 'mutations/UpdateEntry.graphql'
 import { Flex, Box, Link, Textarea } from 'theme-ui'
 import { DateHeader } from './Entry/DateHeader'
 import { palettes } from 'styles/themes'
-import { Entry } from 'shared/types'
+import { Entry, ActivityLog, ActivityState } from 'shared/types'
 
-export const EditorContainer = ({ user }) => {
+const PAUSE_STATES = ['unpaused', 'autopaused', 'manualpause']
+
+const DEFAULT = {
+        savedEntry: null,
+        content: '',
+        wordCount: 0,
+        lowestWordCount: 0,
+        activity: { isActive: false, startTime: null },
+        pause: { isPaused: false, requireManualUnpause: false }
+}
+
+const useEditor = (props) => {
+    // props.date will be an empty
+    const [query, reexecuteQuery] = useQuery({
+        query: ENTRY_BY_DATE,
+        variables: { date:  props.date } })
+
+    const { data, fetching, error } = query
+
+    /**
+     * Entry object  most recently received from server via query or mutation.
+     */
+    const [savedEntry, setSavedEntry] = useState<Entry|null>(DEFAULT.entry)
+    /*
+     * Current content of textarea in open client.
+     */
+    const [content, setContent] = useState<string>(DEFAULT.content)
+    /*
+     * Current word count of textarea in open client.
+     */
+    const [wordCount, setWordCount] = useState<number>(DEFAULT.wordCount)
+    /*
+     * Current content of textarea in open client.
+     */
+    const [activity, setActivity] = useState<ActivityState>(DEFAULT.activity)
+
+    function initEntry(entry: Entry) {
+        if (entry == savedEntry) return
+
+        function getState(s: string) { return (entry[s] || DEFAULT[s]) }
+        setContent(getState('content'))
+        setWordCount(getState('wordCount'))
+        setSavedEntry(getState('savedEntry'))
+        setActivity(getActivityFromQuery(entry.activityLogs))
+    }
+
+    function getActivityFromQuery(logs: ActivityLog[]) {
+        const recentLog = logs.slice(-1)[0]
+        if (recentLog && (getTimeSince(recentLog.end) < 300000)) {
+            return { isActive: true, startTime: recentLog.start }
+        } else {
+            return { isActive: false, startTime: '' }
+        }
+    }
+
+    function handleTextChange(e) {}
+    function togglePause() {}
+}
+
+/////////////////////
+
+export const EditorContainer = ({ date }) => {
   const isVisible = usePageVisibility()
   const [savedEntry, setSavedEntry] = useState() // TODO pass these instead of entry prop
   const [pause, setPause] = useState({
@@ -52,6 +113,8 @@ export const EditorContainer = ({ user }) => {
     </>
   )
 }
+
+/////////////////////
 
 export const Editor = ({ entry, isPaused, togglePause }) => {
   const [content, setContent] = useState('')
