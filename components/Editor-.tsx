@@ -12,80 +12,104 @@ import { DateHeader } from './Entry/DateHeader'
 import { palettes } from 'styles/themes'
 import { Entry, ActivityLog, ActivityState } from 'shared/types'
 
-const PAUSE_STATES = ['unpaused', 'autopaused', 'manualpause']
-
 const DEFAULT = {
-        savedEntry: null,
-        content: '',
-        wordCount: 0,
-        lowestWordCount: 0,
-        activity: { isActive: false, startTime: null },
-        pause: { isPaused: false, requireManualUnpause: false }
+    savedEntry: null,
+    content: '',
+    wordCount: 0,
+    lowestWordCount: 0,
+    activity: { isActive: false, startTime: null },
+    pause: { isPaused: false, requireManualUnpause: false }
 }
+
+
+// function getActivityFromQuery(logs: ActivityLog[]) {
+//     const recentLog = logs.slice(-1)[0]
+//     if (recentLog && (getTimeSince(recentLog.end) < 300000)) {
+//         return { isActive: true, startTime: recentLog.start }
+//     } else { return DEFAULT.pause }
+// }
 
 const useEditor = (props) => {
     // props.date will be an empty
     const [query, reexecuteQuery] = useQuery({
-        query: ENTRY_BY_DATE,
-        variables: { date:  props.date } })
+        query: ENTRY_BY_DATE, variables: { date:  props.date } })
 
     const { data, fetching, error } = query
 
-    /**
-     * Entry object  most recently received from server via query or mutation.
-     */
     const [savedEntry, setSavedEntry] = useState<Entry|null>(DEFAULT.entry)
-    /*
-     * Current content of textarea in open client.
-     */
     const [content, setContent] = useState<string>(DEFAULT.content)
-    /*
-     * Current word count of textarea in open client.
-     */
     const [wordCount, setWordCount] = useState<number>(DEFAULT.wordCount)
-    /*
-     * Current content of textarea in open client.
-     */
+    const [lowestWordCount, setLowestWordCount] = useState<number>(DEFAULT.lowestWordCount)
     const [activity, setActivity] = useState<ActivityState>(DEFAULT.activity)
 
-    function initEntry(entry: Entry) {
+    function syncEditorState(entry?: Entry) {
         if (entry == savedEntry) return
+        setSavedEntry(entry.savedEntry)
 
-        function getState(s: string) { return (entry[s] || DEFAULT[s]) }
-        setContent(getState('content'))
-        setWordCount(getState('wordCount'))
-        setSavedEntry(getState('savedEntry'))
-        setActivity(getActivityFromQuery(entry.activityLogs))
+        if (entry.content != content) { setContent(entry.content) }
+        if (entry.wordCount != wordCount) { setWordCount(entry.wordCount) }
+
+        activity.isInactive ?? getActivityFromLogs(entry.activityLogs)
     }
 
-    function getActivityFromQuery(logs: ActivityLog[]) {
-        const recentLog = logs.slice(-1)[0]
-        if (recentLog && (getTimeSince(recentLog.end) < 300000)) {
-            return { isActive: true, startTime: recentLog.start }
-        } else {
-            return { isActive: false, startTime: '' }
+    function handleTextChange(e) {
+        const text = e.target.value
+        const wc = text.split(/([\s]|[-]{2,}|[.]{3,})+/)
+            .filter(word => { return word.match(/[a-zA-Z]+/)})
+
+        if (text != content) {
+            setContent(content)
+            !activity.isActive ?? setActive(now())
+            if (wc.length != wordCount) {
+                setWordCount(wc.length)
+                (wordCount < lowestWordCount) ?? setLowestWordCount(wordCount)
+            }
         }
     }
 
-    function handleTextChange(e) {}
-    function togglePause() {}
+    function handleSave() {
+        const mutation = savedEntry
+            ? { mutation: UPDATE_ENTRY, variables: { id: savedEntry.id }}
+            : { mutation: CREATE_ENTRY, variables: { date: props.date }}
+        const [mutationResult, executeMutation] = useMutation(mutation)
+
+        executeMutation.then(result => {
+            if (result.error) {
+                console.error(result.error)
+                return result.error }
+            const data = result?.data?.[mutation]
+            if (data) { syncEditorState(data) }
+        })
+
+    }
+
+    function setInactive() {
+        setActivity(DEFAULT.activity)
+        setLowestWordCount(wordCount)
+    }
+
+    function setActive(startTime: Date) {
+        setActivity({ isActive: true, startTime })
+    }
+
+    function getActivityFromLogs(logs: ActivityLog[]) {
+        const recentLog = logs.slice(-1)[0]
+        if (recentLog && (getTimeSince(recentLog.end) < 300000)) {
+            setActive(recentLog.startTime)
+            setLowestWordCount(recentLog.lowestWordCount)
+        } else { setInactive() }
+    }
+
+    function togglePause(requireManualUnpause = false) {
+        setPause({isPaused: !pause.isPaused, requireManualUnpause })
+    }
+
 }
 
 /////////////////////
 
 export const EditorContainer = ({ date }) => {
-  const isVisible = usePageVisibility()
-  const [savedEntry, setSavedEntry] = useState() // TODO pass these instead of entry prop
-  const [pause, setPause] = useState({
-    isPaused: false,
-    requireManualUnpause: false
-  })
 
-  function togglePause(requireManualUnpause = false) {
-    // just a precaution so that (!isPaused && requireManualUnpause) never happens
-    const isManual = pause.isPaused ? false : requireManualUnpause
-    setPause({ isPaused: !pause.isPaused, requireManualUnpause: isManual })
-  }
 
   // TODO LOOKUP ENTRY function on page load, on unpause
 
