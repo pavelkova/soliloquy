@@ -41,27 +41,3 @@ export interface Entry {
   updatedAt: Date
   activityLogs: ActivityLog[]
 }
-
-export interface ActivityState {
-  isActive: boolean
-  startTime?: Date
-}
-
-export interface SaveState {
-  content: string
-  time: Date
-}
-
-export interface PauseState {
-  isPaused: boolean
-  requireManualUnpause: boolean
-}
-
-export interface EditorState {
-  entry: Entry
-  content: string
-  wordCount: number
-  lowestWordCount: number
-  lastSaved: SaveState
-  activity: ActivityState
-}

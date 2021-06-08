@@ -10,11 +10,6 @@ type Entry {
   activityLogs: [ActivityLog]
 }
 
-input ActivityInput {
-  lowestWordCount: Int
-  start: DateTime
-}
-
 input DateSpanInput {
   fromDate: DateTime!
   toDate: DateTime
@@ -30,6 +25,7 @@ type Query {
 }
 
 type Mutation {
-  findOrCreateEntry(date: String!, timezone: String!): Entry
-  updateEntry(id: ID!, content: String, wordCount: Int, activity: ActivityInput): Entry
+  # findOrCreateEntry(date: String!, timezone: String!): Entry
+  # updateEntry(id: ID!, content: String, wordCount: Int, activity: ActivityInput): Entry
+  createOrUpdateEntry(id: Int, date: String, timezone: String, content: String!, wordCount: Int!, lowestWordCount: Int!, startTime: DateTime!): Entry
 }

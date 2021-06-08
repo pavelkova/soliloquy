@@ -1,5 +1,10 @@
 import { db } from 'db'
 import { Entry, ActivityLog, User } from 'shared/types'
+import {
+  CreateEntryInput,
+  UpdateEntryInput,
+  EditorInput,
+} from 'shared/types/editor'
 import { now, formatEntryDate } from 'utils/date'
 import { createOrUpdate as createOrUpdateActivityLog } from './activity-log'
 
@@ -102,9 +107,7 @@ const findAll = async (userId: number): Promise<Entry[]> => {
  *
  * @param user User object passed from GraphQL context.
  */
-const create = async (userId: number,
-                      date: string,
-                      tz: string): Promise<Entry> => {
+const create = async (args: CreateEntryInput): Promise<Entry> => {
 
   console.log('ACTIONS -> CREATE ENTRY ->')
 
@@ -142,11 +145,7 @@ const create = async (userId: number,
 //   content: string
 //   wordCount: number
 // }
-const update = async (user: User,
-                      id: number,
-                      content: string,
-                      wordCount: number,
-                      { lowestWordCount: number, start }): Promise<Entry> => {
+const update = async (args: UpdateEntryInput): Promise<Entry> => {
 
   console.log('ACTIONS -> UPDATE ENTRY->')
 
@@ -165,9 +164,49 @@ const update = async (user: User,
                                       updated_at: updateTime})
     return entryArr[0]
   } catch (e) {
+      // TODO if error is "entry already exists", return content argument appended to saved content with intermediate conflict message (but save nothing new to database)
     console.error(e.message)
     throw new Error(e)
   }
+}
+
+const createOrUpdate = async (args: EditorInput): Promise<Entry> => {
+    let entry: Entry
+    const selectArgs = (obj => obj)(args)
+    function selectArgs(obj) { return obj }(args)
+    // const activity = (
+    //     ({ id content, wordCount, lowestWordCount, startTime }) => ({
+    //         content, wordCount, lowestWordCount, startTime
+    //     }) )(args)
+
+    const saveTime = new Date().toISOString()
+    const activity = selectArgs({ content, wordCount, lowestWordCount, startTime })
+
+    try {
+        if (args.id) {
+            const updatedEntryArr: Entry[] = await t.returning(columns)
+                .where({ args.id })
+                .update({ content: args.content,
+                          word_count: args.wordCount,
+                          updated_at: saveTime })
+            entry = updatedEntryArr[0]
+        } else {
+            const createdEntryArr: Entry[] = await t.returning(columns)
+                .insert({ user_id: args.userId,
+                          date: args.date,
+                          content: args.content,
+                          wordCount: args.wordCount,
+                                      timezone: args.timezone,
+                                      created_at: saveTime,
+                          updated_at: saveTime })
+            entry = createdEntryArr[0]
+        }
+        activity.saveTime = saveTime
+        activity.id = entry.id
+        await createOrUpdateActivityLog(activity)
+        // the entry would not have the most recent activity log here?
+        return entry
+    }
 }
 
 export { findById, findByDate, findByDateSpan, findAll,
