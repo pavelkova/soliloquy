@@ -20,17 +20,17 @@ const UserResolvers: IResolvers = {
     },
   },
   Mutation: {
-    signup: async (_, { email, name, password, timezone }, ctx) => {
+    signup: async (_, { email, name, password, timezone }, ctx): Promise<User> => {
       const user = await signup(email, name, password, timezone)
       if (user) setUserToken(ctx.res, user)
       return user
     },
-    login: async (_, { email, password }, ctx) => {
+    login: async (_, { email, password }, ctx): Promise<User> => {
       const user = await login(email, password)
       if (user) setUserToken(ctx.res, user)
       return user
     },
-    logout: async (_, {}, ctx) => {
+    logout: async (_, {}, ctx): Promise<boolean> => {
       return await revokeUserToken(ctx)
     },
     updatePassword: authenticate(async(_, { oldPassword, newPassword }, ctx) => {

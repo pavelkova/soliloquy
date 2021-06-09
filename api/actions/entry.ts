@@ -170,44 +170,43 @@ const update = async (args: UpdateEntryInput): Promise<Entry> => {
   }
 }
 
-const createOrUpdate = async (args: EditorInput): Promise<Entry> => {
-    let entry: Entry
-    const selectArgs = (obj => obj)(args)
-    function selectArgs(obj) { return obj }(args)
-    // const activity = (
-    //     ({ id content, wordCount, lowestWordCount, startTime }) => ({
-    //         content, wordCount, lowestWordCount, startTime
-    //     }) )(args)
+// const createOrUpdate = async (args: EditorInput): Promise<Entry> => {
+//     let entry: Entry
+//     const selectArgs = (obj => obj)(args)
+//     // const activity = (
+//     //     ({ id content, wordCount, lowestWordCount, startTime }) => ({
+//     //         content, wordCount, lowestWordCount, startTime
+//     //     }) )(args)
 
-    const saveTime = new Date().toISOString()
-    const activity = selectArgs({ content, wordCount, lowestWordCount, startTime })
+//     const saveTime = new Date().toISOString()
+//     const activity = selectArgs({ content, wordCount, lowestWordCount, startTime })
 
-    try {
-        if (args.id) {
-            const updatedEntryArr: Entry[] = await t.returning(columns)
-                .where({ args.id })
-                .update({ content: args.content,
-                          word_count: args.wordCount,
-                          updated_at: saveTime })
-            entry = updatedEntryArr[0]
-        } else {
-            const createdEntryArr: Entry[] = await t.returning(columns)
-                .insert({ user_id: args.userId,
-                          date: args.date,
-                          content: args.content,
-                          wordCount: args.wordCount,
-                                      timezone: args.timezone,
-                                      created_at: saveTime,
-                          updated_at: saveTime })
-            entry = createdEntryArr[0]
-        }
-        activity.saveTime = saveTime
-        activity.id = entry.id
-        await createOrUpdateActivityLog(activity)
-        // the entry would not have the most recent activity log here?
-        return entry
-    }
-}
+//     try {
+//         if (args.id) {
+//             const updatedEntryArr: Entry[] = await t.returning(columns)
+//                 .where({ args.id })
+//                 .update({ content: args.content,
+//                           word_count: args.wordCount,
+//                           updated_at: saveTime })
+//             entry = updatedEntryArr[0]
+//         } else {
+//             const createdEntryArr: Entry[] = await t.returning(columns)
+//                 .insert({ user_id: args.userId,
+//                           date: args.date,
+//                           content: args.content,
+//                           wordCount: args.wordCount,
+//                                       timezone: args.timezone,
+//                                       created_at: saveTime,
+//                           updated_at: saveTime })
+//             entry = createdEntryArr[0]
+//         }
+//         activity.saveTime = saveTime
+//         activity.id = entry.id
+//         await createOrUpdateActivityLog(activity)
+//         // the entry would not have the most recent activity log here?
+//         return entry
+//     }
+// }
 
 export { findById, findByDate, findByDateSpan, findAll,
          create, update }

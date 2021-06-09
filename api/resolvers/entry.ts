@@ -5,15 +5,18 @@ import {
   findByDate,
   findByDateSpan,
   findAll,
-  // create,
-  // update,
-  createOrUpdate,
+  create,
+  update,
 } from '../actions/entry'
 import { findAll as findEntryLogs } from '../actions/activity-log'
 import { findById as findEntryOwner } from '../actions/user'
 import { Entry, User, ActivityLog } from 'shared/types'
-// import { CreateEntryInput, UpdateEntryInput, EditorInput } from 'shared/types/editor'
-import { EditorInput } from 'shared/types/editor'
+import {
+  CreateEntryInput,
+  UpdateEntryInput,
+  EditorInput,
+} from 'shared/types/editor'
+// import { EditorInput } from 'shared/types/editor'
 import Ctx from '../context'
 
 const EntryResolvers: IResolvers = {
@@ -24,7 +27,7 @@ const EntryResolvers: IResolvers = {
       }
     ),
     findEntryByDate: authenticate(
-      async (_, args: Pick<Entry, 'date'>, ctx: Ctx) => {
+      async (_, args: Pick<Entry, 'date'>, ctx: Ctx): Promise<Entry> => {
         console.log('RESOLVERS -> ENTRY -> FIND BY DATE ->')
         return await findByDate(ctx.user.id, args.date)
       }
@@ -37,38 +40,34 @@ const EntryResolvers: IResolvers = {
     //   async (_, { dateSpan }, ctx) => {
     //     return await findByDateSpan(ctx.user.id, dateSpan)
     // }),
-    findEntriesByDates: authenticate(async (_, { dateSpan }, ctx: Ctx) => {
+    findEntriesByDates: authenticate(async (_, { dateSpan }, ctx: Ctx): Promise<
+      Entry[]
+    > => {
       return await findByDateSpan(ctx.user.id, dateSpan)
     }),
-    findAllEntries: authenticate(async (_, {}, ctx: Ctx) => {
+    findAllEntries: authenticate(async (_, {}, ctx: Ctx): Promise<Entry[]> => {
       return await findAll(ctx.user.id)
     }),
   },
   Mutation: {
-    // createEntry: authenticate(async (_, args: CreateEntryInput, ctx: Ctx) => {
-    //   console.log('RESOLVERS -> ENTRY -> FIND OR CREATE ->')
-    //   return await createEntry(ctx.user.id, ...args)
-    // }),
-    // updateEntry: authenticate(async (_, args: UpdateEntryInput, ctx: Ctx) => {
-    //   console.log('RESOLVERS -> ENTRY -> UPDATE ->')
-    //   return await update(ctx.user.id, ...args)
-    // }),
-    createOrUpdateEntry: authenticate(
-      async (_, args: EditorInput, ctx: Ctx): Promise<Entry> => {
-        console.log('RESOLVERS -> ENTRY -> CREATE OR UPDATE ->')
-        // return args.id
-        //   ? await update(ctx.user.id, args)
-        //   : await create(ctx.user.id, args)
-        args.userId = ctx.user.id
-        return await createOrUpdate(args)
+    createEntry: authenticate(
+      async (_, args: CreateEntryInput, ctx: Ctx): Promise<Entry> => {
+        console.log('RESOLVERS -> ENTRY -> FIND OR CREATE ->')
+        return await createEntry(ctx.user.id, ...args)
+      }
+    ),
+    updateEntry: authenticate(
+      async (_, args: UpdateEntryInput, ctx: Ctx): Promise<Entry> => {
+        console.log('RESOLVERS -> ENTRY -> UPDATE ->')
+        return await update(ctx.user.id, ...args)
       }
     ),
   },
   Entry: {
-    user: async (entry, {}, ctx: Ctx) => {
+    user: async (entry, {}, ctx: Ctx): Promise<User> => {
       return await findEntryOwner(entry.userId)
     },
-    activityLogs: async (entry, {}, ctx: Ctx) => {
+    activityLogs: async (entry, {}, ctx: Ctx): Promise<ActivityLog[]> => {
       return findEntryLogs(entry.id)
     },
   },
