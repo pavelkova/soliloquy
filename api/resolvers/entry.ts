@@ -7,6 +7,7 @@ import {
   findAll,
   create,
   update,
+  createOrUpdate,
 } from '../actions/entry'
 import { findAll as findEntryLogs } from '../actions/activity-log'
 import { findById as findEntryOwner } from '../actions/user'
@@ -52,7 +53,7 @@ const EntryResolvers: IResolvers = {
   Mutation: {
     createEntry: authenticate(
       async (_, args: CreateEntryInput, ctx: Ctx): Promise<Entry> => {
-        console.log('RESOLVERS -> ENTRY -> FIND OR CREATE ->')
+        console.log('RESOLVERS -> ENTRY -> CREATE ->')
         return await createEntry(ctx.user.id, ...args)
       }
     ),
@@ -60,6 +61,12 @@ const EntryResolvers: IResolvers = {
       async (_, args: UpdateEntryInput, ctx: Ctx): Promise<Entry> => {
         console.log('RESOLVERS -> ENTRY -> UPDATE ->')
         return await update(ctx.user.id, ...args)
+      }
+    ),
+    createOrUpdateEntry: authenticate(
+      async (_, args: EditorInput, ctx: Ctx): Promise<Entry> => {
+        console.log('RESOLVERS -> ENTRY -> CREATE OR UPDATE ->')
+        return await createOrUpdate({ userId: ctx.user.id, ...args })
       }
     ),
   },

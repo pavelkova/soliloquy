@@ -19,12 +19,13 @@ export const StatusBar = (props: StatusBarProps) => {
       <Box>
         {props.wordCount} {props.wordCount == 1 ? 'word' : 'words'}
       </Box>
-      <Box>
-        saved at
-        {new Date(props.lastSavedAt).toLocaleString('en-us', {
-          timeStyle: 'short',
-        })}
-      </Box>
+      {props.lastSavedAt && (
+        <Box>
+          saved at
+          {new Date(props.lastSavedAt).toLocaleString('en-us', {
+            timeStyle: 'short' })}
+        </Box>
+      )}
     </Flex>
   )
 }

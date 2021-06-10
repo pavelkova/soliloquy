@@ -94,7 +94,7 @@ const create = async (entryId: number,
  * @param lowestWordCount
  * @param netWordCount
  */
-const update = async (id, content, lowestWordCount, netWordCount, end) => {
+const update = async (id: number, content: string, lowestWordCount: number, netWordCount: number, end: Date) => {
   console.log('ACTIONS -> ACTIVITY LOG -> UPDATE ->')
 
   let log
@@ -124,12 +124,12 @@ const update = async (id, content, lowestWordCount, netWordCount, end) => {
  * @param start
  * @param end
  */
-const createOrUpdate = async (entryId,
-                              content,
-                              wordCount,
-                              lowestWordCount,
-                              start,
-                              end): Promise<ActivityLog> => {
+const createOrUpdate = async (entryId: number,
+                              content: string,
+                              wordCount: number,
+                              lowestWordCount: number,
+                              start: Date,
+                              end: Date): Promise<ActivityLog> => {
                                 console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
 
   const netWordCount = wordCount - lowestWordCount

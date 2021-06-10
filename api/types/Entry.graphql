@@ -25,7 +25,7 @@ type Query {
 }
 
 type Mutation {
-  createEntry(date: String!, timezone: String! id: ID!, content: String!, wordCount: Int!, lowestWordCount: Int!, startTime: DateTime!): Entry
+  createEntry(date: String!, timezone: String!, content: String!, wordCount: Int!, lowestWordCount: Int!, startTime: DateTime!): Entry
   updateEntry(id: ID!, content: String!, wordCount: Int!, lowestWordCount: Int!, startTime: DateTime!): Entry
-  # createOrUpdateEntry(id: ID!, date: String, timezone: String, content: String!, wordCount: Int!, lowestWordCount: Int!, startTime: DateTime!): Entry
+  createOrUpdateEntry(id: ID, date: String, timezone: String, content: String!, wordCount: Int!, lowestWordCount: Int!, startTime: DateTime!): Entry
 }

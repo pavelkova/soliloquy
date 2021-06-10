@@ -1,0 +1,15 @@
+#import "../fragments/ActivityLogFragment.graphql"
+#import "../fragments/EntryFragment.graphql"
+#import "../fragments/UserFragment.graphql"
+
+mutation ($id: ID, $date: String, $timezone: String, $content: String!, $wordCount: Int!, $lowestWordCount: Int!, $startTime: DateTime!) {
+  createOrUpdateEntry(id: $id, date: $date, timezone: $timezone, content: $content, wordCount: $wordCount, lowestWordCount: $lowestWordCount, startTime: $startTime) {
+    ...EntryFragment
+    user {
+      ...UserFragment
+    }
+    activityLogs {
+      ...ActivityLogFragment
+    }
+  }
+}

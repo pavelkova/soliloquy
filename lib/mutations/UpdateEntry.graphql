@@ -1,8 +1,8 @@
 #import "../fragments/ActivityLogFragment.graphql"
 #import "../fragments/EntryFragment.graphql"
 
-mutation ($id: ID!, $content: String, $wordCount: Int, $activity: ActivityInput) {
-  updateEntry(content: $content, wordCount: $wordCount, id: $id, activity: $activity) {
+mutation ($id: ID!, $content: String!, $wordCount: Int!, $lowestWordCount: Int!, $startTime: DateTime!) {
+  updateEntry(id: $id, content: $content, wordCount: $wordCount, lowestWordCount: $lowestWordCount, startTime: $startTime) {
     ...EntryFragment
     activityLogs {
       ...ActivityLogFragment
