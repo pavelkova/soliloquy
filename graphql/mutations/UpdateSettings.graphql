@@ -1,7 +1,0 @@
-#import "../fragments/UserFragment.graphql"
-
-mutation ($settings: JSONObject!) {
-  updateSettings(settings: $settings) {
-    ...UserFragment
-  }
-}

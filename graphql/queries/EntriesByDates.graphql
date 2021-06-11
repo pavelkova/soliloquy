@@ -1,7 +1,0 @@
-#import "../fragments/EntryFragment.graphql"
-
-query ($dateSpan: DateSpanInput!) {
-  findEntriesByDates(dateSpan: $dateSpan) {
-    ...EntryFragment
-  }
-}

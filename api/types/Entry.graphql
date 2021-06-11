@@ -8,6 +8,7 @@ type Entry {
   createdAt: DateTime
   updatedAt: DateTime
   activityLogs: [ActivityLog]
+  # tags: [Tag]
 }
 
 input DateSpanInput {
@@ -22,10 +23,11 @@ type Query {
   # findEntriesByYear(year: Int!): [Entry]
   findEntriesByDates(dateSpan: DateSpanInput!): [Entry]
   findAllEntries: [Entry]
+  # searchEntriesByContent(searchInput: String!): [Entry]
 }
 
 type Mutation {
-  createEntry(date: String!, timezone: String!, content: String!, wordCount: Int!, lowestWordCount: Int!, startTime: DateTime!): Entry
-  updateEntry(id: ID!, content: String!, wordCount: Int!, lowestWordCount: Int!, startTime: DateTime!): Entry
-  createOrUpdateEntry(id: ID, date: String, timezone: String, content: String!, wordCount: Int!, lowestWordCount: Int!, startTime: DateTime!): Entry
+  createEntry(date: String!, timezone: String!, content: String!, wordCount: Int!, lowestWordCount: Int!, start: DateTime!): Entry
+  updateEntry(id: ID!, content: String!, wordCount: Int!, lowestWordCount: Int!, start: DateTime!): Entry
+  createOrUpdateEntry(id: ID, date: String, timezone: String, content: String!, wordCount: Int!, lowestWordCount: Int!, start: DateTime!): Entry
 }

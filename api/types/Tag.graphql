@@ -1,0 +1,26 @@
+type Tag {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
+  depth: Int!
+  parent: Tag
+  children: [Tag]
+  entries: [Entry]
+}
+
+type Query {
+  findAllTags: [Tag]
+  findChildTags(tagId: ID!): [Tag]
+  findParentTag(tagId: ID!): Tag
+  findTagTree(tagId: ID!): [Tag]
+  findTagsByEntry(entryId: ID!): [Tag]
+  findTagTreesByEntry(entryId: ID!): [Tag]
+}
+
+type Mutation {
+  createTag(name: String!, parentId: ID): Tag
+  moveTag(tagId: ID!, parentId: ID): Tag
+  renameTag(tagId: ID!, name: String!): Tag
+  addTagToEntry(tagId: ID!, entryId: ID!): Boolean
+  removeTagFromEntry(tagId: ID!, entryId: ID!): Boolean
+}

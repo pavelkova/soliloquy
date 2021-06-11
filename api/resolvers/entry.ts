@@ -30,7 +30,10 @@ const EntryResolvers: IResolvers = {
     findEntryByDate: authenticate(
       async (_, args: Pick<Entry, 'date'>, ctx: Ctx): Promise<Entry> => {
         console.log('RESOLVERS -> ENTRY -> FIND BY DATE ->')
-        return await findByDate(ctx.user.id, args.date)
+        // return await findByDate(ctx.user.id, args.date)
+          const entry = await findByDate(ctx.user.id, args.date)
+          console.log(entry)
+          return entry
       }
     ),
     // findEntriesByMonth: authenticate(

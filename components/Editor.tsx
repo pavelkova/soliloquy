@@ -16,7 +16,7 @@ const DEFAULT = {
   savedEntry: null,
   content: '',
   wordCount: 0,
-  activity: { isActive: false, startTime: null },
+  activity: { isActive: false, start: null },
   pause: { isPaused: false, requireManualUnpause: false, pausedMessage: '' },
 }
 
@@ -37,11 +37,13 @@ export const Editor = (props) => {
   const { data, fetching, error } = query
 
   // Set local states from server response to queries and mutations
-  function syncEditorState(entry?: Entry) {
-    if (entry == savedEntry) return
-
-    setSavedEntry(entry)
-      console.log(entry)
+    function syncEditorState(entry?: Entry) {
+        console.log('syncEditorState ->')
+      if (entry == savedEntry) return
+      console.log('entry not equal to savedEntry')
+        setSavedEntry(entry)
+        console.log(entry)
+    console.log(savedEntry)
 
     if (entry && !activity.isActive) {
       getActivityFromLogs(entry.activityLogs)
@@ -56,7 +58,7 @@ export const Editor = (props) => {
 
   // Set local activity-related states from entry activity logs
   function getActivityFromLogs(logs: ActivityLog[]) {
-    const recentLog = logs.slice(-1)[0]
+    const recentLog = logs?.slice(-1)[0]
     if (recentLog && getTimeSince(recentLog.end) < 300000) {
       setActive(recentLog.start)
       const lwc =
@@ -78,7 +80,9 @@ export const Editor = (props) => {
 
     if (text != content) {
       setContent(text)
-      if (!activity.isActive) { setActive(new Date()) }
+      if (!activity.isActive) {
+        setActive(new Date())
+      }
       if (wc.length != wordCount) {
         setWordCount(wc.length)
         if (wordCount < lowestWordCount) {
@@ -94,13 +98,17 @@ export const Editor = (props) => {
     console.log('HANDLE SAVE')
     console.log('savedEntry')
     console.log(savedEntry)
-    if (!savedEntry?.id && content.length == 0) return
+    if (
+      (!savedEntry?.id && content.length == 0) ||
+      content == savedEntry?.content
+    )
+      return
     console.log('passed the vibe check')
     const args = {
       content,
       wordCount,
       lowestWordCount,
-      start: activity.startTime,
+      start: activity.start,
     }
 
     const variables: EditorInput = savedEntry?.id
@@ -113,8 +121,11 @@ export const Editor = (props) => {
         return result.error
       }
       const res = result?.data?.createOrUpdateEntry
-      if (res) {
-        syncEditorState(res)
+        if (res) {
+            console.log('mutation response')
+            console.log(res)
+            syncEditorState(res)
+            console.log(savedEntry)
       }
       return res
     })
@@ -126,15 +137,20 @@ export const Editor = (props) => {
     setLowestWordCount(wordCount)
   }
 
-  function setActive(startTime: Date) {
-    setActivity({ isActive: true, startTime })
+  function setActive(start: Date) {
+    console.log('EDITOR -> setActive ->')
+    setActivity({ isActive: true, start })
+    console.log(activity)
   }
 
   function setPaused(requireManualUnpause = false, pausedMessage = '') {
     setPause({ isPaused: true, requireManualUnpause, pausedMessage })
   }
   function setUnpaused(isManual = false) {
+    console.log(pause)
     if (pause.requireManualUnpause && !isManual) return
+    console.log('made it to unpause')
+    reexecuteQuery()
     setPause(DEFAULT.pause)
   }
 
@@ -149,11 +165,7 @@ export const Editor = (props) => {
       handleSave()
     }, 3000)
     const autoPauseTimer = setTimeout(() => {
-      setPaused({
-        isPaused: true,
-        requireManualUnpause: true,
-        pausedMessage: 'Your session has been paused due to inactivity.',
-      })
+      setPaused(true, 'Your session has been paused due to inactivity.')
     }, 300000)
     return () => {
       clearTimeout(autoSaveTimer)
@@ -161,15 +173,15 @@ export const Editor = (props) => {
     }
   }, [content])
 
-    useEffect(() => {
-        syncEditorState(data)
-    }, [data])
+  useEffect(() => {
+    console.log(data)
+    syncEditorState(data?.findEntryByDate)
+  }, [data])
 
   // When PAGE VISIBILITY changes:
   useEffect(() => {
     console.log('EDITOR -> USE EFFECT -> isVisible ->')
     if (isVisible) {
-      // if (!pause.requireManualUnpause && pause.isPaused) { togglePause(false) }
       if (!pause.requireManualUnpause && pause.isPaused) {
         setUnpaused(false)
       }
@@ -192,7 +204,8 @@ export const Editor = (props) => {
         onChange={handleTextChange}
       />
       <ButtonBar
-        isPaused={pause.isPaused}
+
+        console.log(reexecuteQuery)        isPaused={pause.isPaused}
         togglePause={toggleManualPause}
         hasUnsavedContent={content != savedEntry?.content}
         handleSave={handleSave}
@@ -202,54 +215,60 @@ export const Editor = (props) => {
 
   return (
     <Flex sx={{ flex: '1', flexDirection: 'column' }}>
-      <Flex
-        sx={{
-          justifyContent: 'space-between',
-          borderBottomColor: 'muted',
-          borderBottomWidth: 1,
-          borderBottomStyle: 'solid',
-          fontSize: '10px',
-          p: 1,
-          mb: 1,
-        }}
-      >
-        <Box>
-          {wordCount} {wordCount == 1 ? 'word' : 'words'}
-        </Box>
-        {savedEntry?.updatedAt && (
-          <Box>
-            saved at
-            {new Date(savedEntry.updatedAt).toLocaleString('en-us', {
-              timeStyle: 'short',
-            })}
-          </Box>
-        )}
-      </Flex>
-      <Textarea
-        flex={1}
-        sx={{
-          flex: '1',
-          border: 'none',
-          outline: 'none',
-          resize: 'none',
-          scrollbarWidth: 'thin',
-          bg: pause.isPaused ? 'muted' : 'background',
-        }}
-      value={content}
-      onChange={handleTextChange}
-        disabled={pause.isPaused}
-      />
-      <Flex sx={{ justifyContent: 'flex-end', mt: 1 }}>
-        <Link onClick={toggleManualPause} sx={{ mr: 2 }}>
-          {pause.isPaused ? 'start' : 'pause'}
-        </Link>
-        <Link
-          onClick={handleSave}
-          disabled={pause.isPaused || content == savedEntry?.content}
-        >
-          save
-        </Link>
-      </Flex>
+      {error && <p>there was an issue.</p>}
+      {fetching && <p>loading...</p>}
+      {data && (
+        <>
+          <Flex
+            sx={{
+              justifyContent: 'space-between',
+              borderBottomColor: 'muted',
+              borderBottomWidth: 1,
+              borderBottomStyle: 'solid',
+              fontSize: '10px',
+              p: 1,
+              mb: 1,
+            }}
+          >
+            <Box>
+              {wordCount} {wordCount == 1 ? 'word' : 'words'}
+            </Box>
+            {savedEntry?.updatedAt && (
+              <Box>
+                saved at
+                {new Date(savedEntry.updatedAt).toLocaleString('en-us', {
+                  timeStyle: 'short',
+                })}
+              </Box>
+            )}
+          </Flex>
+          <Textarea
+            flex={1}
+            sx={{
+              flex: '1',
+              border: 'none',
+              outline: 'none',
+              resize: 'none',
+              scrollbarWidth: 'thin',
+              bg: pause.isPaused ? 'muted' : 'background',
+            }}
+            value={content}
+            onChange={handleTextChange}
+            disabled={pause.isPaused}
+          />
+          <Flex sx={{ justifyContent: 'flex-end', mt: 1 }}>
+            <Link onClick={toggleManualPause} sx={{ mr: 2 }}>
+              {pause.isPaused ? 'start' : 'pause'}
+            </Link>
+            <Link
+              onClick={handleSave}
+              disabled={pause.isPaused || content == savedEntry?.content}
+            >
+              save
+            </Link>
+          </Flex>
+        </>
+      )}
     </Flex>
   )
 }

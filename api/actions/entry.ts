@@ -132,7 +132,7 @@ const create = async (args: CreateEntryInput): Promise<Entry> => {
  * @param start
  */
 const update = async (args: UpdateEntryInput): Promise<Entry> => {
-  const { content, wordCount, lowestWordCount, startTime } = args
+  const { content, wordCount, lowestWordCount, start } = args
   console.log('ACTIONS -> UPDATE ENTRY->')
 
   // use the same timestamp for entry.updated_at and activity_log.end
@@ -162,7 +162,7 @@ const update = async (args: UpdateEntryInput): Promise<Entry> => {
 }
 
 const createOrUpdate = async (args: EditorInput): Promise<Entry> => {
-  const { content, wordCount, lowestWordCount, startTime } = args
+  const { content, wordCount, lowestWordCount, start } = args
   const now = new Date().toISOString()
 
   let entry: Entry
@@ -179,7 +179,7 @@ const createOrUpdate = async (args: EditorInput): Promise<Entry> => {
         user_id: args.userId,
         date: args.date,
         timezone: args.timezone,
-        created_at: startTime,
+        created_at: start,
         updated_at: now,
       })
       entry = entryArr[0]
