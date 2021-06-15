@@ -109,11 +109,21 @@ const create = async (args: CreateEntryInput): Promise<Entry> => {
     const entryArr = await t.returning(columns).insert({
       user_id: args.userId,
       date: args.date,
-      timezone: args.timezone,
-      created_at: saveTime,
+        timezone: args.timezone,
+        content: args.content,
+        word_count: args.wordCount,
+      created_at: args.start,
       updated_at: saveTime,
     })
-    return entryArr[0]
+      const entry = entryArr[0]
+      await createOrUpdateActivityLog(
+        entry.id,
+        args.content,
+        args.wordCount,
+        args.lowestWordCount,
+        args.start,
+        saveTime
+      )
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
@@ -162,27 +172,35 @@ const update = async (args: UpdateEntryInput): Promise<Entry> => {
 }
 
 const createOrUpdate = async (args: EditorInput): Promise<Entry> => {
+  console.log('ACTIONS -> ENTRY -> CREATE OR UPDATE ->')
   const { content, wordCount, lowestWordCount, start } = args
+  console.log(args)
   const now = new Date().toISOString()
 
   let entry: Entry
 
   try {
     if (args.id) {
+      console.log('-> UPDATE ->')
       const entryArr = await t
         .returning(columns)
         .where({ id: args.id })
         .update({ content, word_count: wordCount, updated_at: now })
       entry = entryArr[0]
+      console.log(entry)
     } else {
+      console.log('-> CREATE ->')
       const entryArr = await t.returning(columns).insert({
         user_id: args.userId,
         date: args.date,
         timezone: args.timezone,
+        content,
+        word_count: wordCount,
         created_at: start,
         updated_at: now,
       })
       entry = entryArr[0]
+      console.log(entry)
     }
     await createOrUpdateActivityLog(
       entry.id,
@@ -192,10 +210,19 @@ const createOrUpdate = async (args: EditorInput): Promise<Entry> => {
       start,
       now
     )
+      return entry
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
 }
 
-export { findById, findByDate, findByDateSpan, findAll, create, update, createOrUpdate }
+export {
+  findById,
+  findByDate,
+  findByDateSpan,
+  findAll,
+  create,
+  update,
+  createOrUpdate,
+}
