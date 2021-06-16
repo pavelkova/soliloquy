@@ -5,10 +5,8 @@ import { now, getTimeSince, formatEntryDate } from 'utils/date'
 import { usePageVisibility } from 'utils/visibility'
 import ENTRY_BY_DATE from 'queries/EntryByDate.graphql'
 import CREATE_OR_UPDATE_ENTRY from 'mutations/CreateOrUpdateEntry.graphql'
-// import { CREATE_ENTRY as createEntry } from 'mutations/CreateEntry.graphql'
-// import { UPDATE_ENTRY as updateEntry } from 'mutations/UpdateEntry.graphql'
 import { Entry, ActivityLog } from 'shared/types'
-import { EditorInput, ActivityState, PauseState } from 'shared/types/editor'
+import { EntryInput, ActivityState, PauseState } from 'shared/types/editor'
 
 import { Box, Flex, Link, Textarea } from 'theme-ui'
 
@@ -69,21 +67,21 @@ export const EditorContainer = ({ date, timezone }) => {
     }
   }, [isVisible])
 
-  const editorProps = {
-    date,
-    timezone,
-    savedEntry,
-    setSavedEntry,
-    isPaused: pause.isPaused,
-    pause: setPaused,
-    unpause: setUnpaused,
-  }
-
   return (
     <Flex sx={{ flex: '1', flexDirection: 'column' }}>
       {error && <p>ERROR</p>}
       {fetching && <p>Loading...</p>}
-      {data && <Editor props={{ ...editorProps }} />}
+      {data && (
+        <Editor
+          date={date}
+          timezone={timezone}
+          savedEntry={savedEntry}
+          setSavedEntry={setSavedEntry}
+          isPaused={pause.isPaused}
+          pause={setPaused}
+          unpause={setUnpaused}
+        />
+      )}
     </Flex>
   )
 }
@@ -107,7 +105,6 @@ export const Editor = ({
   const [activity, setActivity] = useState<ActivityState>(DEFAULT.activity)
 
   // Set local states from server response to queries and mutations
-
   useEffect(() => {
     console.log('EDITOR -> USE EFFECT [savedEntry]')
     if (savedEntry == DEFAULT.savedEntry) return
@@ -144,6 +141,9 @@ export const Editor = ({
     const wc = text.split(/([\s]|[-]{2,}|[.]{3,})+/).filter((word) => {
       return word.match(/[a-zA-Z]+/)
     })
+    console.log('EDITOR -> HANDLE TEXT CHANGE ->')
+    console.log(date)
+    console.log(timezone)
 
     if (text != content) {
       setContent(text)
@@ -164,6 +164,10 @@ export const Editor = ({
   const saveDisabled = isPaused || content == savedEntry?.content
   function handleSave() {
     console.log('EDITOR -> HANDLE SAVE ->')
+    console.log(date)
+    console.log(timezone)
+    console.log(savedEntry)
+    console.log(isPaused)
     if (
       (!savedEntry?.id && content.length == 0) ||
       content == savedEntry?.content
@@ -171,32 +175,23 @@ export const Editor = ({
       return
 
     console.log('-> CONTINUE SAVE ->')
-    const args = {
+    console.log(date)
+    console.log(timezone)
+    executeMutation({
+      date,
+      timezone,
       content,
       wordCount,
       lowestWordCount,
       start: activity.start,
-    }
-
-    console.log(activity)
-    const variables: EditorInput = savedEntry?.id
-      ? { id: savedEntry.id, ...args }
-      : { date, timezone, ...args }
-
-    console.log(variables)
-    executeMutation(variables).then((result) => {
+    }).then((result) => {
       if (result.error) {
         console.error(result.error)
         return result.error
       }
       const entry = result?.data?.createOrUpdateEntry
-      console.log(result)
       if (entry) {
-        console.log('MUTATION RESULT ->')
-        console.log(entry)
         setSavedEntry(entry)
-        console.log('SAVED ENTRY ->')
-        console.log(savedEntry)
       }
       return entry
     })

@@ -15,9 +15,9 @@ import { Entry, User, ActivityLog } from 'shared/types'
 import {
   CreateEntryInput,
   UpdateEntryInput,
-  EditorInput,
+  EntryInput,
 } from 'shared/types/editor'
-// import { EditorInput } from 'shared/types/editor'
+// import { EntryInput } from 'shared/types/editor'
 import Ctx from '../context'
 
 const EntryResolvers: IResolvers = {
@@ -57,7 +57,7 @@ const EntryResolvers: IResolvers = {
     createEntry: authenticate(
       async (_, args: CreateEntryInput, ctx: Ctx): Promise<Entry> => {
         console.log('RESOLVERS -> ENTRY -> CREATE ->')
-        return await createEntry(ctx.user.id, ...args)
+        return await create(ctx.user.id, ...args)
       }
     ),
     updateEntry: authenticate(
@@ -67,7 +67,7 @@ const EntryResolvers: IResolvers = {
       }
     ),
     createOrUpdateEntry: authenticate(
-      async (_, args: EditorInput, ctx: Ctx): Promise<Entry> => {
+      async (_, args: EntryInput, ctx: Ctx): Promise<Entry> => {
         console.log('RESOLVERS -> ENTRY -> CREATE OR UPDATE ->')
         return await createOrUpdate({ userId: ctx.user.id, ...args })
       }

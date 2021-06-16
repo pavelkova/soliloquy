@@ -2,8 +2,8 @@
 #import "../fragments/EntryFragment.graphql"
 #import "../fragments/UserFragment.graphql"
 
-mutation ($id: ID, $date: String, $timezone: String, $content: String!, $wordCount: Int!, $lowestWordCount: Int!, $start: DateTime!) {
-  createOrUpdateEntry(id: $id, date: $date, timezone: $timezone, content: $content, wordCount: $wordCount, lowestWordCount: $lowestWordCount, start: $start) {
+mutation ($date: String!, $timezone: String!, $content: String!, $wordCount: Int!, $lowestWordCount: Int!, $start: DateTime!) {
+  createOrUpdateEntry(date: $date, timezone: $timezone, content: $content, wordCount: $wordCount, lowestWordCount: $lowestWordCount, start: $start) {
     ...EntryFragment
     user {
       ...UserFragment

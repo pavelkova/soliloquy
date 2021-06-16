@@ -1,6 +1,11 @@
 import { db } from 'db'
 import { Entry, ActivityLog } from 'shared/types'
 import { now, getTimeBetween } from 'utils/date'
+import {
+  ActivityLogInput,
+  CreateLogInput,
+  UpdateLogInput,
+} from 'shared/types/editor'
 
 const t = db('activity_logs')
 
@@ -11,7 +16,7 @@ const columns = [
   'end',
   'content',
   'lowest_word_count as lowestWordCount',
-  'net_word_count as netWordCount'
+  'net_word_count as netWordCount',
 ]
 
 /**
@@ -21,15 +26,12 @@ const columns = [
  */
 const findById = async (id: number): Promise<ActivityLog> => {
   console.log('ACTIONS -> ACTIVITY LOG -> FINDBYID ->')
-  let log
   try {
-    log = await t.select(columns)
-                 .where({ id }).first()
+    return await t.select(columns).where({ id }).first()
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  return log
 }
 
 /**
@@ -37,17 +39,14 @@ const findById = async (id: number): Promise<ActivityLog> => {
  *
  * @param entryId
  */
-const findAll = async (entryId) => {
+const findAll = async (entryId: number): Promise<ActivityLog[]> => {
   console.log('ACTIONS -> ACTIVITY LOG -> FINDALL ->')
-  let logs
   try {
-    logs = await t.select(columns)
-                  .where({ entry_id: entryId })
+    return await t.select(columns).where({ entry_id: entryId })
   } catch (e) {
     console.error(e)
     throw new Error(e)
   }
-  return logs
 }
 
 /**
@@ -59,31 +58,28 @@ const findAll = async (entryId) => {
  * @param netWordCount
  * @param start
  */
-const create = async (entryId: number,
-                      content: string,
-                      lowestWordCount: number,
-                      netWordCount: number,
-                      start: Date,
-                      end: Date): Promise<ActivityLog> => {
-
+// const create = async (entryId: number,
+//                       content: string,
+//                       lowestWordCount: number,
+//                       netWordCount: number,
+//                       start: Date,
+//                       end: Date): Promise<ActivityLog> => {
+const create = async (args: CreateLogInput): Promise<ActivityLog> => {
   console.log('ACTIONS -> ACTIVITY LOG -> CREATE ->')
-
-  let log
-
   try {
-    const logArr = await t.returning(columns)
-                          .insert({ entry_id: entryId,
-                                    content,
-                                    lowest_word_count: lowestWordCount,
-                                    net_word_count: netWordCount,
-                                    start,
-                                    end })
-    log = logArr[0]
+    const logArr = await t.returning(columns).insert({
+      entry_id: args.entryId,
+      content: args.content,
+      lowest_word_count: args.lowestWordCount,
+      net_word_count: netWordCount,
+      start: args.start,
+      end: args.end,
+    })
+    return logArr[0]
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  return log
 }
 
 /**
@@ -93,24 +89,21 @@ const create = async (entryId: number,
  * @param content
  * @param lowestWordCount
  * @param netWordCount
+ * @param end
  */
-const update = async (id: number, content: string, lowestWordCount: number, netWordCount: number, end: Date) => {
+const update = async (args: UpdateLogInput) => {
   console.log('ACTIONS -> ACTIVITY LOG -> UPDATE ->')
-
-  let log
-
   try {
-    log = await t.returning(columns)
-                 .where({ id })
-                 .update({ content,
-                           lowest_word_count: lowestWordCount,
-                           net_word_count: netWordCount,
-                           end })
+    return await t.returning(columns).where({ id: args.id }).update({
+      content: args.content,
+      lowest_word_count: args.lowestWordCount,
+      net_word_count: netWordCount,
+      end: args.end,
+    })
   } catch (e) {
     console.error(e.message)
     throw new Error(e)
   }
-  return log
 }
 
 /**
@@ -124,34 +117,46 @@ const update = async (id: number, content: string, lowestWordCount: number, netW
  * @param start
  * @param end
  */
-const createOrUpdate = async (entryId: number,
-                              content: string,
-                              wordCount: number,
-                              lowestWordCount: number,
-                              start: Date,
-                              end: Date): Promise<ActivityLog> => {
-                                console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
+// const createOrUpdate = async (args: ActivityLogInputs): Promise<ActivityLog> => {
+const createOrUpdate = async (
+  args: ActivityLogInputs
+): Promise<ActivityLog> => {
+  console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
 
-  const netWordCount = wordCount - lowestWordCount
+  const netWordCount = args.wordCount - args.lowestWordCount
 
-  const logs = await findAll(entryId)
-  let currentLog = logs.slice(-1)[0]
+  const variables = {
+    content: args.content,
+    lowest_word_count: args.lowestWordCount,
+    net_word_count: netWordCount,
+    end: args.end,
+  }
+
+  const logs = await findAll(args.entryId)
+  let currentLog = logs?.slice(-1)[0]
 
   // if no logs exist, create the first one
   // or if logs exist but the last change was made more than five minutes ago, create a new log
-  if (!currentLog ||
-      (getTimeBetween(currentLog.end, start) > 300000)) {
+  if (!currentLog || getTimeBetween(currentLog.end, start) > 300000) {
     try {
-      currentLog = await create(entryId, content, lowestWordCount, netWordCount, start, end)
-    } catch(e) {
+      // currentLog = await create({ ...variables })
+      const logArr = await t
+        .returning(columns)
+        .insert({ entry_id: args.entryId, start: args.start, ...variables })
+      currentLog = logArr[0]
+    } catch (e) {
       console.error(e.message)
       throw new Error(e)
     }
   } else {
     // otherwise just update the most recent log
     try {
-      currentLog = await update(currentLog.id, content, lowestWordCount, netWordCount, end)
-    } catch(e) {
+      // currentLog = await update({ id: currentLog.id, ...variables })
+      currentLog = await t
+        .returning(columns)
+        .where({ id: currentLog.id })
+        .update({ ...variables })
+    } catch (e) {
       console.error(e.message)
       throw new Error(e)
     }
@@ -159,6 +164,4 @@ const createOrUpdate = async (entryId: number,
   return currentLog
 }
 
-export { findById, findAll,
-         create, update,
-         createOrUpdate }
+export { findById, findAll, create, update, createOrUpdate }

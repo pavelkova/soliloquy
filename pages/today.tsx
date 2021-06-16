@@ -8,11 +8,15 @@ import { userTimezone } from 'utils/locale'
 export { getServerSideProps } from 'lib/ssr/require-auth'
 
 export default function Today(props) {
-  const date = formatEntryDate(props.user)
-  const tz = userTimezone(props.user)
+  // const date = formatEntryDate(props.user)
+  // const tz = userTimezone(props.user)
+
   return (
     <Flex>
-      <EditorContainer date={date} timezone={tz} />
+      <EditorContainer
+        date={formatEntryDate(props.user)}
+        timezone={userTimezone(props.user)}
+      />
     </Flex>
   )
 }
