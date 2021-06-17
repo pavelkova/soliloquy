@@ -51,7 +51,7 @@ const formatLocalDateTime = (user, options = {}, date = '', locale = 'en-US') =>
    * }
    */
   const d = date ? new Date(date) : new Date()
-  if (user.settings.timezone) options.timeZone = userTimezone(user)
+  if (user.settings.timezone != 'AUTO') options.timeZone = userTimezone(user)
 
   return d.toLocaleString(locale, options)
 }

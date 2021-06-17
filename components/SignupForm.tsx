@@ -3,7 +3,7 @@ import { useMutation } from 'urql'
 import { Box, Button, Label, Input, Select } from 'theme-ui'
 import SIGNUP from 'mutations/Signup.graphql'
 
-export const SignupForm = () => {
+export const SignupForm = ({ redirectOnSuccess }) => {
   const { register, handleSubmit, errors, formState } = useForm({
     mode: 'onBlur'
   })
@@ -20,7 +20,7 @@ export const SignupForm = () => {
 
     if (error) { console.error(error) }
 
-    if (data?.signup) router.push('/today')
+      if (data?.signup) redirectOnSuccess() // router.push('/today')
     // setError
   }
 
@@ -46,34 +46,3 @@ export const SignupForm = () => {
     </Box>
   )
 }
-
-/* <form onSubmit={handleSubmit(onSubmit)}>
- *   <div>
- *     <input type="text" placeholder="Name" name="name" ref={
- *     register({ required: 'This field is required.',
- *                maxLength: {
- *                  value: 80,
- *                  message: 'Name cannot be more than 80 characters long.'
- *     }})} />
- *     <span> ERROR: { errors.name?.message }</span>
- *   </div>
- *   <div>
- *     <input type="text" placeholder="Email" name="email" ref={
- *     register({required: true, pattern: /^\S+@\S+$/i})} />
- *   </div>
- *   <div>
- *     <input type="password" placeholder="Password" name="password" ref={
- *     register({required: true})} />
- *   </div>
-
- *   <div>
- *     <label>
- *       <h3>Timezone</h3>
- *       <select name='timezone' ref={
- *         register}>
-   <option value='AUTO'>Autodetect</option>
-   </select>
-   </label>
-   </div>
-   <input type="submit" disabled={ !formState.isValid } />
-   </form> */

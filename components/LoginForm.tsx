@@ -8,14 +8,12 @@ export const LoginForm = ({ redirectOnSuccess }) => {
     mode: 'onChange'
   })
 
-  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   const [result, login] = useMutation(LOGIN)
 
   const onSubmit = async values => {
     if (errors) console.error(errors)
-    console.log(values)
 
-    const { data, fetching, error } = await login({ ...values, browserTimezone })
+    const { data, fetching, error } = await login({ ...values })
 
     if (error) { console.error(error) }
 
@@ -34,16 +32,3 @@ export const LoginForm = ({ redirectOnSuccess }) => {
     </Box>
   )
 }
-
-/* <form onSubmit={handleSubmit(onSubmit)}>
- *   <div>
- *     <input type="text" placeholder="Email" name="email" ref={
- *     register({required: true})} />
- *   </div>
- *   <div>
- *     <input type="password" placeholder="Password" name="password" ref={
- *       register({required: true})} />
-   </div>
-
-   <input type="submit" disabled={ !formState.isValid } />
-   </form> */

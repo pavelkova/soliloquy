@@ -141,9 +141,6 @@ export const Editor = ({
     const wc = text.split(/([\s]|[-]{2,}|[.]{3,})+/).filter((word) => {
       return word.match(/[a-zA-Z]+/)
     })
-    console.log('EDITOR -> HANDLE TEXT CHANGE ->')
-    console.log(date)
-    console.log(timezone)
 
     if (text != content) {
       setContent(text)
@@ -164,10 +161,6 @@ export const Editor = ({
   const saveDisabled = isPaused || content == savedEntry?.content
   function handleSave() {
     console.log('EDITOR -> HANDLE SAVE ->')
-    console.log(date)
-    console.log(timezone)
-    console.log(savedEntry)
-    console.log(isPaused)
     if (
       (!savedEntry?.id && content.length == 0) ||
       content == savedEntry?.content
@@ -175,8 +168,6 @@ export const Editor = ({
       return
 
     console.log('-> CONTINUE SAVE ->')
-    console.log(date)
-    console.log(timezone)
     executeMutation({
       date,
       timezone,

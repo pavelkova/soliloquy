@@ -90,7 +90,7 @@ const login = async (email: string,
 const signup = async (email: string,
                       name: string,
                       password: string,
-                      timezone: string = ''): Promise<User> => {
+                      timezone: string = 'AUTO'): Promise<User> => {
 
   console.log('ACTIONS -> USER -> SIGNUP ->')
 

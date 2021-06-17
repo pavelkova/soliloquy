@@ -1,3 +1,4 @@
+import knex from 'knex'
 import { db } from 'db'
 import { Entry, ActivityLog, User } from 'shared/types'
 import {
@@ -175,20 +176,41 @@ const createOrUpdate = async (args: EntryInput): Promise<Entry> => {
   const now = new Date().toISOString()
 
   try {
-    const entryArr = await t
-      .returning(columns)
-      .insert({
-        user_id: args.userId,
-        date: args.date,
-        timezone: args.timezone,
-        content: args.content,
-        word_count: args.wordCount,
-        created_at: args.start,
-        updated_at: now,
-      })
-      .onConflict(['user_id', 'date'])
-      .merge(['content', 'word_count', 'updated_at'])
-    const entry = entryArr[0]
+    // const entryArr = await t
+    //   .returning(columns)
+    //   .insert({
+    //     user_id: args.userId,
+    //     date: args.date,
+    //     timezone: args.timezone,
+    //     content: args.content,
+    //     word_count: args.wordCount,
+    //     created_at: args.start,
+    //     updated_at: now,
+    //   })
+    //     .onConflict(['user_id', 'date'])
+      //   .merge(['content', 'word_count', 'updated_at'])
+
+    const values = {
+      user_id: args.userId,
+      date: args.date,
+      timezone: args.timezone,
+      content: args.content,
+      word_count: args.wordCount,
+      created_at: args.start,
+      updated_at: now,
+    }
+
+    const entryArr = await db.raw(`
+        ? ON CONFLICT (user_id, date)
+        DO UPDATE SET
+          content=EXCLUDED.content,
+          word_count=EXCLUDED.word_count,
+          updated_at=EXCLUDED.updated_at
+        RETURNING ` + columns + `;`,
+      [t.insert(values)])
+
+      const entry = entryArr.length ? entryArr[0] : entryArr.rows[0]
+      console.log(entryArr)
     await createOrUpdateActivityLog({
       entryId: entry.id,
       content: args.content,
