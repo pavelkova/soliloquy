@@ -46,7 +46,9 @@ const findById = async (id: number): Promise<User> => {
   console.log('ACTIONS -> USER -> FINDBYID ->')
   try {
     const userArr = await t.select(columns)
-                           .where({ id })
+        .where({ id })
+      console.log('here is the thing')
+      console.log(userArr)
     return userArr[0]
   } catch (e) {
     console.error(e.message)

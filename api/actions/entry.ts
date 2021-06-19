@@ -209,15 +209,15 @@ const createOrUpdate = async (args: EntryInput): Promise<Entry> => {
         RETURNING ` + columns + `;`,
       [t.insert(values)])
 
-      const entry = entryArr.length ? entryArr[0] : entryArr.rows[0]
-      console.log(entryArr)
+      const entry = Array.isArray(entryArr) ? entryArr[0] : entryArr.rows[0]
+
     await createOrUpdateActivityLog({
       entryId: entry.id,
       content: args.content,
       wordCount: args.wordCount,
       lowestWordCount: args.lowestWordCount,
       start: args.start,
-      end: entry.updated_at,
+      end: now,
     })
     return entry
   } catch (e) {

@@ -8,11 +8,13 @@ import Ctx from '../context'
 const UserResolvers: IResolvers = {
   Query: {
     currentUser: async (_, {}, ctx: Ctx) => {
-      console.log('RESOLVERS -> CURRENT USER ->')
+        console.log('RESOLVERS -> CURRENT USER ->')
+        console.log(ctx.user)
       if (ctx.user) return await findById(ctx.user.id)
       throw new Error('not logged in')
     },
-    findUserById: async (_, args: { id: number }, ctx: Ctx) => {
+      findUserById: async (_, args: { id: number }, ctx: Ctx) => {
+          console.log(args)
       return await findById(args.id)
     },
     findUserByEmail: async (_, { email }, ctx) => {

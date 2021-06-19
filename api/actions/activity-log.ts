@@ -132,14 +132,12 @@ const createOrUpdate = async (
     end: args.end,
   }
 
-    console.log(args.end)
   const logs = await findAll(args.entryId)
   let currentLog = logs?.slice(-1)[0]
 
   // if no logs exist, create the first one
   // or if logs exist but the last change was made more than five minutes ago, create a new log
     if (!currentLog || getTimeBetween(currentLog.end, args.start) > 300000) {
-        console.log()
     try {
       // currentLog = await create({ ...variables })
       const logArr = await t
@@ -153,7 +151,7 @@ const createOrUpdate = async (
   } else {
     // otherwise just update the most recent log
     try {
-      // currentLog = await update({ id: currentLog.id, ...variables })
+        // currentLog = await update({ id: currentLog.id, ...variables })
       currentLog = await t
         .returning(columns)
         .where({ id: currentLog.id })
