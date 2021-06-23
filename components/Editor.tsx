@@ -65,7 +65,7 @@ export const EditorContainer = ({ date, timezone }) => {
       }, 30000)
       return () => clearTimeout(timer)
     }
-  }, [isVisible])
+ }, [isVisible])
 
   return (
     <Flex sx={{ flex: '1', flexDirection: 'column' }}>

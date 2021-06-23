@@ -119,49 +119,43 @@ const update = async (args: UpdateLogInput) => {
  */
 // const createOrUpdate = async (args: ActivityLogInputs): Promise<ActivityLog> => {
 const createOrUpdate = async (
-  args: ActivityLogInputs
-): Promise<ActivityLog> => {
+    { entryId, start, content, wordCount, lowestWordCount, end}: ActivityLogInput
+): Promise<ActivityLog | any> => {
   console.log('ACTIONS -> ACTIVITYLOGS -> CREATE OR UPDATE ->')
 
-  const netWordCount = args.wordCount - args.lowestWordCount
-
   const variables = {
-    content: args.content,
-    lowest_word_count: args.lowestWordCount,
-    net_word_count: netWordCount,
-    end: args.end,
+    content: content,
+    lowest_word_count: lowestWordCount,
+    net_word_count: wordCount - lowestWordCount,
+    end: end,
   }
+    const currentLog = await getCurrentLog(entryId, start)
 
-  const logs = await findAll(args.entryId)
-  let currentLog = logs?.slice(-1)[0]
-
-  // if no logs exist, create the first one
-  // or if logs exist but the last change was made more than five minutes ago, create a new log
-    if (!currentLog || getTimeBetween(currentLog.end, args.start) > 300000) {
     try {
-      // currentLog = await create({ ...variables })
-      const logArr = await t
+        if (currentLog) {
+            return await t.returning(columns).where({ id: currentLog.id }).update(variables)
+        } else {
+            const logArr = await t
         .returning(columns)
-        .insert({ entry_id: args.entryId, start: args.start, ...variables })
-      currentLog = logArr[0]
+                .insert({ entry_id: entryId, start: start, ...variables })
+            return logArr[0]
+        }
     } catch (e) {
       console.error(e.message)
       throw new Error(e)
     }
-  } else {
-    // otherwise just update the most recent log
-    try {
-        // currentLog = await update({ id: currentLog.id, ...variables })
-      currentLog = await t
-        .returning(columns)
-        .where({ id: currentLog.id })
-        .update({ ...variables })
-    } catch (e) {
-      console.error(e.message)
-      throw new Error(e)
-    }
-  }
-  return currentLog
 }
 
 export { findById, findAll, create, update, createOrUpdate }
+
+
+const getCurrentLog = async (entryId: number, activityStart: Date): Promise<ActivityLog | null> => {
+    const logs = await findAll(entryId)
+    const recentLog = logs?.slice(-1)[0]
+
+    return (recentLog && isLogCurrent(recentLog.end, activityStart)) ? recentLog : null
+}
+
+const isLogCurrent = (logEnd: Date, activityStart: Date): boolean => {
+    return (getTimeBetween(logEnd, activityStart) < 300000)
+}
