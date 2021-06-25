@@ -12,11 +12,11 @@ import Ctx from '../context'
 
 const ActivityLogResolvers: IResolvers = {
   Query: {
-    findActivityLogById: async (_, { id: number }, ctx) => {
-      return await findById(id)
+      findActivityLogById: async (_, args: Pick<ActivityLog, 'id'>, ctx: Ctx) => {
+      return await findById(args.id)
     },
-    findAllActivityLogs: async (_, { entryId: number }, ctx) => {
-      return await findAll(entryId)
+      findAllActivityLogs: async (_, args: Pick<ActivityLog, 'entryId'>, ctx: Ctx) => {
+      return await findAll(args.entryId)
     },
   },
   Mutation: {
@@ -31,7 +31,7 @@ const ActivityLogResolvers: IResolvers = {
   },
   ActivityLog: {
     entry: async (activityLog, {}, ctx: Ctx): Promise<Entry> => {
-      return await findLogOwner(activityLog.entryId)
+        return await findLogOwner(ctx.user.id, activityLog.entryId)
     },
   },
 }
