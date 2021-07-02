@@ -15,6 +15,8 @@ const DEFAULT = {
   content: '',
   wordCount: 0,
   activity: { isActive: false, start: null },
+    // activity: { logId: number, start: Date }
+    // currentLog: { activityLog }
   pause: { isPaused: false, requireManualUnpause: false, pausedMessage: '' },
 }
 
