@@ -39,6 +39,7 @@ const findById = async (id: number): Promise<ActivityLog> => {
  *
  * @param entryId
  */
+
 const findAll = async (entryId: number): Promise<ActivityLog[]> => {
   console.log('ACTIONS -> ACTIVITY LOG -> FINDALL ->')
   try {

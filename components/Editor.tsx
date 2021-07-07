@@ -15,8 +15,9 @@ const DEFAULT = {
   content: '',
   wordCount: 0,
   activity: { isActive: false, start: null },
-    // activity: { logId: number, start: Date }
-    // currentLog: { activityLog }
+  currentLog: null,
+  // activity: { logId: number, start: Date }
+  // currentLog: { activityLog }
   pause: { isPaused: false, requireManualUnpause: false, pausedMessage: '' },
 }
 
@@ -67,7 +68,7 @@ export const EditorContainer = ({ date, timezone }) => {
       }, 30000)
       return () => clearTimeout(timer)
     }
- }, [isVisible])
+  }, [isVisible])
 
   return (
     <Flex sx={{ flex: '1', flexDirection: 'column' }}>
@@ -99,6 +100,9 @@ export const Editor = ({
 }) => {
   const [content, setContent] = useState<string>(
     savedEntry?.content || DEFAULT.content
+  )
+  const [currentLog, setCurrentLog] = useState<ActivityLog>(
+    savedEntry?.logs?.[-1] || DEFAULT.currentLog
   )
   const [wordCount, setWordCount] = useState<number>(
     savedEntry?.wordCount || DEFAULT.wordCount
