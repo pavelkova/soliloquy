@@ -64,6 +64,7 @@ const findByEmail = async (email: string): Promise<User> => {
                            .where({ email })
     return userArr[0]
   } catch (e) {
+      console.log('error here')
     console.error(e.message)
     throw new Error(e)
   }

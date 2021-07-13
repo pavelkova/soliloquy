@@ -13,15 +13,15 @@ type Query {
   findAllActivityLogs(entryId: ID!): [ActivityLog]
 }
 
-# type Mutation {
-#   createActivityLog(
-#     entryId: ID!,
-#     content: String,
-#     start: DateTime,
-#     end: DateTime): ActivityLog
-#   updateActivityLog(
-#     id: ID!,
-#     content: String,
-#     start: DateTime,
-#     end: DateTime): ActivityLog
-# }
+type Mutation {
+  # createLog(
+  #   entryId: ID!,
+  #   content: String,
+  #   start: DateTime,
+  #   end: DateTime): ActivityLog
+  updateLog(
+    id: ID!,
+    content: String,
+    start: DateTime,
+    end: DateTime): ActivityLog
+}
