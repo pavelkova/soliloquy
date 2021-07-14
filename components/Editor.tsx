@@ -49,7 +49,6 @@ export const EditorContainer = ({ date, timezone }) => {
   function setUnpaused(isManual = false) {
     console.log(pause)
     if (pause.requireManualUnpause && !isManual) return
-    console.log('made it to unpause')
     reexecuteQuery()
     setPause(DEFAULT.pause)
   }
