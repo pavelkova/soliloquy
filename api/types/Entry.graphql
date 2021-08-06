@@ -98,3 +98,9 @@ type EntryAnalysis {
 
 # add to settings: enableEditing, strictEditing
 # Editor scenarios: entry exists, activity is current -> update activity; entry exists, activity is not current -> create activity; entry does not exist -> create entry, create activity
+
+type ActiveDay {
+  date: String
+  writtenEntry: Entry
+  editedEntries: [Entry]
+}
