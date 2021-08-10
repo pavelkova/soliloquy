@@ -104,3 +104,5 @@ type ActiveDay {
   writtenEntry: Entry
   editedEntries: [Entry]
 }
+
+# tables: entry, activity, analysis, activity log -> entry many/many table
