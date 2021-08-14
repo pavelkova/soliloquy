@@ -10,8 +10,8 @@ exports.up = function (knex) {
          .onDelete('cascade')
     table.date('date').notNullable()
     table.text('timezone').notNullable()
-    table.float('day_ends_at').defaultTo(0)
-    table.timestamps(true, true)
+    table.float('day_starts_at').defaultTo(0)
+    table.timestamp('created_at').defaultTo(knex.fn.now())
     table.unique(['user_id', 'date'])
   })
 }
