@@ -145,3 +145,43 @@ export interface EditingLog {
     madeOn: Entry
     editLog: ActivityLog
 }
+
+
+export interface ActiveDay {
+    id: number
+    userId: number
+    date: string
+    timezone: string
+    dayStartsAt: number
+    createdAt: Date
+    entryId: number
+}
+
+export interface Entryy {
+    id: number
+    userId: number
+    date: string
+    disableAnalysis?: boolean
+}
+
+
+export interface ActivityLogg {
+    id: number
+    userId: number
+    entryId: number
+    activeDayId: number // activityDate: string
+    activityType: string
+    content: string
+    wordCount: number
+    start: Date
+    end: Date
+}
+
+export interface Entryyy {
+    id: number
+    user: User
+    writingLogs: [ActivityLog]
+    editingLogs?: [ActivityLog]
+    writingAnalysis?: EntryAnalysis
+    editingAnalysis?: EntryAnalysis
+}
