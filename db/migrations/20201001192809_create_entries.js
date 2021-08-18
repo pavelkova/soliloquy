@@ -5,7 +5,7 @@ exports.up = function (knex) {
     table.date('date').notNullable()
     table.text('timezone').notNullable()
     table.float('day_starts_at').defaultTo(0)
-    table.timestamp('created_at').defaultTo(knex.fn.now())
+    table.timestamps(true, true)
     table.unique(['user_id', 'date'])
   })
 }
