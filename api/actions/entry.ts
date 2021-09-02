@@ -8,7 +8,21 @@ const columns = [
     'date',
     'timezone',
     'day_starts_at as dayStartsAs',
-    'enable_analysis as enableAnalysis',
+    'disable_analysis as disableAnalysis',
     'created_at as createdAt',
     'updated_at as updatedAt'
 ]
+
+
+const findEntryByDate = () => {
+}
+
+const findEntryById = () => {
+}
+
+const createEntry = () => {
+}
+
+export {
+    findEntryByDate, findEntryById, createEntry
+}

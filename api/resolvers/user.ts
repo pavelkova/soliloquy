@@ -27,9 +27,12 @@ const UserResolvers: IResolvers = {
       if (user) setUserToken(ctx.res, user)
       return user
     },
-    login: async (_, { email, password }, ctx): Promise<User> => {
-      const user = await login(email, password)
-      if (user) setUserToken(ctx.res, user)
+      login: async (_, { email, password, browserTimezone }, ctx): Promise<User> => {
+          const user = await login(email, password)
+          if (user) {
+              const session = { userId: user.id, userEmail: user.email, loginTime: new Date(), browserTimezone }
+              setUserToken(ctx.res, session)
+          }
       return user
     },
     logout: async (_, {}, ctx): Promise<boolean> => {
