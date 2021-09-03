@@ -20,7 +20,7 @@ const findEntryByDate = () => {
 const findEntryById = () => {
 }
 
-const createEntry = () => {
+const createOrUpdate = (userId: number, date: Date, timezone: string) => {
 }
 
 export {

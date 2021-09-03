@@ -35,16 +35,44 @@ const findCurrent = (entryId: number) => {
     }
 }
 
-const findOrCreate = (entryId: number, createdAt: Date) => {
+// const createOrUpdate = async (entryId: number, createdAt: Date, content: string, wordCount: number) => {
+//     const logArr = await t
+//         .returning(columns)
+//         .insert({
+//             entry_id: entryId,
+//             content,
+//             created_at: createdAt,
+//             word_count: wordCount})
+//         .onConflict(['entry_id', 'created_at'])
+//         .merge(['content', 'word_count', 'updated_at'])
+//     return logArr[-1]
+
+//     // const logArr = await db.raw(`
+//     //     ? ON CONFLICT (entry_id, created_at)
+//     //     DO UPDATE SET
+//     //       content=EXCLUDED.content,
+//     //       word_count=EXCLUDED.word_count,
+//     //       updated_at=EXCLUDED.updated_at
+//     //     RETURNING ` + columns + `;`,
+//     //   [t.insert(values)])
+// }
+
+const createOrUpdate = async (userId: number, date: string, timezone: string, dayStartsAt: string,
+                              createdAt: Date, content: string, wordCount: number,
+                              entryId?: number) => {
+                                  if (!entryId) {
+                                      createOrUpdateEntry(userId, date, timezone, dayStartsAt)
+                                  }
     const logArr = await t
         .returning(columns)
         .insert({
             entry_id: entryId,
             content,
-            created_at: start,
+            created_at: createdAt,
             word_count: wordCount})
         .onConflict(['entry_id', 'created_at'])
         .merge(['content', 'word_count', 'updated_at'])
+    return logArr[-1]
 
     // const logArr = await db.raw(`
     //     ? ON CONFLICT (entry_id, created_at)
