@@ -60,10 +60,12 @@ const findCurrent = (entryId: number) => {
 const createOrUpdate = async (userId: number, date: string, timezone: string, dayStartsAt: string,
                               createdAt: Date, content: string, wordCount: number,
                               entryId?: number) => {
-                                  if (!entryId) {
-                                      createOrUpdateEntry(userId, date, timezone, dayStartsAt)
-                                  }
-    const logArr = await t
+    if (!entryId) {
+        const entry = createOrUpdateEntry(userId, date, timezone, dayStartsAt)
+        entryId = entry.id
+    }
+
+    return await t
         .returning(columns)
         .insert({
             entry_id: entryId,
@@ -72,7 +74,6 @@ const createOrUpdate = async (userId: number, date: string, timezone: string, da
             word_count: wordCount})
         .onConflict(['entry_id', 'created_at'])
         .merge(['content', 'word_count', 'updated_at'])
-    return logArr[-1]
 
     // const logArr = await db.raw(`
     //     ? ON CONFLICT (entry_id, created_at)

@@ -20,7 +20,21 @@ const findEntryByDate = () => {
 const findEntryById = () => {
 }
 
-const createOrUpdate = (userId: number, date: Date, timezone: string) => {
+const findOrCreate = async (userId: number, date: Date, timezone: string, dayStartsAt: string, disableAnalysis: boolean) => {
+    const entryArr = await t
+        .returning(columns)
+        .where({ user_id: userId, date })
+        .onNotExists(t
+        .returning(columns)
+        .insert({ user_id: userId,
+                  date,
+                  timezone,
+                  day_starts_at: dayStartsAt,
+                  disable_analysis: disableAnalysis }))
+}
+
+const update = async (userId: number, date: Date) => {
+    const entryArr = await t.returning(columns).where({ user_id: userId, date }).update({ date })
 }
 
 export {
