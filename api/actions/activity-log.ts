@@ -1,5 +1,6 @@
 import knex from 'knex'
 import { db } from 'db'
+import { findOrCreateEntry } from './entry'
 
 const t = db('activity_logs')
 const columns = [
@@ -20,7 +21,7 @@ const findByEntry = async (entryId: number): Promise<ActivityLog[]> => {
     }
 }
 
-const findCurrent = (entryId: number) => {
+const findCurrentByEntry = async (entryId: number) => {
     try {
         const logArr = await t.select(columns).where({ entry_id: entryId })
         if (logArr[-1]) {
@@ -57,9 +58,18 @@ const findCurrent = (entryId: number) => {
 //     //   [t.insert(values)])
 // }
 
-const createOrUpdate = async (userId: number, date: string, timezone: string, dayStartsAt: string,
-                              createdAt: Date, content: string, wordCount: number,
-                              entryId?: number) => {
+interface EntryLogInput {
+    userId: number
+    date: string
+    timezone: string
+    dayStartsAt: string
+    createdAt: Date
+    content: string
+    wordCount: number
+    entryId?: number
+}
+
+const createOrUpdate = async ({ userId, date, timezone, dayStartsAt, createdAt, content, wordCount, entryId }: EntryLogInput) => {
     if (!entryId) {
         const entry = createOrUpdateEntry(userId, date, timezone, dayStartsAt)
         entryId = entry.id

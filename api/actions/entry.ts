@@ -20,7 +20,15 @@ const findEntryByDate = () => {
 const findEntryById = () => {
 }
 
-const findOrCreate = async (userId: number, date: Date, timezone: string, dayStartsAt: string, disableAnalysis: boolean) => {
+interface EntryInput {
+    userId: number
+    date: Date
+    timezone: string
+    dayStartsAt: string
+    disableAnalysis: boolean
+}
+
+const findOrCreateEntry = async ({ userId, date, timezone, dayStartsAt, disableAnalysis }: EntryInput) => {
     const entryArr = await t
         .returning(columns)
         .where({ user_id: userId, date })
@@ -31,6 +39,7 @@ const findOrCreate = async (userId: number, date: Date, timezone: string, daySta
                   timezone,
                   day_starts_at: dayStartsAt,
                   disable_analysis: disableAnalysis }))
+    return entryArr[0]
 }
 
 const update = async (userId: number, date: Date) => {
@@ -38,5 +47,5 @@ const update = async (userId: number, date: Date) => {
 }
 
 export {
-    findEntryByDate, findEntryById, createEntry
+    findEntryByDate, findEntryById, findOrCreateEntry
 }
