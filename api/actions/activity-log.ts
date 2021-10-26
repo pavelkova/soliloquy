@@ -21,12 +21,12 @@ const findByEntry = async (entryId: number): Promise<ActivityLog[]> => {
     }
 }
 
-const findCurrentByEntry = async (entryId: number) => {
+const findCurrentByEntry = async (entryId: number): Promise<ActivityLog> => {
     try {
         const logArr = await t.select(columns).where({ entry_id: entryId })
         if (logArr[-1]) {
             const updated = logArr[-1].updated_at
-            const minuteDifference = (updated.getTime() - new Date.getTime()) / (1000 * 60)
+            const minuteDifference = (updated.getTime() - new Date().getTime()) / (1000 * 60)
             if (minuteDifference <= 5) return logArr[-1]
         }
         return null
@@ -58,6 +58,7 @@ const findCurrentByEntry = async (entryId: number) => {
 //     //   [t.insert(values)])
 // }
 
+// TODO make this from union of activity log and entry types
 interface EntryLogInput {
     userId: number
     date: string
@@ -71,7 +72,7 @@ interface EntryLogInput {
 
 const createOrUpdate = async ({ userId, date, timezone, dayStartsAt, createdAt, content, wordCount, entryId }: EntryLogInput) => {
     if (!entryId) {
-        const entry = createOrUpdateEntry(userId, date, timezone, dayStartsAt)
+        const entry = findOrCreateEntry({ userId, date, timezone, dayStartsAt })
         entryId = entry.id
     }
 
@@ -94,3 +95,9 @@ const createOrUpdate = async ({ userId, date, timezone, dayStartsAt, createdAt, 
     //     RETURNING ` + columns + `;`,
     //   [t.insert(values)])
 }
+
+// on page load: send user id, current user settings (timezone, day offset), date -> find entry + most recent log (find entry by user & date, if exists, find newest log) -> set local entry state + content, etc from log
+// if no local entry state, on start typing: create entry -> set local entry state
+// on save: find entry + most recent log (if no recent log, or if recent log and log.lastUpdated is more than five minutes before now, create new log) -> set local entry state + content, etc from log
+// on unpause/page refocus: get current log
+// wrap pause, etc functions in function to return if no entry
