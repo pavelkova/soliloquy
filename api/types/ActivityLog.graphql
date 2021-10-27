@@ -1,11 +1,10 @@
 type ActivityLog {
   id: ID!
   entry: Entry!
-  start: DateTime!
-  end: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime
   content: String!
-  lowestWordCount: Int
-  netWordCount: Int
+  wordCount: Int!
 }
 
 type Query {
@@ -22,6 +21,6 @@ type Mutation {
   updateLog(
     id: ID!,
     content: String,
-    start: DateTime,
-    end: DateTime): ActivityLog
+    createdAt: DateTime,
+    updatedAt: DateTime): ActivityLog
 }

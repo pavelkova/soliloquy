@@ -20,54 +20,55 @@ export interface User {
   settings: Settings
 }
 
-// export interface ActivityLog {
-//   id: number
-//   entryId: number
-//   start: Date
-//   end: Date
-//   content: string
-//   lowestWordCount: number
-//   netWordCount: number
-// }
-
-// export interface Entry {
-//   id: number
-//   userId: number
-//   date: string
-//   timezone: string
-//   content: string
-//   wordCount: number
-//   createdAt: Date
-//   updatedAt: Date
-//   activityLogs: ActivityLog[]
-// }
-
-export interface DBEntry {
+interface SharedEntry {
     id: number
-    userId: number
     date: string
     timezone: string
-    dayStartsAt: number
-    createdAt: Date
+    dayStartsAt: string
+    disableAnalysis: boolean
 }
 
-export interface DBActivityLog {
-    id: number
+export interface DBEntry extends SharedEntry {
     userId: number
-    entryId: number
-    activityType: string
+}
+
+export interface Entry extends SharedEntry {
+    user: User
+    activityLogs?: ActivityLog[]
+    tags?: Tag[]
+}
+
+interface SharedActivityLog {
+    id: number
     content: string
-    start: Date
-    end: Date
     wordCount: number
+    createdAt: Date
+    updatedAt: Date
 }
 
-export interface DBTag {
+export interface DBActivityLog extends SharedActivityLog {
+    entryId: number
+}
+
+export interface ActivityLog extends SharedActivityLog {
+    entry: Entry
+}
+
+interface SharedTag {
     id: number
-    userId: number
-    parentId?: number
     name: string
     createdAt: Date
+}
+
+export interface DBTag extends SharedTag {
+    userId: number
+    parentId?: number
+}
+
+export interface Tag extends SharedTag {
+    user: User
+    parent?: Tag
+    children?: [Tag]
 }
 
 export interface DBEntryTags {
@@ -76,112 +77,10 @@ export interface DBEntryTags {
     tagId: number
 }
 
-export interface DBEntryEditingLogs {
-    id: number
-    activeEntryId: number
-    editingActivityLogId: number
-}
-
 export interface DBEntryAnalysis {
     id: number
     createdAt: Date
     updatedAt: Date
     entryId: number
-    activityType: string
     activityLogId: number
-}
-
-export interface Entry {
-    id: number
-    user: User
-    date: string
-    timezone: string
-    dayStartsAt: number
-    createdAt: Date
-    activityLogs: [ActivityLog]
-}
-
-export interface ActivityLog {
-    id: number
-    user: User
-    entry: Entry
-    activityType: string
-    content: string
-    start: Date
-    end: Date
-    wordCount: number
-}
-
-export interface Tag {
-    id: number
-    user: User
-    parent?: Tag
-    name: string
-    createdAt: Date
-}
-
-export interface EntryTags {
-    id: number
-    entryId: number
-    tagId: number
-}
-
-export interface EntryEditingLogs {
-    id: number
-    activeEntryId: number
-    editingActivityLogId: number
-}
-
-export interface EntryAnalysis {
-    id: number
-    createdAt: Date
-    updatedAt: Date
-    entryId: number
-    activityType: string
-    activityLogId: number
-}
-
-export interface EditingLog {
-    madeOn: Entry
-    editLog: ActivityLog
-}
-
-
-export interface ActiveDay {
-    id: number
-    userId: number
-    date: string
-    timezone: string
-    dayStartsAt: number
-    createdAt: Date
-    entryId: number
-}
-
-export interface Entryy {
-    id: number
-    userId: number
-    date: string
-    disableAnalysis?: boolean
-}
-
-
-export interface ActivityLogg {
-    id: number
-    userId: number
-    entryId: number
-    activeDayId: number // activityDate: string
-    activityType: string
-    content: string
-    wordCount: number
-    start: Date
-    end: Date
-}
-
-export interface Entryyy {
-    id: number
-    user: User
-    writingLogs: [ActivityLog]
-    editingLogs?: [ActivityLog]
-    writingAnalysis?: EntryAnalysis
-    editingAnalysis?: EntryAnalysis
 }

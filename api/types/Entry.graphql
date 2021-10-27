@@ -3,12 +3,11 @@ type Entry {
   user: User!
   date: String!
   timezone: String!
-  content: String
-  wordCount: Int
+  dayStartsAt: String
   createdAt: DateTime
   updatedAt: DateTime
   activityLogs: [ActivityLog]
-  # tags: [Tag]
+  tags: [Tag]
 }
 
 input DateSpanInput {
@@ -27,72 +26,7 @@ type Query {
 }
 
 type Mutation {
-  createEntry(date: String!, timezone: String!, content: String!, wordCount: Int!, lowestWordCount: Int!, start: DateTime!): Entry
-  updateEntry(id: ID!, content: String!, wordCount: Int!, lowestWordCount: Int!, start: DateTime!): Entry
-  createOrUpdateEntry(date: String!, timezone: String!, content: String!, wordCount: Int!, lowestWordCount: Int!, start: DateTime!): Entry
-}
-
-## BRAINSTORM
-
-type Entry {
-  id: ID!
-  user: User!
-  date: String!
-  state: String! # WRITE | EDIT | COMPLETE
-  activities: [Activity]
-}
-
-type Activity {
-  id: ID!
-  user: User!
-  entry: Entry!
-  activityDate: String!
-  activityType: String!
-  content: String
-  wordCount: Int
-  lowestWordCount: Int
-  start: DateTime
-  end: DateTime
-  timezone: String
-  dayStartsAt: String
-}
-
-input CreateEntryInput {
-  userId: ID!
-  date: String!
-  timezone: String!
-  dayStartsAt: String!
-  start: DateTime!
-  content: String!
-  wordCount: Int!
-}
-
-input CreateEntryActivityInput {
-  entryId: ID!
-  timezone: String!
-  start: DateTime!
-  content: String!
-  wordCount: Int!
-
-}
-
-type EntryGroup {
-  entry: Entry # date, state, most recent log -> content, wordCount, type
-}
-
-type EntryAnalysis {
-  # analysis types
-  entry: Entry!
-  retrieved: DateTime
-}
-
-# Editor scenarios: entry exists, activity is current -> update activity; entry exists, activity is not current -> create activity; entry does not exist -> create entry, create activity
-
-
-type Query {
-  findEntryByDate(date: String!): [Entry]
-  getCurrentEntryState(entry): Entry, mostRecentActivityLog
-}
-
-type Mutation {
+  createEntry(date: String!, timezone: String!, content: String!, wordCount: Int!, createdAt: DateTime!): Entry
+  updateEntry(id: ID!, content: String!, wordCount: Int!, createdAt: DateTime!): Entry
+  createOrUpdateEntry(date: String!, timezone: String!, content: String!, wordCount: Int!, createdAt: DateTime!): Entry
 }
