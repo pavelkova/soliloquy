@@ -1,5 +1,6 @@
 import knex from 'knex'
 import { db } from 'db'
+import { DBEntry} from 'shared/types/entry'
 
 const t = db('entries')
 const columns = [
@@ -22,14 +23,14 @@ const findEntryById = () => {
 
 interface EntryInput {
     userId: number
-    date: Date
+    date: string
     timezone: string
     dayStartsAt: string
     disableAnalysis: boolean
 }
 
-const findOrCreateEntry = async ({ userId, date, timezone, dayStartsAt, disableAnalysis }: EntryInput) => {
-    const entryArr = await t
+const findOrCreateEntry = async ({ userId, date, timezone, dayStartsAt, disableAnalysis }: EntryInput): Promise<DBEntry> => {
+    const entryArr: DBEntry[] = await t
         .returning(columns)
         .where({ user_id: userId, date })
         .onNotExists(t
@@ -42,8 +43,9 @@ const findOrCreateEntry = async ({ userId, date, timezone, dayStartsAt, disableA
     return entryArr[0]
 }
 
-const update = async (userId: number, date: Date) => {
+const update = async (userId: number, date: Date): Promise<DBEntry> => {
     const entryArr = await t.returning(columns).where({ user_id: userId, date }).update({ date })
+    return entryArr[0]
 }
 
 export {

@@ -1,6 +1,8 @@
 import knex from 'knex'
 import { db } from 'db'
 import { findOrCreateEntry } from './entry'
+import { DBActivityLog } from 'shared/types/activity-log'
+import { DBEntry } from 'shared/types/entry'
 
 const t = db('activity_logs')
 const columns = [
@@ -12,7 +14,7 @@ const columns = [
     'word_count as wordCount'
 ]
 
-const findByEntry = async (entryId: number): Promise<ActivityLog[]> => {
+const findByEntry = async (entryId: number): Promise<DBActivityLog[]> => {
     try {
         return await t.select(columns).where({ entry_id: entryId })
     } catch(e) {
@@ -21,7 +23,7 @@ const findByEntry = async (entryId: number): Promise<ActivityLog[]> => {
     }
 }
 
-const findCurrentByEntry = async (entryId: number): Promise<ActivityLog> => {
+const findCurrentByEntry = async (entryId: number): Promise<DBActivityLog> => {
     try {
         const logArr = await t.select(columns).where({ entry_id: entryId })
         if (logArr[-1]) {
@@ -64,15 +66,16 @@ interface EntryLogInput {
     date: string
     timezone: string
     dayStartsAt: string
+    disableAnalysis: boolean
     createdAt: Date
     content: string
     wordCount: number
     entryId?: number
 }
 
-const createOrUpdate = async ({ userId, date, timezone, dayStartsAt, createdAt, content, wordCount, entryId }: EntryLogInput) => {
+const createOrUpdate = async ({ userId, date, timezone, dayStartsAt, disableAnalysis, createdAt, content, wordCount, entryId }: EntryLogInput): Promise<DBActivityLog> => {
     if (!entryId) {
-        const entry = findOrCreateEntry({ userId, date, timezone, dayStartsAt })
+        const entry: DBEntry = await findOrCreateEntry({ userId, date, timezone, dayStartsAt, disableAnalysis })
         entryId = entry.id
     }
 
