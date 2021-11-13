@@ -43,8 +43,17 @@ const findOrCreateEntry = async ({ userId, date, timezone, dayStartsAt, disableA
     return entryArr[0]
 }
 
-const update = async (userId: number, date: Date): Promise<DBEntry> => {
+const updateDate = async (userId: number, date: Date): Promise<DBEntry> => {
     const entryArr = await t.returning(columns).where({ user_id: userId, date }).update({ date })
+    return entryArr[0]
+}
+
+const toggleAnalysis = async (id: number, disable_analysis: boolean): Promise<DBEntry> => {
+    return await update(id, { disable_analysis })
+}
+
+const update = async (id: number, args: Partial<DBEntry>): Promise<DBEntry> => {
+    const entryArr = await t.returning(columns).where({ id }).update(args)
     return entryArr[0]
 }
 
