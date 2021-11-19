@@ -15,10 +15,22 @@ const columns = [
 ]
 
 
-const findEntryByDate = () => {
+const findEntryByDate = async (userId: number, date: string): Promise<DBEntry> => {
+    try {
+        const entryArr = await t.select(columns).where({ user_id: userId, date })
+        return entryArr[0]
+    } catch (e) {
+        console.error(e)
+    }
 }
 
-const findEntryById = () => {
+const findEntryById = async (userId: number, id: number): Promise<DBEntry> => {
+    try {
+        const entryArr = await t.select(columns).where({ user_id: userId, id })
+        return entryArr[0]
+    } catch (e) {
+        console.error(e)
+    }
 }
 
 interface EntryInput {
@@ -29,32 +41,58 @@ interface EntryInput {
     disableAnalysis: boolean
 }
 
-const findOrCreateEntry = async ({ userId, date, timezone, dayStartsAt, disableAnalysis }: EntryInput): Promise<DBEntry> => {
-    const entryArr: DBEntry[] = await t
-        .returning(columns)
-        .where({ user_id: userId, date })
-        .onNotExists(t
-        .returning(columns)
-        .insert({ user_id: userId,
-                  date,
-                  timezone,
-                  day_starts_at: dayStartsAt,
-                  disable_analysis: disableAnalysis }))
-    return entryArr[0]
+const findOrCreateEntry = async (args: EntryInput): Promise<DBEntry> => {
+    const { userId, date, timezone, dayStartsAt, disableAnalysis } = args
+
+    try {
+        const entryArr: DBEntry[] = await t
+            .returning(columns)
+            .where({ user_id: userId, date })
+            .onNotExists(t
+            .returning(columns)
+            .insert({ user_id: userId,
+                      date,
+                      timezone,
+                      day_starts_at: dayStartsAt,
+                      disable_analysis: disableAnalysis }))
+        return entryArr[0]
+    } catch (e) {
+        console.error(e)
+    }
 }
 
 const updateDate = async (userId: number, date: Date): Promise<DBEntry> => {
-    const entryArr = await t.returning(columns).where({ user_id: userId, date }).update({ date })
-    return entryArr[0]
-}
-
-const toggleAnalysis = async (id: number, disable_analysis: boolean): Promise<DBEntry> => {
-    return await update(id, { disable_analysis })
+    try {
+        const entryArr = await t.returning(columns).where({ user_id: userId, date }).update({ date })
+        return entryArr[0]
+    } catch (e) {
+        console.error(e)
+    }
 }
 
 const update = async (id: number, args: Partial<DBEntry>): Promise<DBEntry> => {
-    const entryArr = await t.returning(columns).where({ id }).update(args)
-    return entryArr[0]
+    try {
+        const entryArr = await t.returning(columns).where({ id }).update(args)
+        return entryArr[0]
+    } catch (e) {
+        console.error(e)
+    }
+}
+
+const toggleAnalysis = async (id: number, disableAnalysis: boolean): Promise<DBEntry> => {
+    try {
+        return await update(id, { disable_analysis: disableAnalysis })
+    } catch (e) {
+        console.error(e)
+    }
+}
+
+const updateEntryWithSettings = async (id: number, timezone: string, dayStartsAt: string): Promise<DBEntry> => {
+    try {
+        return await update(id, { timezone, day_starts_at: dayStartsAt })
+    } catch (e) {
+        console.error(e)
+    }
 }
 
 export {
