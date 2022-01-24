@@ -1,7 +1,0 @@
-#import "../fragments/UserFragment.graphql"
-
-query {
-  currentUser {
-    ...UserFragment
-  }
-}

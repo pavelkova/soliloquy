@@ -1,7 +1,0 @@
-#import "../fragments/ActivityLogFragment.graphql"
-
-query {
-  findAllActivityLogs {
-    ...ActivityLogFragment
-  }
-}
