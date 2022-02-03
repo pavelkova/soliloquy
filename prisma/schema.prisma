@@ -8,43 +8,52 @@ datasource db {
 }
 
 model User {
-  id         String    @id @default(uuid())
-  email      String    @unique
-  name       String?
-  password   String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  entries    Entry[]
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  settings  Json
+  entries   Entry[]
+  Tag       Tag[]
 }
 
 model Entry {
-  id            String    @id @default(uuid())
-  user          User
-  date          String
-  timezone      String
-  content       String
-  wordCount     Int
-  activityLogs  ActivityLog[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  tags          Tag[]
+  id           String        @id @default(uuid())
+  user         User          @relation(fields: [userId], references: [id])
+  date         String
+  timezone     String
+  content      String
+  wordCount    Int
+  activityLogs ActivityLog[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  tags         Tag[]
+  userId       String
 }
 
 model ActivityLog {
-  id               String    @id @default(uuid())
-  entry            Entry
-  content          String
-  lowestWordCount  Int
-  netWordCount     Int
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id              String   @id @default(uuid())
+  entry           Entry    @relation(fields: [entryId], references: [id])
+  content         String
+  lowestWordCount Int
+  netWordCount    Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  entryId         String
 }
 
 model Tag {
-  id            String    @id @default(uuid())
-  user          User
-  name          String
-  parent        Tag?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  parent    Tag?     @relation("TagToTag", fields: [tagId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Entry     Entry?   @relation(fields: [entryId], references: [id])
+  entryId   String?
+  userId    String
+  tagId     String?
+  Tag       Tag[]    @relation("TagToTag")
 }
