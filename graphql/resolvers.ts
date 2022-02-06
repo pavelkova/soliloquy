@@ -10,7 +10,7 @@ const authenticate = resolver => (_parent, _args, ctx) => {
 const resolvers: IResolvers = {
     Query: {
         findEntryByDate: authenticate(async (_parent, args, ctx) => {
-            return ctx.prisma.entry.findUnique({
+            return await ctx.prisma.entry.findUnique({
                 where: {
                     date: args.date,
                     User: {
@@ -20,7 +20,7 @@ const resolvers: IResolvers = {
             })
         }),
         findEntriesByDateSpan: authenticate(async (_parent, args, ctx) => {
-            return ctx.prisma.entry.findMany({
+            return await ctx.prisma.entry.findMany({
                 where: {
                     User: {
                         id: ctx.user.id
@@ -29,7 +29,7 @@ const resolvers: IResolvers = {
             })
         }),
         findAllEntries: authenticate(async (_parent, args, ctx) => {
-            return ctx.prisma.entry.findMany({
+            return await ctx.prisma.entry.findMany({
                 where: {
                     User: {
                         id: ctx.user.id
@@ -38,7 +38,7 @@ const resolvers: IResolvers = {
             })
         }),
         findAllTags: authenticate(async (_parent, _args, ctx) => {
-            return ctx.prisma.tags.findMany({
+            return await ctx.prisma.tags.findMany({
                 where: {
                     User: {
                         id: ctx.user.id
@@ -49,7 +49,7 @@ const resolvers: IResolvers = {
     },
     Mutation: {
         signup: async (_parent, args, ctx) => {
-            return ctx.prisma.user.create({
+            return await ctx.prisma.user.create({
                 data: { ...args }
             })
         },
@@ -60,7 +60,12 @@ const resolvers: IResolvers = {
             return
         }),
         updateUser: authenticate(async (_parent, args, ctx) => {
-            return
+            return await ctx.prisma.user.update({
+                where: {
+                    id: ctx.user.id
+                },
+                data: { ...args }
+            })
         }),
         createOrUpdateEntry: authenticate(async (_parent, args, ctx) => {
             return
@@ -69,17 +74,17 @@ const resolvers: IResolvers = {
             return
         }),
         createTag: authenticate(async (_parent, args, ctx) => {
-            return
+            return await ctx.prisma.tag.create()
         }),
         updateTag: authenticate(async (_parent, args, ctx) => {
             return
         }),
         deleteTag: authenticate(async (_parent, args, ctx) => {
-            return ctx.prisma.tag.delete({
+            return await ctx.prisma.tag.delete({
                 where: {
                     id: args.id,
                     User: {
-                        id: ctx.usr.id
+                        id: ctx.user.id
                     }
                 }
             })
