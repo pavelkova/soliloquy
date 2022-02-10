@@ -7,6 +7,50 @@ const authenticate = resolver => (_parent, _args, ctx) => {
     throw new Error('Not authenticated')
 }
 
+interface User {
+    id: string
+    email: string
+    name?: string
+    password: string
+    createdAt: Date
+    updatedAt: Date
+    settings: Settings
+}
+
+interface Settings {
+}
+
+interface Entry {
+    id: string
+    user: User
+    date: string
+    timezone: string
+    createdAt: Date
+    updatedAt: Date
+    activityLogs?: ActivityLog[]
+    tags?: Tag[]
+}
+
+interface ActivityLog {
+    id: string
+    entry: Entry
+    content: string
+    wordCount: number
+    lowestWordCount: number
+    createdAt: Date
+    updatedAt: Date
+}
+
+interface Tag {
+    id: string
+    user: User
+    name: string
+    parent?: Tag
+    children?: Tag[]
+    createdAt: Date
+    updatedAt: Date
+}
+
 const resolvers: IResolvers = {
     Query: {
         findEntryByDate: authenticate(async (_, { date }, ctx) => {
@@ -61,17 +105,25 @@ const resolvers: IResolvers = {
     },
     Mutation: {
         signup: async (_, { email, name, password, timezone}, ctx) => {
-            const hashedPassword = password
-
-            return await ctx.prisma.user.create({
-                data: { ...args }
-            })
+            try {
+                const hashedPassword = password
+                return await ctx.prisma.user.create({
+                    data: { ...args }
+                })
+            } catch (e) {
+            }
         },
-        login: async (_parent, args, ctx) => {
-            return
+        login: async (_, args, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
         },
-        logout: authenticate(async (_parent, _args, ctx) => {
-            return
+        logout: authenticate(async (_, _args, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
         }),
         updateUser: authenticate(async (_parent, args, ctx) => {
             return await ctx.prisma.user.update({
@@ -81,17 +133,30 @@ const resolvers: IResolvers = {
                 data: { ...args }
             })
         }),
-        createOrUpdateEntry: authenticate(async (_parent, { }, ctx) => {
-
-            return
+        createOrUpdateEntry: authenticate(async (_, { }, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
         }),
-        createOrUpdateLog: authenticate(async (_parent, args, ctx) => {
-            return
+        createOrUpdateLog: authenticate(async (_, args, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
         }),
-        createTag: authenticate(async (_parent, args, ctx) => {
+        createTag: authenticate(async (_, args, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
             return await ctx.prisma.tag.create()
         }),
-        updateTag: authenticate(async (_parent, args, ctx) => {
+        updateTag: authenticate(async (_, args, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
             return ctx.prisma.tag.update({
                 where: {
                     id: args.id,
@@ -102,32 +167,91 @@ const resolvers: IResolvers = {
                 data: { ...args }
             })
         }),
-        deleteTag: authenticate(async (_parent, args, ctx) => {
-            return
+        deleteTag: authenticate(async (_, args, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
         }),
-        addTagToEntry: authenticate(async (_parent, args, ctx) => {
-            return
+        addTagToEntry: authenticate(async (_, args, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
         }),
-        deleteTagFromEntry: authenticate(async (_parent, args, ctx) => {
-            return
+        deleteTagFromEntry: authenticate(async (_, args, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
         })
     },
     User: {
-        entries: {},
-        tags: {}
+        entries: async (user, {}, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
+        },
+        tags: async (user, {}, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
+        }
     },
     Entry: {
-        user: {},
-        activityLogs: {},
-        tags: {}
+        user: async (entry, {}, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
+        },
+        activityLogs: async (entry, {}, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
+        },
+        tags: async (entry, {}, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
+        }
     },
     ActivityLog: {
-        entry: {}
+        entry: async (activityLog, {}, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
+        }
     },
     Tag: {
-        user: {}
-        parent: {},
-        children: {},
-        entries: {}
+        user: async (tag, {}, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
+        },
+        parent: async (tag, {}, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
+        },
+        children: async (tag, {}, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
+        },
+        entries: async (tag, {}, ctx) => {
+            try {
+                return
+            } catch (e) {
+            }
+        }
     }
 }
