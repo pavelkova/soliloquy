@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt'
 import { IResolvers } from 'graphql-tools'
 
 const authenticate = resolver => (_parent, _args, ctx) => {
@@ -45,6 +46,7 @@ interface Tag {
     id: string
     user: User
     name: string
+
     parent?: Tag
     children?: Tag[]
     createdAt: Date
@@ -104,9 +106,9 @@ const resolvers: IResolvers = {
         }),
     },
     Mutation: {
-        signup: async (_, { email, name, password, timezone}, ctx) => {
+        signup: async (_, args, ctx) => {
             try {
-                const hashedPassword = password
+                const hashedPassword = args.password
                 return await ctx.prisma.user.create({
                     data: { ...args }
                 })
@@ -115,7 +117,14 @@ const resolvers: IResolvers = {
         },
         login: async (_, args, ctx) => {
             try {
-                return
+                const user = await ctx.prisma.user.findUnique({
+                    where: {
+                        email: args.email
+                    }
+                })
+                if (user) {
+                    return
+                }
             } catch (e) {
             }
         },
@@ -125,7 +134,7 @@ const resolvers: IResolvers = {
             } catch (e) {
             }
         }),
-        updateUser: authenticate(async (_parent, args, ctx) => {
+        updateUserSettings: authenticate(async (_, args, ctx) => {
             return await ctx.prisma.user.update({
                 where: {
                     id: ctx.user.id
@@ -133,9 +142,43 @@ const resolvers: IResolvers = {
                 data: { ...args }
             })
         }),
-        createOrUpdateEntry: authenticate(async (_, { }, ctx) => {
+        updateUserEmail: authenticate(async (_, args, ctx) => {
+            return await ctx.prisma.user.update({
+                where: {
+                    id: ctx.user.id
+                },
+                data: { ...args }
+            })
+        }),
+        updateUserPassword: authenticate(async (_, args, ctx) => {
+            return await ctx.prisma.user.update({
+                where: {
+                    id: ctx.user.id
+                },
+                data: { ...args }
+            })
+        }),
+        findOrCreateEntry: authenticate(async (_, args, ctx) => {
             try {
-                return
+                const entry = await ctx.prisma.entry.findUnique({
+                    where: {
+                        date: args.date,
+                        User: {
+                            id: ctx.user.id
+                        }
+                    }
+                })
+                if (entry) {
+                    return entry
+                } else {
+                    return await ctx.prisma.entry.create({ data: {
+                        date: args.date,
+                        timezone: args.timezone,
+                        User: {
+                            id: ctx.user.id
+                        }
+                    }})
+                }
             } catch (e) {
             }
         }),
