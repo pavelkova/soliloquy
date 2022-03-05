@@ -55,11 +55,11 @@ interface Tag {
 
 const resolvers: IResolvers = {
     Query: {
-        findEntryByDate: authenticate(async (_, { date }, ctx) => {
+        findEntryByDate: authenticate(async (_, { date }: { date: string }, ctx) => {
             try {
                 return await ctx.prisma.entry.findUnique({
                     where: {
-                        date: date,
+                        date,
                         User: {
                             id: ctx.user.id
                         }
@@ -70,6 +70,7 @@ const resolvers: IResolvers = {
         }),
         findEntriesByDateSpan: authenticate(async (_, args, ctx) => {
             try {
+                // TODO ref prisma documentation for date queries
                 return await ctx.prisma.entry.findMany({
                     where: {
                         User: {
@@ -93,6 +94,7 @@ const resolvers: IResolvers = {
             }
         }),
         findAllTags: authenticate(async (_, {}, ctx) => {
+            // DEBUG returning tag trees
             try {
                 return await ctx.prisma.tags.findMany({
                     where: {
@@ -106,59 +108,88 @@ const resolvers: IResolvers = {
         }),
     },
     Mutation: {
-        signup: async (_, args, ctx) => {
+        signup: async (_, args: { email: string, password: string, timezone?: string }, ctx) => {
             try {
-                const hashedPassword = args.password
-                return await ctx.prisma.user.create({
-                    data: { ...args }
+                const existingUser = await ctx.prisma.user.findUnique({
+                    where: {
+                        email: args.email
+                    }
                 })
+                if (existingUser) {
+                    throw new Error()
+                } else {
+                    const hashedPassword = args.password
+                    return await ctx.prisma.user.create({
+                        data: { email: args.email, password: hashedPassword }
+                    })
+                }
             } catch (e) {
             }
         },
-        login: async (_, args, ctx) => {
+        login: async (_, args: { email: string, password: string }, ctx) => {
             try {
                 const user = await ctx.prisma.user.findUnique({
                     where: {
                         email: args.email
                     }
                 })
-                if (user) {
-                    return
+                if (user && (args.password == user.password)) {
+                    // TODO login process: set cookie, add to ctx
+                } else {
+                    throw new Error("Invalid email or password.")
                 }
+                return user
             } catch (e) {
             }
         },
-        logout: authenticate(async (_, _args, ctx) => {
+        logout: authenticate(async (_, {}, ctx) => {
             try {
+                // TODO remove cookie, redirect
                 return
             } catch (e) {
             }
         }),
-        updateUserSettings: authenticate(async (_, args, ctx) => {
-            return await ctx.prisma.user.update({
-                where: {
-                    id: ctx.user.id
-                },
-                data: { ...args }
-            })
+        updateUserSettings: authenticate(async (_, args: Partial<Settings>, ctx) => {
+            try {
+                // FIXME this will overwrite entire settings block--submit all every update?
+                return await ctx.prisma.user.update({
+                    where: {
+                        id: ctx.user.id
+                    },
+                    data: { settings: args }
+                })
+                // update cookie/localStorage, current entry
+            } catch (e) {
+            }
         }),
-        updateUserEmail: authenticate(async (_, args, ctx) => {
-            return await ctx.prisma.user.update({
-                where: {
-                    id: ctx.user.id
-                },
-                data: { ...args }
-            })
+        updateUserEmail: authenticate(async (_, { email }: { email: string }, ctx) => {
+            try {
+                return await ctx.prisma.user.update({
+                    where: {
+                        id: ctx.user.id
+                    },
+                    data: { email }
+                })
+            } catch (e) {
+            }
         }),
-        updateUserPassword: authenticate(async (_, args, ctx) => {
-            return await ctx.prisma.user.update({
-                where: {
-                    id: ctx.user.id
-                },
-                data: { ...args }
-            })
+        updateUserPassword: authenticate(async (_, args: { oldPassword: string, newPassword: string }, ctx) => {
+            try {
+                // TODO passsword hashing
+                const hashedPassword = args.oldPassword
+                if (ctx.user.password == hashedPassword) {
+                    return await ctx.prisma.user.update({
+                        where: {
+                            id: ctx.user.id
+                        },
+                        data: { password: args.newPassword }
+                    })
+                }
+            } catch (e) {
+            }
         }),
-        findOrCreateEntry: authenticate(async (_, args, ctx) => {
+        findOrCreateEntry: authenticate(async (_, args: { date: string, timezone: string }, ctx) => {
+            // FIXME  ugly conditional
             try {
                 const entry = await ctx.prisma.entry.findUnique({
                     where: {
@@ -168,9 +199,7 @@ const resolvers: IResolvers = {
                         }
                     }
                 })
-                if (entry) {
-                    return entry
-                } else {
+                if (!entry) {
                     return await ctx.prisma.entry.create({ data: {
                         date: args.date,
                         timezone: args.timezone,
@@ -179,23 +208,60 @@ const resolvers: IResolvers = {
                         }
                     }})
                 }
+                return entry
             } catch (e) {
             }
         }),
-        createOrUpdateLog: authenticate(async (_, args, ctx) => {
+        // TEST -- to replace all log and entry create/update functions
+        
+        createOrUpdateEntry: authenticate(async (_, args: { date, timezone, dayEndsAt, activity: { start, end, content, wordCount, lowestWordCount } }, ctx) => {
+            // TODO make activityLog.start and entry unique property
             try {
-                return
+                return ctx.prisma.entry.upsert({
+                    data: {
+                        activityLog: {
+                            upsert: {
+                                create: { ...args.activity },
+                                update: {
+                                    end: args.activity.end,
+                                    content: args.activity.content,
+                                    wordCount: args.activity.wordCount,
+                                    lowestWordCount: args.activity.lowestWordCount
+                                }
+                            }
+                        }
+                    }
+                })
             } catch (e) {
             }
         }),
-        createTag: authenticate(async (_, args, ctx) => {
+        //
+        createLog: authenticate(async (_, args, ctx) => {
+            // TODO
             try {
-                return
+                return ctx.prisma.activityLog.create({
+                })
+            } catch (e) {
+            }
+        }),
+        updateOrCreateLog: authenticate(async (_, args, ctx) => {
+            try {
+                return ctx.prisma.activityLog.update({
+                })
+            } catch (e) {
+            }
+        }),
+        createTag: authenticate(async (_, { name, parentId = null }: { name: string, parentId?: number }, ctx) => {
+            try {
+                return ctx.prisma.tag.create({ data: {
+                    name,
+                    parentId
+                }})
             } catch (e) {
             }
             return await ctx.prisma.tag.create()
         }),
-        updateTag: authenticate(async (_, args, ctx) => {
+        updateTag: authenticate(async (_, args: { id: number, name: string, parentId?: number }, ctx) => {
             try {
                 return
             } catch (e) {
@@ -210,21 +276,63 @@ const resolvers: IResolvers = {
                 data: { ...args }
             })
         }),
-        deleteTag: authenticate(async (_, args, ctx) => {
+        deleteTag: authenticate(async (_, { id }: { id: number }, ctx) => {
+            // TODO handle cascading/reparenting
             try {
-                return
+                return await ctx.prisma.tag.delete({
+                    where: {
+                        id,
+                        User: {
+                            id: ctx.user.id
+                        }
+                    }
+                })
             } catch (e) {
             }
         }),
-        addTagToEntry: authenticate(async (_, args, ctx) => {
+        addTagToEntry: authenticate(async (_, args: { entryId: number, tagName: string }, ctx) => {
+            // TODO make tag name & user unique property
             try {
-                return
+                return await ctx.prisma.entry.update({
+                    where: {
+                        id: entryId,
+                        User: {
+                            id: ctx.user.id
+                        }
+                    },
+                    data: {
+                        tags: {
+                            connectOrCreate: {
+                                where: {
+                                    name: tagName
+                                },
+                                create: {
+                                    User: {
+                                        id: ctx.user.id
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
             } catch (e) {
             }
         }),
-        deleteTagFromEntry: authenticate(async (_, args, ctx) => {
+        deleteTagFromEntry: authenticate(async (_, args: { entryId: number, tagId: number }, ctx) => {
             try {
-                return
+                return await ctx.prisma.entry.update({
+                    where: {
+                        id: entryId
+                    },
+                    data: {
+                        tags: {
+                            disconnect: [{ id: tagId }]
+                        }
+                    },
+                    select: {
+                        tags: true
+                    }
+                })
             } catch (e) {
             }
         })
