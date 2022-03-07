@@ -55,7 +55,7 @@ interface Tag {
 
 const resolvers: IResolvers = {
     Query: {
-        findEntryByDate: authenticate(async (_, { date }: { date: string }, ctx) => {
+        findEntryByDate: authenticate(async (_, { date }: { date: string }, ctx): Promise<Entry> => {
             try {
                 return await ctx.prisma.entry.findUnique({
                     where: {
@@ -68,7 +68,7 @@ const resolvers: IResolvers = {
             } catch (e) {
             }
         }),
-        findEntriesByDateSpan: authenticate(async (_, args, ctx) => {
+        findEntriesByDateSpan: authenticate(async (_, args, ctx): Promise<Entry[]> => {
             try {
                 // TODO ref prisma documentation for date queries
                 return await ctx.prisma.entry.findMany({
@@ -81,7 +81,7 @@ const resolvers: IResolvers = {
             } catch (e) {
             }
         }),
-        findAllEntries: authenticate(async (_, {}, ctx) => {
+        findAllEntries: authenticate(async (_, {}, ctx): Promise<Entry[]> => {
             try {
                 return await ctx.prisma.entry.findMany({
                     where: {
@@ -93,7 +93,7 @@ const resolvers: IResolvers = {
             } catch (e) {
             }
         }),
-        findAllTags: authenticate(async (_, {}, ctx) => {
+        findAllTags: authenticate(async (_, {}, ctx): Promise<Tag[]> => {
             // DEBUG returning tag trees
             try {
                 return await ctx.prisma.tags.findMany({
@@ -108,7 +108,7 @@ const resolvers: IResolvers = {
         }),
     },
     Mutation: {
-        signup: async (_, args: { email: string, password: string, timezone?: string }, ctx) => {
+        signup: async (_, args: { email: string, password: string, timezone?: string }, ctx): Promise<User> => {
             try {
                 const existingUser = await ctx.prisma.user.findUnique({
                     where: {
@@ -126,7 +126,7 @@ const resolvers: IResolvers = {
             } catch (e) {
             }
         },
-        login: async (_, args: { email: string, password: string }, ctx) => {
+        login: async (_, args: { email: string, password: string }, ctx): Promise<User> => {
             try {
                 const user = await ctx.prisma.user.findUnique({
                     where: {
@@ -162,7 +162,7 @@ const resolvers: IResolvers = {
             } catch (e) {
             }
         }),
-        updateUserEmail: authenticate(async (_, { email }: { email: string }, ctx) => {
+        updateUserEmail: authenticate(async (_, { email }: { email: string }, ctx): Promise<User> => {
             try {
                 return await ctx.prisma.user.update({
                     where: {
@@ -173,7 +173,7 @@ const resolvers: IResolvers = {
             } catch (e) {
             }
         }),
-        updateUserPassword: authenticate(async (_, args: { oldPassword: string, newPassword: string }, ctx) => {
+        updateUserPassword: authenticate(async (_, args: { oldPassword: string, newPassword: string }, ctx): Promise<User> => {
             try {
                 // TODO passsword hashing
                 const hashedPassword = args.oldPassword
@@ -188,7 +188,7 @@ const resolvers: IResolvers = {
             } catch (e) {
             }
         }),
-        findOrCreateEntry: authenticate(async (_, args: { date: string, timezone: string }, ctx) => {
+        findOrCreateEntry: authenticate(async (_, args: { date: string, timezone: string }, ctx): Promise<Entry> => {
             // FIXME  ugly conditional
             try {
                 const entry = await ctx.prisma.entry.findUnique({
@@ -214,29 +214,32 @@ const resolvers: IResolvers = {
         }),
         // TEST -- to replace all log and entry create/update functions
         
-        createOrUpdateEntry: authenticate(async (_, args: { date, timezone, dayEndsAt, activity: { start, end, content, wordCount, lowestWordCount } }, ctx) => {
-            // TODO make activityLog.start and entry unique property
+        createOrUpdateEntry: authenticate(async (_, { date, timezone, activity }, ctx): Promise<Entry> => {
             try {
-                return ctx.prisma.entry.upsert({
-                    data: {
-                        activityLog: {
-                            upsert: {
-                                create: { ...args.activity },
-                                update: {
-                                    end: args.activity.end,
-                                    content: args.activity.content,
-                                    wordCount: args.activity.wordCount,
-                                    lowestWordCount: args.activity.lowestWordCount
-                                }
-                            }
-                        }
+                const entry = ctx.prisma.entry.upsert({
+                    where: {
+                        date,
+                        userId: ctx.user.id
+                    },
+                    update: {
+                        timezone,
+                        dayEndsAt: ctx.user.settings.dayEndsAt,
+                        updatedAt: Date.now()
+                    },
+                    create: {
+                        date,
+                        timezone,
+                        dayEndsAt: ctx.user.settings.dayEndsAt,
+                        userId: ctx.user.id
                     }
                 })
+                // TODO upsert activity log?
+                return entry
             } catch (e) {
             }
         }),
         //
-        createLog: authenticate(async (_, args, ctx) => {
+        createLog: authenticate(async (_, args, ctx): Promise<ActivityLog> => {
             // TODO
             try {
                 return ctx.prisma.activityLog.create({
@@ -244,14 +247,14 @@ const resolvers: IResolvers = {
             } catch (e) {
             }
         }),
-        updateOrCreateLog: authenticate(async (_, args, ctx) => {
+        updateOrCreateLog: authenticate(async (_, args, ctx): Promise<ActivityLog> => {
             try {
                 return ctx.prisma.activityLog.update({
                 })
             } catch (e) {
             }
         }),
-        createTag: authenticate(async (_, { name, parentId = null }: { name: string, parentId?: number }, ctx) => {
+        createTag: authenticate(async (_, { name, parentId = null }: { name: string, parentId?: number }, ctx): Promise<Tag> => {
             try {
                 return ctx.prisma.tag.create({ data: {
                     name,
@@ -261,7 +264,7 @@ const resolvers: IResolvers = {
             }
             return await ctx.prisma.tag.create()
         }),
-        updateTag: authenticate(async (_, args: { id: number, name: string, parentId?: number }, ctx) => {
+        updateTag: authenticate(async (_, args: { id: number, name: string, parentId?: number }, ctx): Promise<Tag> => {
             try {
                 return
             } catch (e) {
