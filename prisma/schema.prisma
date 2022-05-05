@@ -20,15 +20,16 @@ model User {
 }
 
 model Entry {
-  id           String        @id @default(uuid())
-  user         User          @relation(fields: [userId], references: [id])
-  date         DateTime      @db.Date
-  timezone     String
-  activityLogs ActivityLog[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  tags         Tag[]
-  userId       String
+  id              String        @id @default(uuid())
+  user            User          @relation(fields: [userId], references: [id])
+  date            DateTime      @db.Date
+  timezone        String
+  disableAnalysis Boolean
+  activityLogs    ActivityLog[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  tags            Tag[]
+  userId          String
 }
 
 model ActivityLog {
