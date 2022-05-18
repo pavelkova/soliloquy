@@ -65,6 +65,9 @@ const resolvers: IResolvers = {
             } catch (e) {
             }
         },
+        logout: (_, _, ctx) => {
+            return revokeUserToken(ctx)
+        },
         updatePassword: authenticate(async (_, args: { currentPassword: string, newPassword: string }, ctx): Promise<User> => {
             try {
                 return

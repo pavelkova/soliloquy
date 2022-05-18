@@ -64,6 +64,7 @@ export const revokeUserToken = (res: NextApiResponse) => {
   })
 }
 
+// AUTH WRAPPER
 export const authenticate = resolver => (root, args, ctx, info) => {
   if (ctx?.user) {
     return resolver(root, args, ctx, info)
